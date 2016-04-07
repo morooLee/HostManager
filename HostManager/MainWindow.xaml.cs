@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace HostManager
 {
@@ -25,9 +26,10 @@ namespace HostManager
     /// </summary>
     public partial class MainWindow : Window
     {
-        TreeViewModelController treeViewModelController = new TreeViewModelController();
-        HostIOController hostIOController = new HostIOController();
-        TreeViewModel treeViewModel = new TreeViewModel();
+        private TreeViewModelController treeViewModelController = new TreeViewModelController();
+        private HostIOController hostIOController = new HostIOController();
+        private TreeViewModel treeViewModel = new TreeViewModel();
+        private List<Node> tmpTreeViewNode = null;
 
         public MainWindow()
         {
@@ -169,10 +171,21 @@ namespace HostManager
         private void BindTree()
         {
             treeViewModel = hostIOController.HostLoad();
+
+            if (tmpTreeViewNode == null)
+            {
+                tmpTreeViewNode = new List<Node>();
+
+                foreach (Node item in treeViewModel.NodeList.ToList())
+                {
+                    tmpTreeViewNode.Add(item);
+                }
+            }
+
             HostsTreeView.ItemsSource = treeViewModel.NodeList;
         }
 
-        private void ChangeInfoLabel(String type, String msg, bool? setEdit)
+        private void ChangeInfoLabel(String type, String msg, bool setEdit)
         {
             String BackgroundColor = "";
             String ForegroundColor = "";
@@ -203,16 +216,60 @@ namespace HostManager
             InfoLabel.Foreground = (Brush)Conv.ConvertFromString(ForegroundColor);
             InfoLabel.Content = msg;
 
-            if (setEdit == true)
+            ChangeButtonUI(setEdit);
+        }
+
+        private void ChangeButtonUI(bool isChanged)
+        {
+            if (Apply_Button.IsEnabled != isChanged)
             {
-                Apply_Button.IsEnabled = true;
-                Cancle_Button.IsEnabled = true;
+                Apply_Button.IsEnabled = isChanged;
             }
-            else if (setEdit == false)
+
+            if (Cancle_Button.IsEnabled != isChanged)
             {
-                Apply_Button.IsEnabled = false;
-                Cancle_Button.IsEnabled = false;
+                Cancle_Button.IsEnabled = isChanged;
             }
+        }
+
+        private void CheckBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ChangeButtonUI(true);
+        }
+
+        private void Apply_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (hostIOController.HostSave(treeViewModel))
+            {
+                ChangeInfoLabel("Success", "적용되었습니다.", true);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "실패하였습니다.", true);
+            }
+
+            //tmpTreeViewNode.Clear();
+
+            //foreach (Node item in treeViewModel.NodeList.ToList().AsReadOnly())
+            //{
+            //    tmpTreeViewNode.Add(item);
+            //}
+            
+            ChangeButtonUI(false);
+        }
+
+        private void Cancle_Button_Click(object sender, RoutedEventArgs e)
+        {
+            treeViewModel.NodeList.Clear();
+
+            foreach (Node item in tmpTreeViewNode.ToList().AsReadOnly())
+            {
+                treeViewModel.NodeList.Add(item);
+            }
+
+            HostsTreeView.ItemsSource = treeViewModel.NodeList;
+
+            ChangeButtonUI(false);
         }
     }
 }

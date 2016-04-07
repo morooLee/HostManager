@@ -42,6 +42,8 @@ namespace HostManager.Models
     public class Node : INotifyPropertyChanged
     {
         private bool? _check = false;
+        private bool _isSelected = false;
+        private bool _isExpanded = false;
         private string _header = "";
         private string _tooltip = null;
         private Node _parentNode;
@@ -72,6 +74,30 @@ namespace HostManager.Models
             _header = header;
             _tooltip = tooltip;
             _nodeList = nodeList;
+        }
+
+        public bool IsSelected
+        {
+            get
+            {
+                return _isSelected;
+            }
+            set
+            {
+                _isSelected = value;
+            }
+        }
+
+        public bool IsExpanded
+        {
+            get
+            {
+                return _isExpanded;
+            }
+            set
+            {
+                _isExpanded = value;
+            }
         }
 
         public string Header

@@ -11,9 +11,15 @@
         <DockPanel.Resources>
             <src:TreeViewModel x:Key="TreeViewList"/>
 
-            <HierarchicalDataTemplate DataType = "{x:Type src:Node}" ItemsSource = "{Binding Path=NodeList}">
+            <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+                <Setter Property="IsExpanded" Value="{Binding Path:IsExpanded}" />
+                <Setter Property="IsSelected" Value="{Binding Path:IsSelected}" />
+                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+            </Style>
+
+            <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
                 <StackPanel Height="20" Orientation="Horizontal">
-                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" Loaded="CheckBox_Loaded"/>
+                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" Loaded="CheckBox_Loaded" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
                     <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="TextBlock_Loaded" TextInput="TextBlock_TextInput"></TextBlock>
                 </StackPanel>
             </HierarchicalDataTemplate>
@@ -43,13 +49,13 @@
                 </Border>
             </StackPanel>
             <StackPanel Grid.Column="2" MinWidth="66" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Name="Apply_Button" Margin="0,0,5,0" IsEnabled="False">적용</Button>
-                <Button Name="Cancle_Button" IsEnabled="False">취소</Button>
+                <Button Name="Apply_Button" Margin="0,0,5,0" IsEnabled="False" Click="Apply_Button_Click">적용</Button>
+                <Button Name="Cancle_Button" IsEnabled="False" Click="Cancle_Button_Click">취소</Button>
             </StackPanel>
         </DockPanel>
         <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
         <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
-        <TreeView Name="HostsTreeView" Padding="2,0,2,0" BorderThickness="0" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
+        <TreeView Name="HostsTreeView" Padding="2,0,2,0" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
 
         </TreeView>
     </DockPanel>
