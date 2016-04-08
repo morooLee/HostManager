@@ -12,14 +12,15 @@
             <src:TreeViewModel x:Key="TreeViewList"/>
 
             <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
-                <Setter Property="IsExpanded" Value="{Binding Path:IsExpanded}" />
+                <Setter Property="IsExpanded" Value="{Binding Path:IsExpanded, Mode=TwoWay}" />
                 <Setter Property="IsSelected" Value="{Binding Path:IsSelected}" />
                 <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                <EventSetter Event="KeyUp" Handler="OnKeyUp" />
             </Style>
 
             <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
                 <StackPanel Height="20" Orientation="Horizontal">
-                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" Loaded="CheckBox_Loaded" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
+                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" Loaded="CheckBox_Loaded" />
                     <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="TextBlock_Loaded" TextInput="TextBlock_TextInput"></TextBlock>
                 </StackPanel>
             </HierarchicalDataTemplate>
@@ -41,9 +42,9 @@
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <Border BorderThickness="1" BorderBrush="#FFABADB3">
                     <StackPanel Orientation="Horizontal">
-                        <TextBox MinWidth="200" BorderThickness="0"></TextBox>
-                        <Button Width="18" Background="White" BorderThickness="0" Margin="1" Focusable="False" IsTabStop="False">
-                            <Image Source="Resources/Search.png"></Image>
+                        <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0"></TextBox>
+                        <Button Name="SearchButton" Width="18" Background="White" BorderThickness="0" Margin="1" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                            <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
                         </Button>
                     </StackPanel>
                 </Border>
@@ -55,8 +56,6 @@
         </DockPanel>
         <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
         <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
-        <TreeView Name="HostsTreeView" Padding="2,0,2,0" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
-
-        </TreeView>
+        <TreeView Name="HostsTreeView" Padding="2,0,2,0" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged" />
     </DockPanel>
 </Window>

@@ -97,6 +97,7 @@ namespace HostManager.Models
             set
             {
                 _isExpanded = value;
+                this.OnPropertyChanged("IsExpanded");
             }
         }
 
