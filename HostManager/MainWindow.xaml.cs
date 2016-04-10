@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -66,6 +67,7 @@ namespace HostManager
             CheckBox ckb = (CheckBox)sender;
             StackPanel sp = (StackPanel)ckb.Parent;
             BrushConverter Conv = new BrushConverter();
+            Node node = sp.DataContext as Node;
 
             sp.Opacity = 1.0;
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
@@ -96,6 +98,206 @@ namespace HostManager
             sp.Opacity = 1.0;
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
             ckb.BorderBrush = (Brush)Conv.ConvertFromString("Red");
+        }
+
+        private void CheckBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            CheckBox ckb = (CheckBox)sender;
+            StackPanel sp = (StackPanel)ckb.Parent;
+            Node node = sp.DataContext as Node;
+
+            node.IsSelected = true;
+
+            ChangeInfoLabel("None", "", null);
+        }
+
+        private void TreeViewItem_KeyUp(object sender, KeyEventArgs e)
+        {
+            TreeViewItem item = sender as TreeViewItem;
+            Node node = item.DataContext as Node;
+
+            if (e.Key == Key.Space)
+            {
+                // ignore alt+space which invokes the system menu
+                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                {
+                    return;
+                }
+
+                if (item.IsSelected)
+                {
+                    if (e.OriginalSource == sender)
+                    {
+                        if (node.IsChecked == true)
+                        {
+                            node.IsChecked = false;
+                        }
+                        else
+                        {
+                            node.IsChecked = true;
+                        }
+                    }
+                }
+            }
+            else if (e.Key == Key.Enter && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
+            {
+                if (item.IsSelected)
+                {
+                    if (e.OriginalSource == sender)
+                    {
+                        if (node.IsChecked == true)
+                        {
+                            node.IsChecked = false;
+                        }
+                        else
+                        {
+                            node.IsChecked = true;
+                        }
+                    }
+                }
+            }
+            else if (e.Key == Key.Escape)
+            {
+                // ignore alt+space which invokes the system menu
+                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                {
+                    return;
+                }
+                                
+                if (SearchBox.Text != "" && SearchBox.Text != null)
+                {
+                    SearchButtonImage.Tag = "Cancle";
+                    SearchButton_Click(SearchButton, null);
+                }
+            }
+        }
+
+        private void TreeViewItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+        }
+
+        private void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+        }
+
+        private void TreeViewItem_Collapsed(object sender, RoutedEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+        }
+
+        private void Apply_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (hostIOController.HostSave(treeViewModel))
+            {
+                ChangeInfoLabel("Success", "적용되었습니다.", true);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "실패하였습니다.", true);
+            }
+
+            ChangeButtonUI(false);
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SearchButtonImage.Tag.ToString() == "Search")
+            {
+                if (SearchBox.Text == "")
+                {
+                    ChangeInfoLabel("Warning", "검색어를 입력하세요.", null);
+                }
+                else
+                {
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.UriSource = new Uri("Resources/Cancel.png", UriKind.Relative);
+                    bi.EndInit();
+                    SearchButtonImage.Source = bi;
+                    SearchButtonImage.Tag = "Cancle";
+
+                    int Count = 0;
+
+                    for (int i = 0; i < treeViewModel.NodeList.Count; i++)
+                    {
+                        Count += treeViewModel.NodeList[i].Search(SearchBox.Text);
+
+                    }
+
+                    if (Count == 0)
+                    {
+                        ChangeInfoLabel("Info", SearchBox.Text + "에 대한 검색 결과가 없습니다.", null);
+                    }
+                    else
+                    {
+                        FindTreeViewItem(HostsTreeView);
+                        ChangeInfoLabel("Info", Count + "개 검색되었습니다.", null);
+                    }
+                }
+            }
+            else
+            {
+                SearchBox.Text = "";
+
+                BitmapImage bi = new BitmapImage();
+                bi.BeginInit();
+                bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                bi.EndInit();
+                SearchButtonImage.Source = bi;
+                SearchButtonImage.Tag = "Search";
+
+                FindTreeViewItem(HostsTreeView);
+
+                ChangeInfoLabel("Info", "검색을 취소하였습니다.", null);
+            }
+        }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            BitmapImage bi = new BitmapImage();
+            bi.BeginInit();
+            bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+            bi.EndInit();
+            SearchButtonImage.Source = bi;
+            SearchButtonImage.Tag = "Search";
+        }
+
+        private void SearchBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                // ignore alt+space which invokes the system menu
+                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                {
+                    return;
+                }
+
+                SearchButtonImage.Tag = "Search";
+                SearchButton_Click(SearchButton, null);
+            }
+            else if ((e.Key == Key.Escape))
+            {
+                // ignore alt+space which invokes the system menu
+                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                {
+                    return;
+                }
+
+                SearchButtonImage.Tag = "Cancle";
+                SearchButton_Click(SearchButton, null);
+            }
+            else if (e.Key == Key.Return && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
+            {
+                SearchButtonImage.Tag = "Search";
+                SearchButton_Click(SearchButton, null);
+            }
+            else if (e.Key == Key.Escape && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
+            {
+                SearchButtonImage.Tag = "Cancle";
+                SearchButton_Click(SearchButton, null);
+            }
         }
 
         private void TextBlock_Loaded(object sender, RoutedEventArgs e)
@@ -175,29 +377,16 @@ namespace HostManager
 
             statusBar.Items.Clear();
             statusBar.Items.Add(sbText);
-            #endregion
-
-            item.IsSelected = true;
+            #endregion  
         }
 
         private void BindTree()
         {
             treeViewModel = hostIOController.HostLoad();
-
-            //if (tmpTreeViewNode == null)
-            //{
-            //    tmpTreeViewNode = new TreeViewModel();
-
-            //    foreach (Node item in treeViewModel.NodeList.ToList())
-            //    {
-            //        tmpTreeViewNode.Add(item);
-            //    }
-            //}
-
             HostsTreeView.ItemsSource = treeViewModel.NodeList;
         }
 
-        private void ChangeInfoLabel(String type, String msg, bool setEdit)
+        private void ChangeInfoLabel(String type, String msg, bool? setEdit)
         {
             String BackgroundColor = "";
             String ForegroundColor = "";
@@ -231,139 +420,81 @@ namespace HostManager
             ChangeButtonUI(setEdit);
         }
 
-        private void ChangeButtonUI(bool isChanged)
+        private void ChangeButtonUI(bool? isChanged)
         {
-            if (Apply_Button.IsEnabled != isChanged)
+            if (isChanged == null)
             {
-                Apply_Button.IsEnabled = isChanged;
+                return;
             }
-
-            if (Cancle_Button.IsEnabled != isChanged)
+            else if (isChanged == true)
             {
-                Cancle_Button.IsEnabled = isChanged;
-            }
-        }
-
-        private void Apply_Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (hostIOController.HostSave(treeViewModel))
-            {
-                ChangeInfoLabel("Success", "적용되었습니다.", true);
+                if (Apply_Button.IsEnabled != true)
+                {
+                    Apply_Button.IsEnabled = true;
+                }
             }
             else
             {
-                ChangeInfoLabel("Warning", "실패하였습니다.", true);
-            }
-
-            //tmpTreeViewNode.Clear();
-
-            //foreach (Node item in treeViewModel.NodeList.ToList().AsReadOnly())
-            //{
-            //    tmpTreeViewNode.Add(item);
-            //}
-            
-            ChangeButtonUI(false);
-        }
-
-        private void Cancle_Button_Click(object sender, RoutedEventArgs e)
-        {
-            //treeViewModel.NodeList.Clear();
-
-            //foreach (Node item in tmpTreeViewNode.ToList().AsReadOnly())
-            //{
-            //    treeViewModel.NodeList.Add(item);
-            //}
-
-            //HostsTreeView.ItemsSource = treeViewModel.NodeList;
-
-            ChangeInfoLabel("Warning", "취소하였습니다.", true);
-            ChangeButtonUI(false);
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            TreeViewItem item = sender as TreeViewItem;
-            Node node = item.DataContext as Node;
-
-            if (item.IsSelected)
-            {
-                if (e.OriginalSource == sender)
+                if (Apply_Button.IsEnabled != false)
                 {
-                    if (e.Key == Key.Space)
-                    {
-                        // ignore alt+space which invokes the system menu
-                        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
-                        {
-                            return;
-                        }
-
-                        node.IsChecked = !node.IsChecked;
-                    }
-                    else if (e.Key == Key.Enter && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
-                    {
-                        node.IsChecked = !node.IsChecked;
-                    }
+                    Apply_Button.IsEnabled = false;
                 }
             }
+        } 
+
+        public void FindTreeViewItem(DependencyObject obj)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                TreeViewItem treeViewItem = obj as TreeViewItem;
+                if (treeViewItem != null)
+                {
+                    HighlightText(treeViewItem);
+                }
+                FindTreeViewItem(VisualTreeHelper.GetChild(obj as DependencyObject, i));
+            }
         }
 
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        private void HighlightText(Object itx)
         {
-            if (SearchButtonImage.Tag.ToString() == "Search")
+            if (itx != null)
             {
-                if (SearchBox.Text == "")
+                if (itx is TextBlock)
                 {
-                    ChangeInfoLabel("Warning", "검색어를 입력하세요.", false);
+                    Regex regex = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
+                    TextBlock textBlock = itx as TextBlock;
+                    if (SearchBox.Text.Length == 0)
+                    {
+                        string str = textBlock.Text;
+                        textBlock.Inlines.Clear();
+                        textBlock.Inlines.Add(str);
+                        return;
+                    }
+                    string[] substrings = regex.Split(textBlock.Text);
+                    textBlock.Inlines.Clear();
+                    foreach (var item in substrings)
+                    {
+                        if (regex.Match(item).Success)
+                        {
+                            Run runx = new Run(item);
+                            runx.Background = Brushes.Red;
+                            runx.Foreground = Brushes.White;
+                            runx.FontWeight = FontWeights.Bold;
+                            textBlock.Inlines.Add(runx);
+                        }
+                        else
+                        {
+                            textBlock.Inlines.Add(item);
+                        }
+                    }
+                    return;
                 }
                 else
                 {
-                    BitmapImage bi = new BitmapImage();
-                    bi.BeginInit();
-                    bi.UriSource = new Uri("Resources/Cancel.png", UriKind.Relative);
-                    bi.EndInit();
-                    SearchButtonImage.Source = bi;
-                    SearchButtonImage.Tag = "Cancle";
-
-
-                    foreach (Node node in treeViewModel.NodeList)
+                    for (int i = 0; i < VisualTreeHelper.GetChildrenCount(itx as DependencyObject); i++)
                     {
-                        jumpToFolder(HostsTreeView, SearchBox.Text);
+                        HighlightText(VisualTreeHelper.GetChild(itx as DependencyObject, i));
                     }
-                }
-            }
-            else
-            {
-                SearchBox.Text = "";
-
-                BitmapImage bi = new BitmapImage();
-                bi.BeginInit();
-                bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
-                bi.EndInit();
-                SearchButtonImage.Source = bi;
-                SearchButtonImage.Tag = "Search";
-
-                ChangeInfoLabel("Info", "검색을 취소하였습니다.", false);
-            }
-            
-            Console.WriteLine(SearchBox.Text);
-        }
-
-        private void SearchTreeView(Node node)
-        {
-            if (node.Header.ToString().Contains(SearchBox.Text))
-            {
-                node.IsExpanded = true;
-            }
-            else
-            {
-                node.IsExpanded = true;
-            }
-
-            if (node.NodeList != null)
-            {
-                foreach (Node _node in node.NodeList)
-                {
-                    SearchTreeView(_node);
                 }
             }
         }

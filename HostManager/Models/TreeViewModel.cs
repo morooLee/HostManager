@@ -63,11 +63,6 @@ namespace HostManager.Models
             }
         }
 
-        public Node(string header) : this(false, header, null, null)
-        {
-
-        }
-
         public Node(bool? check, string header, string tooltip, ObservableCollection<Node> nodeList)
         {
             _check = check;
@@ -85,6 +80,7 @@ namespace HostManager.Models
             set
             {
                 _isSelected = value;
+                this.OnPropertyChanged("IsSelected");
             }
         }
 
@@ -97,7 +93,6 @@ namespace HostManager.Models
             set
             {
                 _isExpanded = value;
-                this.OnPropertyChanged("IsExpanded");
             }
         }
 
@@ -161,7 +156,59 @@ namespace HostManager.Models
             }
         }
 
-        void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
+        public int Search(String searchString)
+        {
+            int count = 0;
+
+            if (this.Header.ToUpper().Contains(searchString.ToUpper()))
+            {
+                count++;
+
+                if (_isExpanded != true)
+                {
+                    _isExpanded = true;
+                    this.OnPropertyChanged("IsExpanded");
+                }
+
+                if (_parentNode != null)
+                {
+                    _parentNode.ParentIsExpanded();
+                }
+            }
+            else
+            {
+                if (_isExpanded != false)
+                {
+                    _isExpanded = false;
+                    this.OnPropertyChanged("IsExpanded");
+                }
+            }
+            if (NodeList != null || NodeList.Count > 0)
+            {
+                foreach (Node node in this.NodeList)
+                {
+                    count += node.Search(searchString);
+                }
+            }
+
+            return count;
+        }
+
+        private void ParentIsExpanded()
+        {
+            if (_isExpanded != true)
+            {
+                _isExpanded = true;
+                this.OnPropertyChanged("IsExpanded");
+            }
+            
+            if (_parentNode != null)
+            {
+                _parentNode.ParentIsExpanded();
+            }
+        }
+
+        private void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
         {
             if (value == _check)
             {
@@ -186,7 +233,7 @@ namespace HostManager.Models
             this.OnPropertyChanged("IsChecked");
         }
 
-        void VerifyCheckedState()
+        private void VerifyCheckedState()
         {
             bool? state = null;
 
@@ -208,7 +255,7 @@ namespace HostManager.Models
             SetIsChecked(state, false, true);
         }
 
-        void OnPropertyChanged(string prop)
+        private void OnPropertyChanged(string prop)
         {
             if (this.PropertyChanged != null)
                 this.PropertyChanged(this, new PropertyChangedEventArgs(prop));
