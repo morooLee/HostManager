@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\InfoLabelModel.cs" />
+    <Compile Include="Models\ContextMenuModel.cs" />
     <Compile Include="Models\TreeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

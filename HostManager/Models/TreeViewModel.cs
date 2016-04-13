@@ -41,6 +41,7 @@ namespace HostManager.Models
 
     public class Node : INotifyPropertyChanged
     {
+        private bool _isLastNode = false;
         private bool? _check = false;
         private bool _isSelected = false;
         private bool _isExpanded = false;
@@ -69,6 +70,19 @@ namespace HostManager.Models
             _header = header;
             _tooltip = tooltip;
             _nodeList = nodeList;
+        }
+
+        public bool IsLastNode
+        {
+            get
+            {
+                return _isLastNode;
+            }
+            set
+            {
+                _isLastNode = value;
+                this.OnPropertyChanged("IsLastNode");
+            }
         }
 
         public bool IsSelected

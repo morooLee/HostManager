@@ -7,9 +7,21 @@
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
         Title="Moroo | Host Manager" x:Name="UI" Height="530" MinWidth="400" Icon="Resources/Sign_Icon.ico" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="UI_Loaded">
+    <Window.Resources>
+        
+    </Window.Resources>
+    
     <DockPanel>
         <DockPanel.Resources>
             <src:TreeViewModel x:Key="TreeViewList"/>
+            
+            <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=IsLastNode}" Value="true">
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
 
             <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -17,14 +29,28 @@
                 <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                 <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
                 <EventSetter Event="MouseLeftButtonUp" Handler="TreeViewItem_MouseLeftButtonUp" />
+                <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown" />
                 <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
                 <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed" />
             </Style>
 
+            <ContextMenu x:Key="TreeViewContext" >
+                <MenuItem Header="하위 항목에 추가" Style="{StaticResource MenuItemStyle}"/>
+                <MenuItem Header="현재 항목에 추가"/>
+                <MenuItem Header="선택한 항목 삭제"/>
+                <MenuItem Header="선택한 항목 변경"/>
+                <Separator/>
+                <MenuItem Header="위로 이동"/>
+                <MenuItem Header="아래로 이동"/>
+                <Separator/>
+                <MenuItem Header="복사하기"/>
+                <MenuItem Header="붙여넣기"/>
+            </ContextMenu>
+
             <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
-                <StackPanel Height="20" Orientation="Horizontal">
+                <StackPanel Height="20" Orientation="Horizontal" ContextMenu="{StaticResource TreeViewContext}">
                     <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" Loaded="CheckBox_Loaded" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
-                    <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="TextBlock_Loaded" TextInput="TextBlock_TextInput"></TextBlock>
+                    <TextBlock Name="HeaderText" Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="TextBlock_Loaded" TextInput="TextBlock_TextInput"></TextBlock>
                 </StackPanel>
             </HierarchicalDataTemplate>
         </DockPanel.Resources>

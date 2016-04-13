@@ -99,6 +99,7 @@ namespace HostManager.Controllers
                             }
                         }
 
+                        node.IsLastNode = true;
                         node.NodeList = null;
 
                         if (NodeDepth == 0)

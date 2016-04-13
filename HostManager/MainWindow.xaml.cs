@@ -177,6 +177,26 @@ namespace HostManager
             ChangeInfoLabel("None", "", null);
         }
 
+        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node != null)
+            {
+                node.IsSelected = true;
+                if (node.NodeList == null)
+                {
+                    Console.WriteLine("null");
+                }
+                else
+                {
+                    Console.WriteLine(node.NodeList.Count);
+                }
+                Console.WriteLine(node.Header);
+            }
+        }
+
         private void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
         {
             ChangeInfoLabel("None", "", null);
