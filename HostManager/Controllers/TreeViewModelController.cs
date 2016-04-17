@@ -14,7 +14,7 @@ namespace HostManager.Controllers
     {
         Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
 
-        public TreeViewModel ConverterTreeViewModelFromString(String hostTxt)
+        public TreeViewModel ConverterToTreeViewModel(String hostTxt)
         {
             TreeViewModel treeViewModel = new TreeViewModel();
             String[] tmpHostTxt = hostTxt.Split('\n');
@@ -190,38 +190,47 @@ namespace HostManager.Controllers
             return treeViewModel;
         }
 
-        public String ConverterStringFromTreeViewModel(TreeViewModel treeViewModel)
+        public String ConverterToString(TreeViewModel treeViewModel)
         {
+            String bagicText = "";
             String tmpText = "";
 
-            tmpText += "# Copyright (c) 1993-2009 Microsoft Corp.\r\n";
-            tmpText += "#\r\n";
-            tmpText += "# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.\r\n";
-            tmpText += "#\r\n";
-            tmpText += "# This file contains the mappings of IP addresses to host names. Each\r\n";
-            tmpText += "# entry should be kept on an individual line. The IP address should\r\n";
-            tmpText += "# be placed in the first column followed by the corresponding host name.\r\n";
-            tmpText += "# The IP address and the host name should be separated by at least one\r\n";
-            tmpText += "# space.\r\n";
-            tmpText += "#\r\n";
-            tmpText += "# Additionally, comments (such as these) may be inserted on individual\r\n";
-            tmpText += "# lines or following the machine name denoted by a '#' symbol.\r\n";
-            tmpText += "#\r\n";
-            tmpText += "# For example:\r\n";
-            tmpText += "#\r\n";
-            tmpText += "#      102.54.94.97     rhino.acme.com          # source server\r\n";
-            tmpText += "#       38.25.63.10     x.acme.com              # x client host\r\n";
-            tmpText += "\r\n";
-            tmpText += "# localhost name resolution is handled within DNS itself.\r\n";
-            tmpText += "\r\n";
-            tmpText += "\r\n";
-            tmpText += "# Edited By Moroo Host Manager (Do not delete this line.)\r\n";
-            tmpText += "\r\n";
+            bagicText += "# Copyright (c) 1993-2009 Microsoft Corp.\r\n";
+            bagicText += "#\r\n";
+            bagicText += "# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.\r\n";
+            bagicText += "#\r\n";
+            bagicText += "# This file contains the mappings of IP addresses to host names. Each\r\n";
+            bagicText += "# entry should be kept on an individual line. The IP address should\r\n";
+            bagicText += "# be placed in the first column followed by the corresponding host name.\r\n";
+            bagicText += "# The IP address and the host name should be separated by at least one\r\n";
+            bagicText += "# space.\r\n";
+            bagicText += "#\r\n";
+            bagicText += "# Additionally, comments (such as these) may be inserted on individual\r\n";
+            bagicText += "# lines or following the machine name denoted by a '#' symbol.\r\n";
+            bagicText += "#\r\n";
+            bagicText += "# For example:\r\n";
+            bagicText += "#\r\n";
+            bagicText += "#      102.54.94.97     rhino.acme.com          # source server\r\n";
+            bagicText += "#       38.25.63.10     x.acme.com              # x client host\r\n";
+            bagicText += "\r\n";
+            bagicText += "# localhost name resolution is handled within DNS itself.\r\n";
+            bagicText += "\r\n";
+            bagicText += "\r\n";
+            bagicText += "# Edited By Moroo Host Manager (Do not delete this line.)\r\n";
+            bagicText += "\r\n";
 
             foreach (Node item in treeViewModel.NodeList)
             {
                 tmpText += SetString(item);
             }
+
+            return bagicText + tmpText;
+        }
+
+        public String ConverterToString(Node node)
+        {
+            String tmpText = "";
+            tmpText += SetString(node);
 
             return tmpText;
         }
@@ -257,14 +266,20 @@ namespace HostManager.Controllers
             }
             else
             {
-                if (node.NodeList != null && regex.IsMatch(node.NodeList.FirstOrDefault().Header) == false)
+                if (tmpString != "")
                 {
-                    tmpString += "\r\n";
-                    tmpString += "\r\n";
-                }
-                else if (node.NodeList != null)
-                {
-                    tmpString += "\r\n";
+                    if (node.NodeList != null && regex.IsMatch(node.NodeList.FirstOrDefault().Header) == false)
+                    {
+                        if (tmpString != "")
+                        {
+                            tmpString += "\r\n";
+                            tmpString += "\r\n";
+                        }
+                    }
+                    else if (node.NodeList != null)
+                    {
+                        tmpString += "\r\n";
+                    }
                 }
 
                 if (node.Tooltip == null || node.Tooltip == "")

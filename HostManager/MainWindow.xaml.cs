@@ -179,21 +179,14 @@ namespace HostManager
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
+
             TreeViewItem treeViewItem = sender as TreeViewItem;
             Node node = treeViewItem.DataContext as Node;
 
             if (node != null)
             {
                 node.IsSelected = true;
-                if (node.NodeList == null)
-                {
-                    Console.WriteLine("null");
-                }
-                else
-                {
-                    Console.WriteLine(node.NodeList.Count);
-                }
-                Console.WriteLine(node.Header);
             }
         }
 
@@ -517,6 +510,70 @@ namespace HostManager
                     }
                 }
             }
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = new Node();
+            Console.WriteLine(node.ParentNode.Header);
+            node.ParentNode = menuItem.DataContext as Node;
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(null, menuItem.Header.ToString());
+            editTreeViewWindow.Owner = Application.Current.MainWindow;
+            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            editTreeViewWindow.ShowDialog();
+            editTreeViewWindow.Focus();
+        }
+
+        private void AddItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node newNode = new Node();
+            newNode.ParentNode = menuItem.DataContext as Node;
+
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(newNode, menuItem.Header.ToString());
+            editTreeViewWindow.Owner = Application.Current.MainWindow;
+            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            editTreeViewWindow.ShowDialog();
+            editTreeViewWindow.Focus();
+        }
+
+        private void AddChildItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = menuItem.DataContext as Node;
+            Node newNode = new Node();
+            newNode.ParentNode = node.ParentNode;
+
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(newNode, menuItem.Header.ToString());
+            editTreeViewWindow.Owner = Application.Current.MainWindow;
+            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            editTreeViewWindow.ShowDialog();
+            editTreeViewWindow.Focus();
+        }
+
+        private void EditItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = menuItem.DataContext as Node;
+
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, menuItem.Header.ToString());
+            editTreeViewWindow.ParentWindow = this;
+
+            editTreeViewWindow.Owner = Application.Current.MainWindow;
+            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            editTreeViewWindow.ShowDialog();
+            editTreeViewWindow.Focus();
+        }
+
+        private void DelItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public void ApplyEditNode(Node node)
+        {
+            Console.WriteLine(node.Header);
         }
     }
 }

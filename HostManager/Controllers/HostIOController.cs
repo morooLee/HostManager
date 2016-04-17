@@ -22,7 +22,7 @@ namespace HostManager.Controllers
                 TreeViewModel treeViewModel = new TreeViewModel();
                 StreamReader streamReader = new StreamReader(@"C:\Windows\System32\drivers\etc\Hosts");
 
-                treeViewModel = treeViewModelController.ConverterTreeViewModelFromString(streamReader.ReadToEnd());
+                treeViewModel = treeViewModelController.ConverterToTreeViewModel(streamReader.ReadToEnd());
                 streamReader.Close();
 
                 return treeViewModel;
@@ -39,7 +39,7 @@ namespace HostManager.Controllers
         {
             if (treeViewModel != null)
             {
-                String HostTxt = treeViewModelController.ConverterStringFromTreeViewModel(treeViewModel);
+                String HostTxt = treeViewModelController.ConverterToString(treeViewModel);
 
                 try
                 {

@@ -1,0 +1,72 @@
+﻿<Window x:Class="HostManager.EditTreeViewHelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HostManager"
+        mc:Ignorable="d"
+        Title="작성법 도움말" Height="200" Width="400" Icon="Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"></ColumnDefinition>
+            <ColumnDefinition Width="2"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Margin="5" Header="작성 예시">
+                <StackPanel>
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{기본          #윈도우 기본 호스트" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#127.0.0.1     LocalHost   #루프백 아이피" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#}}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Margin="5" Header="적용 시">
+                <TreeView BorderThickness="0">
+                    <TreeViewItem ToolTip="윈도우 기본 호스트" IsExpanded="True">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" />
+                                <TextBlock Height="18" Text="기본" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                        <TreeViewItem ToolTip="루프백 아이피">
+                            <TreeViewItem.Header>
+                                <StackPanel Height="18" Orientation="Horizontal">
+                                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" />
+                                    <TextBlock Height="18" Text="127.0.0.1     LocalHost" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </TreeViewItem.Header>
+                        </TreeViewItem>
+                    </TreeViewItem>
+                </TreeView>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="1" Margin="0, 5, 0, 5" Background="LightGray">
+            
+        </Grid>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Margin="5" Header="항목 작성법">
+                <StackPanel>
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{항목명  #도움말" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#}}" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{항목명" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#}}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Margin="5" Header="호스트 작성법">
+                <StackPanel>
+                    <TextBlock FontSize="10" Foreground="Gray" Text="127.0.0.1  도메인  #도움말" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="127.0.0.1  도메인" />
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>

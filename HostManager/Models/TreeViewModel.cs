@@ -140,6 +140,10 @@ namespace HostManager.Models
             {
                 return _parentNode;
             }
+            set
+            {
+                _parentNode = value;
+            }
         }
 
         public ObservableCollection<Node> NodeList
