@@ -119,6 +119,7 @@ namespace HostManager.Models
             set
             {
                 _header = value;
+                this.OnPropertyChanged("Header");
             }
         }
 
@@ -131,6 +132,7 @@ namespace HostManager.Models
             set
             {
                 _tooltip = value;
+                this.OnPropertyChanged("Tooltip");
             }
         }
 

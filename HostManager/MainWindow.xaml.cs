@@ -30,7 +30,7 @@ namespace HostManager
         private TreeViewModelController treeViewModelController = new TreeViewModelController();
         private HostIOController hostIOController = new HostIOController();
         private TreeViewModel treeViewModel = new TreeViewModel();
-        private TreeViewModel tmpTreeViewNode = null;
+        public Node editNode = null;
 
         public MainWindow()
         {
@@ -512,44 +512,67 @@ namespace HostManager
             }
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void AddChildItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node node = new Node();
-            Console.WriteLine(node.ParentNode.Header);
-            node.ParentNode = menuItem.DataContext as Node;
+            Node node = menuItem.DataContext as Node;
+
             EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(null, menuItem.Header.ToString());
             editTreeViewWindow.Owner = Application.Current.MainWindow;
             editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             editTreeViewWindow.ShowDialog();
-            editTreeViewWindow.Focus();
+
+            if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+            {
+                editTreeViewWindow.treeViewModel.NodeList.Reverse();
+
+                foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
+                {
+                    item.ParentNode = node;
+                    node.NodeList.Insert(0, item);
+                }
+
+                ChangeInfoLabel("Success", "하위 항목에 추가되었습니다.", null);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+            }
+
+            editTreeViewWindow.treeViewModel = null;
+            editTreeViewWindow.Close();
         }
 
         private void AddItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node newNode = new Node();
-            newNode.ParentNode = menuItem.DataContext as Node;
+            Node childNode = menuItem.DataContext as Node;
+            Node parentNode = childNode.ParentNode;
 
-            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(newNode, menuItem.Header.ToString());
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(null, menuItem.Header.ToString());
             editTreeViewWindow.Owner = Application.Current.MainWindow;
             editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             editTreeViewWindow.ShowDialog();
-            editTreeViewWindow.Focus();
-        }
 
-        private void AddChildItem_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node node = menuItem.DataContext as Node;
-            Node newNode = new Node();
-            newNode.ParentNode = node.ParentNode;
+            if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+            {
+                editTreeViewWindow.treeViewModel.NodeList.Reverse();
 
-            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(newNode, menuItem.Header.ToString());
-            editTreeViewWindow.Owner = Application.Current.MainWindow;
-            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            editTreeViewWindow.ShowDialog();
-            editTreeViewWindow.Focus();
+                foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
+                {
+                    item.ParentNode = menuItem.DataContext as Node;
+                    parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                }
+
+                ChangeInfoLabel("Success", "현재 항목에 추가되었습니다.", null);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+            }
+
+            editTreeViewWindow.treeViewModel = null;
+            editTreeViewWindow.Close();
         }
 
         private void EditItem_Click(object sender, RoutedEventArgs e)
@@ -558,22 +581,27 @@ namespace HostManager
             Node node = menuItem.DataContext as Node;
 
             EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, menuItem.Header.ToString());
-            editTreeViewWindow.ParentWindow = this;
-
             editTreeViewWindow.Owner = Application.Current.MainWindow;
             editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             editTreeViewWindow.ShowDialog();
-            editTreeViewWindow.Focus();
+
+            if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+            {
+                node = editTreeViewWindow.treeViewModel.NodeList.ElementAt(0);
+                ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", null);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+            }
+
+            editTreeViewWindow.treeViewModel = null;
+            editTreeViewWindow.Close();
         }
 
         private void DelItem_Click(object sender, RoutedEventArgs e)
         {
 
-        }
-
-        public void ApplyEditNode(Node node)
-        {
-            Console.WriteLine(node.Header);
         }
     }
 }

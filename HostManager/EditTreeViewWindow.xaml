@@ -63,11 +63,7 @@
 
                         <GroupBox Margin="0, 5, 0, 5">
                             <GroupBox.Header>
-                                <RadioButton x:Name="CategoryRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold">
-                                    <RadioButton.Content>
-                                        <TextBlock>카테고리</TextBlock>
-                                    </RadioButton.Content>
-                                </RadioButton>
+                                <RadioButton x:Name="CategoryRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="카테고리"/>
                             </GroupBox.Header>
                             <StackPanel Style="{StaticResource CategoryIsEnabledStyle}">
                                 <StackPanel Margin="5" Orientation="Horizontal">
@@ -82,11 +78,7 @@
                         </GroupBox>
                         <GroupBox Margin="0, 5, 0, 5">
                             <GroupBox.Header>
-                                <RadioButton x:Name="HostRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold">
-                                    <RadioButton.Content>
-                                        <TextBlock>호스트</TextBlock>
-                                    </RadioButton.Content>
-                                </RadioButton>
+                                <RadioButton x:Name="HostRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="호스트"/>
                             </GroupBox.Header>
                             <StackPanel Style="{StaticResource HostIsEnabledStyle}">
                                 <StackPanel Margin="5" Orientation="Horizontal">

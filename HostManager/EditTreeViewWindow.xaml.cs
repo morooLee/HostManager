@@ -22,8 +22,8 @@ namespace HostManager
     /// </summary>
     public partial class EditTreeViewWindow : Window
     {
-        public Node node = null;
-        public MainWindow ParentWindow;
+        public TreeViewModel treeViewModel = new TreeViewModel();
+        private Node tmpNode = null;
         TreeViewModelController treeViewModelController = new TreeViewModelController();
 
         public EditTreeViewWindow(Node node, String stringTitle)
@@ -32,7 +32,7 @@ namespace HostManager
             this.Title = stringTitle;
             if (node != null)
             {
-                this.node = node;
+                tmpNode = node;
             }
         }
 
@@ -47,28 +47,32 @@ namespace HostManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (this.node != null)
+            if (tmpNode != null)
             {
-                String nodeString = treeViewModelController.ConverterToString(this.node);
+                String nodeString = treeViewModelController.ConverterToString(tmpNode);
                 DirectEditTextBox.AppendText(nodeString);
                 
-                if (this.node.IsLastNode)
+                if (tmpNode.IsLastNode)
                 {
                     Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
 
-                    String stringIP = regex.Match(this.node.Header).Value;
-                    String stringDomain = this.node.Header.Replace(stringIP, "").Replace("\t", "").Trim();
+                    String stringIP = regex.Match(tmpNode.Header).Value;
+                    String stringDomain = tmpNode.Header.Replace(stringIP, "").Replace("\t", "").Trim();
 
                     HostRadioButton.IsChecked = true;
                     HostIPTextBox.Text = stringIP;
                     HostDomainTextBox.Text = stringDomain;
-                    HostTooltipTextBox.Text = this.node.Tooltip;
+                    HostTooltipTextBox.Text = tmpNode.Tooltip;
+                    CategoryRadioButton.IsEnabled = false;
+                    CategoryRadioButton.Foreground = Brushes.Gray;
                 }
                 else
                 {
                     CategoryRadioButton.IsChecked = true;
-                    CategoryNameTextBox.Text = this.node.Header;
-                    CategoryTooltipTextBox.Text = this.node.Tooltip;
+                    CategoryNameTextBox.Text = tmpNode.Header;
+                    CategoryTooltipTextBox.Text = tmpNode.Tooltip;
+                    HostRadioButton.IsEnabled = false;
+                    HostRadioButton.Foreground = Brushes.Gray;
                 }
             }
         }
@@ -92,31 +96,43 @@ namespace HostManager
         {
             if (TextTabItem.IsSelected)
             {
-                TreeViewModel treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEditTextBox.Text);
+                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEditTextBox.Text);
             }
             else
             {
+                if (tmpNode == null)
+                {
+                    tmpNode = new Node();
+                }
+
                 if (CategoryRadioButton.IsChecked == true)
                 {
-                    node.Header = CategoryNameTextBox.Text;
-                    node.IsLastNode = false;
-                    node.Tooltip = CategoryTooltipTextBox.Text;
+                    tmpNode.Header = CategoryNameTextBox.Text;
+                    tmpNode.IsLastNode = false;
+                    if (CategoryTooltipTextBox.Text != "")
+                    {
+                        tmpNode.Tooltip = CategoryTooltipTextBox.Text;
+                    }
                 }
                 else
                 {
                     if (HostIPTextBox.Text.Length < 16)
                     {
-                        node.Header = HostIPTextBox.Text + "\t\t" + HostDomainTextBox.Text;
+                        tmpNode.Header = HostIPTextBox.Text + "\t\t" + HostDomainTextBox.Text;
                     }
                     else
                     {
-                        node.Header = HostIPTextBox.Text + "\t" + HostDomainTextBox.Text;
+                        tmpNode.Header = HostIPTextBox.Text + "\t" + HostDomainTextBox.Text;
                     }
-                    node.IsLastNode = true;
-                    node.Tooltip = HostTooltipTextBox.Text;
+                    tmpNode.IsLastNode = true;
+                    if (HostTooltipTextBox.Text != "")
+                    {
+                        tmpNode.Tooltip = HostTooltipTextBox.Text;
+                    }
                 }
             }
-            ((MainWindow)(this.Owner)).ApplyEditNode(node);
+
+            treeViewModel.NodeList.Add(tmpNode);
             Close();
         }
 

@@ -192,39 +192,14 @@ namespace HostManager.Controllers
 
         public String ConverterToString(TreeViewModel treeViewModel)
         {
-            String bagicText = "";
             String tmpText = "";
-
-            bagicText += "# Copyright (c) 1993-2009 Microsoft Corp.\r\n";
-            bagicText += "#\r\n";
-            bagicText += "# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.\r\n";
-            bagicText += "#\r\n";
-            bagicText += "# This file contains the mappings of IP addresses to host names. Each\r\n";
-            bagicText += "# entry should be kept on an individual line. The IP address should\r\n";
-            bagicText += "# be placed in the first column followed by the corresponding host name.\r\n";
-            bagicText += "# The IP address and the host name should be separated by at least one\r\n";
-            bagicText += "# space.\r\n";
-            bagicText += "#\r\n";
-            bagicText += "# Additionally, comments (such as these) may be inserted on individual\r\n";
-            bagicText += "# lines or following the machine name denoted by a '#' symbol.\r\n";
-            bagicText += "#\r\n";
-            bagicText += "# For example:\r\n";
-            bagicText += "#\r\n";
-            bagicText += "#      102.54.94.97     rhino.acme.com          # source server\r\n";
-            bagicText += "#       38.25.63.10     x.acme.com              # x client host\r\n";
-            bagicText += "\r\n";
-            bagicText += "# localhost name resolution is handled within DNS itself.\r\n";
-            bagicText += "\r\n";
-            bagicText += "\r\n";
-            bagicText += "# Edited By Moroo Host Manager (Do not delete this line.)\r\n";
-            bagicText += "\r\n";
 
             foreach (Node item in treeViewModel.NodeList)
             {
                 tmpText += SetString(item);
             }
 
-            return bagicText + tmpText;
+            return tmpText;
         }
 
         public String ConverterToString(Node node)

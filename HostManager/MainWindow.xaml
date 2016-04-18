@@ -35,8 +35,8 @@
             </Style>
 
             <ContextMenu x:Key="TreeViewContext">
-                <MenuItem Name="AddItem" Header="하위 항목에 추가" Style="{StaticResource MenuItemStyle}" DataContext="{Binding}" Click="AddItem_Click" />
-                <MenuItem Name="AddChildItem" Header="현재 항목에 추가" DataContext="{Binding}" Click="AddChildItem_Click" />
+                <MenuItem Name="AddItem" Header="하위 항목에 추가" Style="{StaticResource MenuItemStyle}" DataContext="{Binding}" Click="AddChildItem_Click" />
+                <MenuItem Name="AddChildItem" Header="현재 항목에 추가" DataContext="{Binding}" Click="AddItem_Click" />
                 <MenuItem Name="EditItem" Header="선택한 항목 수정" DataContext="{Binding}" Click="EditItem_Click" />
                 <MenuItem Name="DelItem" Header="선택한 항목 삭제" DataContext="{Binding}" Click="DelItem_Click" />
                 <Separator/>
