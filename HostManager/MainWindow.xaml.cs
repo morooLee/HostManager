@@ -30,7 +30,6 @@ namespace HostManager
         private TreeViewModelController treeViewModelController = new TreeViewModelController();
         private HostIOController hostIOController = new HostIOController();
         private TreeViewModel treeViewModel = new TreeViewModel();
-        public Node editNode = null;
 
         public MainWindow()
         {
@@ -73,7 +72,7 @@ namespace HostManager
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
             ckb.BorderBrush = (Brush)Conv.ConvertFromString("Red");
 
-            ChangeButtonUI(true);
+            ChangeInfoLabel("None", "", true);
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -86,7 +85,7 @@ namespace HostManager
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
             ckb.BorderBrush = (Brush)Conv.ConvertFromString("Black");
 
-            ChangeButtonUI(true);
+            ChangeInfoLabel("None", "", true);
         }
 
         private void CheckBox_Indeterminate(object sender, RoutedEventArgs e)
@@ -107,8 +106,6 @@ namespace HostManager
             Node node = sp.DataContext as Node;
 
             node.IsSelected = true;
-
-            ChangeInfoLabel("None", "", null);
         }
 
         private void TreeViewItem_KeyUp(object sender, KeyEventArgs e)
@@ -172,15 +169,35 @@ namespace HostManager
             }
         }
 
-        private void TreeViewItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void TreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            ChangeInfoLabel("None", "", null);
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node.IsLastNode && node.IsSelected)
+            {
+                EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, "선택한 항목 수정");
+                editTreeViewWindow.Owner = Application.Current.MainWindow;
+                editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                editTreeViewWindow.ShowDialog();
+
+                if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+                {
+                    node = editTreeViewWindow.treeViewModel.NodeList.ElementAt(0);
+                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", null);
+                }
+                else
+                {
+                    ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+                }
+
+                editTreeViewWindow.treeViewModel = null;
+                editTreeViewWindow.Close();
+            }
         }
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ChangeInfoLabel("None", "", null);
-
             TreeViewItem treeViewItem = sender as TreeViewItem;
             Node node = treeViewItem.DataContext as Node;
 
@@ -192,12 +209,24 @@ namespace HostManager
 
         private void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
         {
-            ChangeInfoLabel("None", "", null);
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node.IsLastNode == false)
+            {
+                ChangeInfoLabel("None", "", null);
+            }
         }
 
         private void TreeViewItem_Collapsed(object sender, RoutedEventArgs e)
         {
-            ChangeInfoLabel("None", "", null);
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node.IsLastNode == false)
+            {
+                ChangeInfoLabel("None", "", null);
+            }
         }
 
         private void Apply_Button_Click(object sender, RoutedEventArgs e)
@@ -391,12 +420,19 @@ namespace HostManager
             statusBar.Items.Clear();
             statusBar.Items.Add(sbText);
             #endregion  
+
+            ChangeInfoLabel("None", "", null);
         }
 
         private void BindTree()
         {
             treeViewModel = hostIOController.HostLoad();
             HostsTreeView.ItemsSource = treeViewModel.NodeList;
+
+            if (treeViewModel.NodeList.Count == 0)
+            {
+                ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+            }
         }
 
         private void ChangeInfoLabel(String type, String msg, bool? setEdit)

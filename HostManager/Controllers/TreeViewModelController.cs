@@ -6,18 +6,22 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace HostManager.Controllers
 {
     class TreeViewModelController
     {
-        Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
+        private Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
 
         public TreeViewModel ConverterToTreeViewModel(String hostTxt)
         {
             TreeViewModel treeViewModel = new TreeViewModel();
             String[] tmpHostTxt = hostTxt.Split('\n');
+            String LostTxt = "";
+            int OpenNode = 0;
+            int CloseNode = 0;
 
             if (tmpHostTxt.Length != 0)
             {
@@ -45,6 +49,7 @@ namespace HostManager.Controllers
 
                         nodeList.Add(node);
                         NodeDepth++;
+                        OpenNode++;
                     }
                     #endregion
 
@@ -119,7 +124,14 @@ namespace HostManager.Controllers
                         NodeDepth--;
                         int CheckCount = 0;
 
-                        if (NodeDepth > 0)
+                        if (NodeDepth < 0)
+                        {
+                            MessageBox.Show("카테고리 구성에 실패하였습니다.", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+
+                            treeViewModel.NodeList.Clear();
+                            return treeViewModel;
+                        }
+                        else if (NodeDepth > 0)
                         {
                             Node tmpNode = new Node();
                             tmpNode = nodeList.Last();
@@ -147,8 +159,9 @@ namespace HostManager.Controllers
 
                             nodeList.Remove(nodeList.Last());
                             nodeList.Last().NodeList.Add(tmpNode);
+                            CloseNode++;
                         }
-                        else if (NodeDepth == 0)
+                        else
                         {
                             foreach (Node item in nodeList.Last().NodeList)
                             {
@@ -173,21 +186,54 @@ namespace HostManager.Controllers
 
                             treeViewModel.NodeList.Add(nodeList.Last());
                             nodeList.Remove(nodeList.Last());
+                            CloseNode++;
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (tmpHostTxt[i].Replace("\r", "").Replace("\n", "").Trim() != "")
                         {
-                            Console.WriteLine("열려 있는 노드가 없는데 닫는 문장이 입력");
+                            LostTxt += (i + 1) +"\t" + tmpHostTxt[i];
                         }
                     }
                     #endregion
                 }
+
+                if (OpenNode != CloseNode)
+                {
+                    MessageBox.Show("카테고리 구성에 실패하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    treeViewModel.NodeList.Clear();
+                    return treeViewModel;
+                }
+                else if (LostTxt != "")
+                {
+                    MessageBox.Show("변환 중 형식에 어긋나 포함되지 않은 내역\r\n\r\n줄번호\t텍스트 내용\r\n" + LostTxt, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show("변환된 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                treeViewModel.NodeList.Clear();
+                return treeViewModel;
             }
 
-            foreach (Node item in treeViewModel.NodeList)
+            if (treeViewModel == null || treeViewModel.NodeList.Count == 0)
             {
-                item.Initialize();
+                MessageBox.Show("변환된 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                treeViewModel.NodeList.Clear();
+                return treeViewModel;
             }
-            return treeViewModel;
+            else
+            {
+                foreach (Node item in treeViewModel.NodeList)
+                {
+                    item.Initialize();
+                }
+                return treeViewModel;
+            }
         }
 
         public String ConverterToString(TreeViewModel treeViewModel)

@@ -23,8 +23,8 @@ namespace HostManager
     public partial class EditTreeViewWindow : Window
     {
         public TreeViewModel treeViewModel = new TreeViewModel();
+        private TreeViewModelController treeViewModelController = new TreeViewModelController();
         private Node tmpNode = null;
-        TreeViewModelController treeViewModelController = new TreeViewModelController();
 
         public EditTreeViewWindow(Node node, String stringTitle)
         {
@@ -96,7 +96,21 @@ namespace HostManager
         {
             if (TextTabItem.IsSelected)
             {
-                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEditTextBox.Text);
+                if (DirectEditTextBox.Text.Trim() == "")
+                {
+                    MessageBox.Show("입력된 내용이 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else
+                {
+                    treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEditTextBox.Text);
+
+                    if (treeViewModel.NodeList.Count == 0)
+                    {
+                        //MessageBox.Show("변환된 내용이 없습니다.\r\n작성된 내용을 확인하세요.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
             }
             else
             {
@@ -107,32 +121,70 @@ namespace HostManager
 
                 if (CategoryRadioButton.IsChecked == true)
                 {
-                    tmpNode.Header = CategoryNameTextBox.Text;
-                    tmpNode.IsLastNode = false;
-                    if (CategoryTooltipTextBox.Text != "")
+                    if (CategoryNameTextBox.Text == "")
                     {
-                        tmpNode.Tooltip = CategoryTooltipTextBox.Text;
-                    }
-                }
-                else
-                {
-                    if (HostIPTextBox.Text.Length < 16)
-                    {
-                        tmpNode.Header = HostIPTextBox.Text + "\t\t" + HostDomainTextBox.Text;
+                        MessageBox.Show("항목명을 입력하세요.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
                     else
                     {
-                        tmpNode.Header = HostIPTextBox.Text + "\t" + HostDomainTextBox.Text;
+                        tmpNode.Header = CategoryNameTextBox.Text;
+                        tmpNode.IsLastNode = false;
+
+                        if (CategoryTooltipTextBox.Text != "")
+                        {
+                            tmpNode.Tooltip = CategoryTooltipTextBox.Text;
+                        }
                     }
+                }
+                else if (HostRadioButton.IsChecked == true)
+                {
+                    Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
+
+                    if (regex.IsMatch(HostIPTextBox.Text))
+                    {
+                        if (HostDomainTextBox.Text == "")
+                        {
+                            MessageBox.Show("도메인을 입력하세요.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        else
+                        {
+                            if (HostIPTextBox.Text.Length < 16)
+                            {
+                                tmpNode.Header = HostIPTextBox.Text + "\t\t" + HostDomainTextBox.Text;
+                            }
+                            else
+                            {
+                                tmpNode.Header = HostIPTextBox.Text + "\t" + HostDomainTextBox.Text;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("IP주소를 입력하지 않았거나 형식에 어긋납니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    
                     tmpNode.IsLastNode = true;
+
                     if (HostTooltipTextBox.Text != "")
                     {
                         tmpNode.Tooltip = HostTooltipTextBox.Text;
                     }
                 }
+                else
+                {
+                    MessageBox.Show("작성된 내용이 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
 
-            treeViewModel.NodeList.Add(tmpNode);
+            if (tmpNode != null)
+            {
+                treeViewModel.NodeList.Add(tmpNode);
+            }
+            
             Close();
         }
 

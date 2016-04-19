@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HostManager"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Height="300" Width="300" Icon="Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
+        Height="330" Width="300" MinHeight="330" MinWidth="300" Icon="Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="CanResizeWithGrip" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -16,8 +16,8 @@
             <TabItem Name="TextTabItem" Header="텍스트로 작성하기">
                 <TabItem.Content>
                     <DockPanel>
-                        <StackPanel DockPanel.Dock="Top" Margin="0, 5, 0, 5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                            <Button Background="White" Foreground="#31708F" BorderThickness="0" Margin="0, 0, 45, 0" Click="Button_Click">
+                        <DockPanel DockPanel.Dock="Top" Margin="0, 5, 0, 5" VerticalAlignment="Center">
+                            <Button DockPanel.Dock="Left" Background="White" Foreground="#31708F" BorderThickness="0" Click="Button_Click">
                                 <Button.ToolTip>
                                     <StackPanel>
                                         <TextBlock Text="#{{항목명     #도움말"></TextBlock>
@@ -32,16 +32,104 @@
                                     </StackPanel>
                                 </Button.Content>
                             </Button>
-                            <Button Name="RichTextBoxClearButton" Margin="0, 0, 10, 0" Click="RichTextBoxClearButton_Click">모두 지우기</Button>
-                            <Button Name="RichTextBoxAddButton" Margin="0, 0, 2, 0" Click="RichTextBoxAddButton_Click">항목 추가하기</Button>
-                        </StackPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Button Name="RichTextBoxClearButton" Margin="0, 0, 10, 0" Click="RichTextBoxClearButton_Click">모두 지우기</Button>
+                                <Button Name="RichTextBoxAddButton" Margin="0, 0, 2, 0" Click="RichTextBoxAddButton_Click">항목 추가하기</Button>
+                            </StackPanel>
+                        </DockPanel>
                         <TextBox Name="DirectEditTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" TextWrapping="NoWrap"></TextBox>
                     </DockPanel>
                 </TabItem.Content>
             </TabItem>
             <TabItem Name="ControlsTabItem" Header="항목별로 작성하기">
                 <TabItem.Content>
-                    <StackPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        
+                        <Grid.Resources>
+                            <Style x:Key="CategoryIsEnabledStyle" TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, ElementName=CategoryRadioButton}" Value="false">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style x:Key="HostIsEnabledStyle" TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, ElementName=HostRadioButton}" Value="false">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Resources>
+
+                        <GroupBox Grid.Row="0" Margin="5">
+                            <GroupBox.Header>
+                                <RadioButton x:Name="CategoryRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="카테고리"/>
+                            </GroupBox.Header>
+                            <StackPanel Style="{StaticResource CategoryIsEnabledStyle}">
+                                <Grid Margin="5" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Width="50" Text="항목명"></TextBlock>
+                                    <TextBox Grid.Column="1" Name="CategoryNameTextBox"></TextBox>
+                                </Grid>
+                                <Grid Margin="5" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Width="50" Text="도움말"></TextBlock>
+                                    <TextBox Grid.Column="1" Name="CategoryTooltipTextBox"></TextBox>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" Margin="5">
+                            <GroupBox.Header>
+                                <RadioButton x:Name="HostRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="호스트"/>
+                            </GroupBox.Header>
+                            <StackPanel Style="{StaticResource HostIsEnabledStyle}">
+                                <Grid Margin="5" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Width="50" Text="IP"></TextBlock>
+                                    <TextBox Grid.Column="1" Name="HostIPTextBox"></TextBox>
+                                </Grid>
+                                <Grid Margin="5" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Width="50" Text="도메인"></TextBlock>
+                                    <TextBox Grid.Column="1" Name="HostDomainTextBox"></TextBox>
+                                </Grid>
+                                <Grid Margin="5" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Width="50" Text="도움말"></TextBlock>
+                                    <TextBox Grid.Column="1" Name="HostTooltipTextBox"></TextBox>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+                    
+                    <!--<StackPanel>
                         <StackPanel.Resources>
                             <Style x:Key="CategoryIsEnabledStyle" TargetType="StackPanel">
                                 <Style.Triggers>
@@ -68,11 +156,11 @@
                             <StackPanel Style="{StaticResource CategoryIsEnabledStyle}">
                                 <StackPanel Margin="5" Orientation="Horizontal">
                                     <TextBlock Width="50" Text="항목명"></TextBlock>
-                                    <TextBox Name="CategoryNameTextBox" Width="200"></TextBox>
+                                    <TextBox Name="CategoryNameTextBox" MinWidth="200"></TextBox>
                                 </StackPanel>
                                 <StackPanel Margin="5" Orientation="Horizontal">
                                     <TextBlock Width="50" Text="도움말"></TextBlock>
-                                    <TextBox Name="CategoryTooltipTextBox" Width="200"></TextBox>
+                                    <TextBox Name="CategoryTooltipTextBox" MinWidth="200"></TextBox>
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox>
@@ -83,19 +171,19 @@
                             <StackPanel Style="{StaticResource HostIsEnabledStyle}">
                                 <StackPanel Margin="5" Orientation="Horizontal">
                                     <TextBlock Width="50" Text="IP"></TextBlock>
-                                    <TextBox Name="HostIPTextBox" Width="200"></TextBox>
+                                    <TextBox Name="HostIPTextBox" MinWidth="200"></TextBox>
                                 </StackPanel>
                                 <StackPanel Margin="5" Orientation="Horizontal">
                                     <TextBlock Width="50" Text="도메인"></TextBlock>
-                                    <TextBox Name="HostDomainTextBox" Width="200"></TextBox>
+                                    <TextBox Name="HostDomainTextBox" MinWidth="200"></TextBox>
                                 </StackPanel>
                                 <StackPanel Margin="5" Orientation="Horizontal">
                                     <TextBlock Width="50" Text="도움말"></TextBlock>
-                                    <TextBox Name="HostTooltipTextBox" Width="200"></TextBox>
+                                    <TextBox Name="HostTooltipTextBox" MinWidth="200"></TextBox>
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox>
-                    </StackPanel>
+                    </StackPanel>-->
                 </TabItem.Content>
             </TabItem>
         </TabControl>

@@ -13,7 +13,7 @@ namespace HostManager.Controllers
 {
     public class HostIOController
     {
-        TreeViewModelController treeViewModelController = new TreeViewModelController();
+        private TreeViewModelController treeViewModelController = new TreeViewModelController();
 
         public TreeViewModel HostLoad()
         {
@@ -29,7 +29,7 @@ namespace HostManager.Controllers
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Moroo | Host Manager", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return null;
             }
@@ -65,7 +65,7 @@ namespace HostManager.Controllers
                 HostTxt += "# Edited By Moroo Host Manager (Do not delete this line.)\r\n";
                 HostTxt += "\r\n";
 
-                HostTxt += treeViewModelController.ConverterToString(treeViewModel);
+                HostTxt = treeViewModelController.ConverterToString(treeViewModel);
 
                 try
                 {
