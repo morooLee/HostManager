@@ -42,9 +42,10 @@ namespace HostManager.Models
     public class Node : INotifyPropertyChanged
     {
         private bool _isLastNode = false;
-        private bool? _check = false;
         private bool _isSelected = false;
         private bool _isExpanded = false;
+        private bool _isChanged = false;
+        private bool? _check = false;
         private string _header = "";
         private string _tooltip = null;
         private Node _parentNode;
@@ -107,6 +108,19 @@ namespace HostManager.Models
             set
             {
                 _isExpanded = value;
+                this.OnPropertyChanged("IsExpanded");
+            }
+        }
+
+        public bool IsChanged
+        {
+            get
+            {
+                return _isChanged;
+            }
+            set
+            {
+                SetIsChanged(value);
             }
         }
 
@@ -251,6 +265,18 @@ namespace HostManager.Models
             }
 
             this.OnPropertyChanged("IsChecked");
+        }
+
+        private void SetIsChanged(bool value)
+        {
+            _isChanged = value;
+
+            foreach (Node childNode in NodeList)
+            {
+                childNode.SetIsChanged(_isChanged);
+            }
+
+            this.OnPropertyChanged("IsChanged");
         }
 
         private void VerifyCheckedState()

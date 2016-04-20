@@ -566,8 +566,16 @@ namespace HostManager
                 {
                     item.ParentNode = node;
                     node.NodeList.Insert(0, item);
+
+                    if (node.NodeList.ElementAt(0).IsLastNode != true)
+                    {
+                        node.NodeList.ElementAt(0).IsExpanded = true;
+                    }
+
+                    node.IsChanged = true;
                 }
 
+                node.IsExpanded = true;
                 ChangeInfoLabel("Success", "하위 항목에 추가되었습니다.", null);
             }
             else
@@ -596,8 +604,22 @@ namespace HostManager
 
                 foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
                 {
-                    item.ParentNode = menuItem.DataContext as Node;
-                    parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                    item.ParentNode = parentNode;
+                    if (parentNode == null)
+                    {
+                        treeViewModel.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                    }
+                    else
+                    {
+                        parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                    }
+
+                    if (parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsLastNode != true)
+                    {
+                        parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsExpanded = true;
+                    }
+
+                    parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsChanged = true;
                 }
 
                 ChangeInfoLabel("Success", "현재 항목에 추가되었습니다.", null);
@@ -624,6 +646,13 @@ namespace HostManager
             if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
             {
                 node = editTreeViewWindow.treeViewModel.NodeList.ElementAt(0);
+
+                if (node.IsLastNode != true)
+                {
+                    node.IsExpanded = true;
+                }
+
+                node.IsChanged = true;
                 ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", null);
             }
             else

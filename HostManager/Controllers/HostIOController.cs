@@ -78,7 +78,7 @@ namespace HostManager.Controllers
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message, "Moroo | Host Manager", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }

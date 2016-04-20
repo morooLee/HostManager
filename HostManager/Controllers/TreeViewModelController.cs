@@ -240,9 +240,12 @@ namespace HostManager.Controllers
         {
             String tmpText = "";
 
-            foreach (Node item in treeViewModel.NodeList)
+            if (treeViewModel.NodeList.Count != 0)
             {
-                tmpText += SetString(item);
+                foreach (Node item in treeViewModel.NodeList)
+                {
+                    tmpText += SetString(item);
+                }
             }
 
             return tmpText;
