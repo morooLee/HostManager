@@ -22,10 +22,8 @@
             <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsChanged}" Value="true">
-                        <Setter Property="Background" Value="Black"></Setter>
-                        <Setter Property="Foreground" Value="White"></Setter>
-                        <!--<Setter Property="BorderThickness" Value="1"></Setter>
-                        <Setter Property="BorderBrush" Value="#3C763D"></Setter>-->
+                        <Setter Property="Background" Value="Yellow"></Setter>
+                        <Setter Property="Foreground" Value="Red"></Setter>
                     </DataTrigger>
                 </Style.Triggers>
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />

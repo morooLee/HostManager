@@ -25,6 +25,7 @@ namespace HostManager.Controllers
                 treeViewModel = treeViewModelController.ConverterToTreeViewModel(streamReader.ReadToEnd());
                 streamReader.Close();
 
+
                 return treeViewModel;
             }
             catch (Exception e)

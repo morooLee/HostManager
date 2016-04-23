@@ -158,6 +158,8 @@ namespace HostManager
                             {
                                 tmpNode.Header = HostIPTextBox.Text + "\t" + HostDomainTextBox.Text;
                             }
+
+                            tmpNode.Domain = HostDomainTextBox.Text;
                         }
                     }
                     else
@@ -178,13 +180,10 @@ namespace HostManager
                     MessageBox.Show("작성된 내용이 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-            }
 
-            if (tmpNode != null)
-            {
                 treeViewModel.NodeList.Add(tmpNode);
             }
-            
+
             Close();
         }
 

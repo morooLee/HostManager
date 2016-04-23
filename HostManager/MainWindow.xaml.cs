@@ -30,6 +30,7 @@ namespace HostManager
         private TreeViewModelController treeViewModelController = new TreeViewModelController();
         private HostIOController hostIOController = new HostIOController();
         private TreeViewModel treeViewModel = new TreeViewModel();
+        private List<String> headerIsMatchedList = new List<String>();
 
         public MainWindow()
         {
@@ -72,7 +73,10 @@ namespace HostManager
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
             ckb.BorderBrush = (Brush)Conv.ConvertFromString("Red");
 
-            ChangeInfoLabel("None", "", true);
+            if (node.IsSelected)
+            {
+                HeaderIsOverlap(node, true);
+            }
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -80,12 +84,64 @@ namespace HostManager
             CheckBox ckb = (CheckBox)sender;
             StackPanel sp = (StackPanel)ckb.Parent;
             BrushConverter Conv = new BrushConverter();
+            Node node = sp.DataContext as Node;
 
             sp.Opacity = 0.5;
             ckb.BorderThickness = new Thickness(1, 1, 1, 1);
             ckb.BorderBrush = (Brush)Conv.ConvertFromString("Black");
 
-            ChangeInfoLabel("None", "", true);
+            if (node.IsSelected)
+            {
+                HeaderIsOverlap(node, false);
+            }
+        }
+
+        private void HeaderIsOverlap(Node node, bool isChecked)
+        {
+            if (node.IsLastNode)
+            {
+                if (isChecked)
+                {
+                    headerIsMatchedList.Add(node.Domain);
+
+                    if (headerIsMatchedList.Count(x => x == node.Domain) > 1)
+                    {
+                        MessageBox.Show("도메인이 중복으로 적용되어 체크할 수 없습니다.\r\n검색을 통해 적용되어 있는 도메인을 찾으세요.\r\n\r\n도메인명 : " + node.Domain, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ChangeInfoLabel("Info", "중복되는 도메인명 : " + node.Domain, null);
+                        node.IsChecked = false;
+                        Console.WriteLine(headerIsMatchedList.Count);
+                    }
+                    else
+                    {
+                        ChangeInfoLabel("None", "", true);
+                    }
+                    Console.WriteLine(headerIsMatchedList.Count);
+                }
+                else
+                {
+                    if (headerIsMatchedList.Contains(node.Domain))
+                    {
+                        headerIsMatchedList.RemoveAt(headerIsMatchedList.LastIndexOf(node.Domain));
+                        Console.WriteLine(headerIsMatchedList.Count);
+                    }
+
+                    ChangeInfoLabel("None", "", true);
+                }
+            }
+            else
+            {
+                if (node.NodeList == null || node.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("None", "", true);
+                }
+                else
+                {
+                    foreach (Node item in node.NodeList)
+                    {
+                        HeaderIsOverlap(item, isChecked);
+                    }
+                }
+            }
         }
 
         private void CheckBox_Indeterminate(object sender, RoutedEventArgs e)
@@ -233,6 +289,7 @@ namespace HostManager
         {
             if (hostIOController.HostSave(treeViewModel))
             {
+                treeViewModel.IsChangedCancel();
                 ChangeInfoLabel("Success", "적용되었습니다.", true);
             }
             else
@@ -427,7 +484,23 @@ namespace HostManager
         private void BindTree()
         {
             treeViewModel = hostIOController.HostLoad();
-            HostsTreeView.ItemsSource = treeViewModel.NodeList;
+            headerIsMatchedList = treeViewModel.DomainList();
+
+            if (treeViewModel == null)
+            {
+                treeViewModel = new TreeViewModel();
+            }
+            else
+            {
+                HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if(treeViewModel.Pass == false)
+                {
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", null);
+                }
+            }
 
             if (treeViewModel.NodeList.Count == 0)
             {
@@ -491,7 +564,7 @@ namespace HostManager
             }
         } 
 
-        public void FindTreeViewItem(DependencyObject obj)
+        private void FindTreeViewItem(DependencyObject obj)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
@@ -565,18 +638,28 @@ namespace HostManager
                 foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
                 {
                     item.ParentNode = node;
+                    item.IsChanged = true;
+                    item.IsChecked = true;
+                    item.IsExpanded = true;
                     node.NodeList.Insert(0, item);
-
-                    if (node.NodeList.ElementAt(0).IsLastNode != true)
-                    {
-                        node.NodeList.ElementAt(0).IsExpanded = true;
-                    }
-
-                    node.IsChanged = true;
                 }
 
                 node.IsExpanded = true;
-                ChangeInfoLabel("Success", "하위 항목에 추가되었습니다.", null);
+
+                headerIsMatchedList = treeViewModel.DomainList();
+                editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (editTreeViewWindow.treeViewModel.Pass == false)
+                {
+                    headerIsMatchedList = treeViewModel.DomainList();
+
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                }
+                else
+                {
+                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                }
             }
             else
             {
@@ -605,6 +688,10 @@ namespace HostManager
                 foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
                 {
                     item.ParentNode = parentNode;
+                    item.IsChanged = true;
+                    item.IsChecked = true;
+                    item.IsExpanded = true;
+
                     if (parentNode == null)
                     {
                         treeViewModel.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
@@ -613,16 +700,22 @@ namespace HostManager
                     {
                         parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
                     }
-
-                    if (parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsLastNode != true)
-                    {
-                        parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsExpanded = true;
-                    }
-
-                    parentNode.NodeList.ElementAt(parentNode.NodeList.IndexOf(childNode) - 1).IsChanged = true;
                 }
 
-                ChangeInfoLabel("Success", "현재 항목에 추가되었습니다.", null);
+                headerIsMatchedList = treeViewModel.DomainList();
+                editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (editTreeViewWindow.treeViewModel.Pass == false)
+                {
+                    headerIsMatchedList = treeViewModel.DomainList();
+
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                }
+                else
+                {
+                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                }
             }
             else
             {
@@ -645,15 +738,47 @@ namespace HostManager
 
             if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
             {
-                node = editTreeViewWindow.treeViewModel.NodeList.ElementAt(0);
-
-                if (node.IsLastNode != true)
+                foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
                 {
-                    node.IsExpanded = true;
+                    item.ParentNode = node.ParentNode;
+                    item.IsChanged = true;
+                    item.IsChecked = true;
+                    item.IsExpanded = true;
+
+                    if (node.ParentNode == null)
+                    {
+                        treeViewModel.NodeList.Insert(treeViewModel.NodeList.IndexOf(node), item);
+                    }
+                    else
+                    {
+                        node.ParentNode.NodeList.Insert(node.ParentNode.NodeList.IndexOf(node), item);
+                    }
                 }
 
-                node.IsChanged = true;
-                ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", null);
+                if (node.ParentNode == null)
+                {
+                    treeViewModel.NodeList.RemoveAt(treeViewModel.NodeList.IndexOf(node));
+                }
+                else
+                {
+                    node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
+                }
+
+                node.ParentNode.IsSelected = false;
+                headerIsMatchedList = treeViewModel.DomainList();
+                editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (editTreeViewWindow.treeViewModel.Pass == false)
+                {
+                    headerIsMatchedList = treeViewModel.DomainList();
+
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                }
+                else
+                {
+                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                }
             }
             else
             {

@@ -58,20 +58,21 @@ namespace HostManager.Controllers
                     {
                         Node node = new Node();
                         String IP = regex.Match(tmpHostTxt[i]).Value;
-                        tmpHostTxt[i] = tmpHostTxt[i].Replace("\t", "").Replace("\r", "").Trim();
+                        tmpHostTxt[i] = tmpHostTxt[i].Replace("\t", "").Replace("\r", "").Replace("\n", "").Trim();
                         String[] tmpString = tmpHostTxt[i].Split('#');
 
                         if (tmpHostTxt[i].StartsWith("#"))
                         {
                             node.IsChecked = false;
+                            node.Domain = tmpString[1].Replace(IP, "").Trim();
 
                             if (IP.Length < 16)
                             {
-                                node.Header = IP + "\t\t" + tmpString[1].Replace(IP, "").Trim();
+                                node.Header = IP + "\t\t" + node.Domain;
                             }
                             else
                             {
-                                node.Header = IP + "\t" + tmpString[1].Replace(IP, "").Trim();
+                                node.Header = IP + "\t" + node.Domain;
                             }
 
                             if (tmpString.Length >= 3)
@@ -85,14 +86,15 @@ namespace HostManager.Controllers
                         else
                         {
                             node.IsChecked = true;
+                            node.Domain = tmpString[0].Replace(IP, "").Trim();
 
                             if (IP.Length < 16)
                             {
-                                node.Header = IP + "\t\t" + tmpString[0].Replace(IP, "").Trim();
+                                node.Header = IP + "\t\t" + node.Domain;
                             }
                             else
                             {
-                                node.Header = IP + "\t" + tmpString[0].Replace(IP, "").Trim();
+                                node.Header = IP + "\t" + node.Domain;
                             }
 
                             if (tmpString.Length >= 2)

@@ -10,6 +10,7 @@ namespace HostManager.Models
 {
     public class TreeViewModel
     {
+        private bool _pass = true;
         private ObservableCollection<Node> _nodeList = null;
 
         public TreeViewModel() : this(null)
@@ -20,6 +21,14 @@ namespace HostManager.Models
         public TreeViewModel(ObservableCollection<Node> nodeList)
         {
             _nodeList = nodeList;
+        }
+
+        public bool Pass
+        {
+            get
+            {
+                return _pass;
+            }
         }
 
         public ObservableCollection<Node> NodeList
@@ -37,6 +46,131 @@ namespace HostManager.Models
                 _nodeList = value;
             }
         }
+
+        public void IsChangedCancel()
+        {
+            foreach (Node node in _nodeList)
+            {
+                SetIsChangedCancel(node);
+            }
+        }
+
+        private void SetIsChangedCancel(Node node)
+        {
+            node.IsChanged = false;
+
+            if (node.NodeList != null || node.NodeList.Count != 0)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    SetIsChangedCancel(childNode);
+                }
+            }
+        }
+
+        public void DomainIsMatched()
+        {
+            List<String> domainList = DomainList();
+
+            foreach (Node node in _nodeList)
+            {
+                if (SetDomainIsMatched(node, domainList) == false)
+                {
+                    foreach (Node item in _nodeList)
+                    {
+                        item.IsChecked = false;
+                    }
+                    _pass = false;
+                    return;
+                }
+            }
+
+            _pass = true;
+        }
+
+        public void DomainIsMatched(List<String> domainList)
+        {
+            foreach (Node node in _nodeList)
+            {
+                if (SetDomainIsMatched(node, domainList) == false)
+                {
+                    foreach (Node item in _nodeList)
+                    {
+                        item.IsChecked = false;
+                    }
+                    _pass = false;
+                    return;
+                }
+            }
+
+            _pass = true;
+        }
+
+        private bool SetDomainIsMatched(Node node, List<String> domainList)
+        {
+            int count = 0;
+
+            if (node.IsChecked == true && node.IsLastNode == true)
+            {
+                count = domainList.Count(x => x == node.Domain);
+                if (count > 1)
+                {
+                    return false;
+                }
+            }
+
+            if (node.NodeList != null || node.NodeList.Count != 0)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    if(SetDomainIsMatched(childNode, domainList) == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public List<String> DomainList()
+        {
+            List<String> domainList = new List<string>();
+
+            if (this._nodeList == null  && this._nodeList.Count == 0)
+            {
+                return domainList;
+            }
+            else
+            {
+                foreach (Node node in this._nodeList)
+                {
+                    domainList.AddRange(SetDomainIsMatched(node));
+                }
+            }
+
+            return domainList;
+        }
+
+        private List<String> SetDomainIsMatched(Node node)
+        {
+            List<String> domainList = new List<string>();
+
+            if (node.IsChecked == true && node.IsLastNode == true)
+            {
+                domainList.Add(node.Domain);
+            }
+            
+            if (node.NodeList != null || node.NodeList.Count != 0)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    domainList.AddRange(SetDomainIsMatched(childNode));
+                }
+            }
+
+            return domainList;
+        }
     }
 
     public class Node : INotifyPropertyChanged
@@ -48,6 +182,7 @@ namespace HostManager.Models
         private bool? _check = false;
         private string _header = "";
         private string _tooltip = null;
+        private string _domain = null;
         private Node _parentNode;
         private ObservableCollection<Node> _nodeList = null;
 
@@ -147,6 +282,18 @@ namespace HostManager.Models
             {
                 _tooltip = value;
                 this.OnPropertyChanged("Tooltip");
+            }
+        }
+
+        public string Domain
+        {
+            get
+            {
+                return _domain;
+            }
+            set
+            {
+                _domain = value;
             }
         }
 
@@ -269,11 +416,20 @@ namespace HostManager.Models
 
         private void SetIsChanged(bool value)
         {
-            _isChanged = value;
-
-            foreach (Node childNode in NodeList)
+            if (value)
             {
-                childNode.SetIsChanged(_isChanged);
+                _isChanged = value;
+
+                foreach (Node childNode in NodeList)
+                {
+                    childNode.SetIsChanged(value);
+                }
+
+                ParentIsExpanded();
+            }
+            else
+            {
+                _isChanged = value;
             }
 
             this.OnPropertyChanged("IsChanged");
