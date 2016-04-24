@@ -623,7 +623,7 @@ namespace HostManager
             }
         }
 
-        private void AddChildItem_Click(object sender, RoutedEventArgs e)
+        private void Add_Child_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
@@ -672,7 +672,7 @@ namespace HostManager
             editTreeViewWindow.Close();
         }
 
-        private void AddItem_Click(object sender, RoutedEventArgs e)
+        private void Add_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node childNode = menuItem.DataContext as Node;
@@ -696,11 +696,25 @@ namespace HostManager
 
                     if (parentNode == null)
                     {
-                        treeViewModel.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                        if (treeViewModel.NodeList.IndexOf(childNode) < (treeViewModel.NodeList.Count - 1))
+                        {
+                            treeViewModel.NodeList.Insert(treeViewModel.NodeList.IndexOf(childNode) + 1, item);
+                        }
+                        else
+                        {
+                            treeViewModel.NodeList.Add(item);
+                        }
                     }
                     else
                     {
-                        parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode), item);
+                        if (parentNode.NodeList.IndexOf(childNode) < (parentNode.NodeList.Count - 1))
+                        {
+                            parentNode.NodeList.Insert(parentNode.NodeList.IndexOf(childNode) + 1, item);
+                        }
+                        else
+                        {
+                            parentNode.NodeList.Add(item);
+                        }
                     }
                 }
 
@@ -728,7 +742,7 @@ namespace HostManager
             editTreeViewWindow.Close();
         }
 
-        private void EditItem_Click(object sender, RoutedEventArgs e)
+        private void Edit_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
@@ -764,9 +778,9 @@ namespace HostManager
                 else
                 {
                     node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
+                    node.ParentNode.IsSelected = false;
                 }
 
-                node.ParentNode.IsSelected = false;
                 headerIsMatchedList = treeViewModel.DomainList();
                 editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
 
@@ -791,7 +805,7 @@ namespace HostManager
             editTreeViewWindow.Close();
         }
 
-        private void DelItem_Click(object sender, RoutedEventArgs e)
+        private void Del_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
@@ -809,7 +823,7 @@ namespace HostManager
             ChangeInfoLabel("Success", "선택한 항목이 삭제되었습니다.", true);
         }
 
-        private void MoveToUpItem_Checked(object sender, RoutedEventArgs e)
+        private void MoveToUp_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
@@ -840,7 +854,7 @@ namespace HostManager
             }
         }
 
-        private void MoveToDownIOtem_Checked(object sender, RoutedEventArgs e)
+        private void MoveToDown_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
@@ -869,6 +883,77 @@ namespace HostManager
                     ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
                 }
             }
+        }
+
+        private void Root_Add_TreeViewItem(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+
+            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(null, menuItem.Header.ToString());
+            editTreeViewWindow.Owner = Application.Current.MainWindow;
+            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            editTreeViewWindow.ShowDialog();
+
+            if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+            {
+                editTreeViewWindow.treeViewModel.NodeList.Reverse();
+
+                foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
+                {
+                    item.ParentNode = null;
+                    item.IsChanged = true;
+                    item.IsChecked = true;
+                    item.IsExpanded = true;
+
+                    treeViewModel.NodeList.Add(item);
+                }
+
+                headerIsMatchedList = treeViewModel.DomainList();
+                editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (editTreeViewWindow.treeViewModel.Pass == false)
+                {
+                    headerIsMatchedList = treeViewModel.DomainList();
+
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                }
+                else
+                {
+                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                }
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+            }
+
+            editTreeViewWindow.treeViewModel = null;
+            editTreeViewWindow.Close();
+        }
+
+        private void NotePadOpen_TreeView(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DirectEdit_TreeView(object sender, RoutedEventArgs e)
+        {
+            HostsTreeView.Visibility = Visibility.Hidden;
+            DirectEdit_TextBox.Visibility = Visibility.Visible;
+
+            String nodeString = treeViewModelController.ConverterToString(treeViewModel);
+            DirectEdit_TextBox.AppendText(nodeString);
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
