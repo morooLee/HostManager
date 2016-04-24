@@ -7,10 +7,14 @@
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
         Title="Moroo | Host Manager" x:Name="UI" Height="530" MinHeight="152" MinWidth="400" Icon="Resources/Sign_Icon.ico" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="UI_Loaded">
+    <Window.Resources>
+        <AlternationConverter x:Key="AlternationConverter"/>
+    </Window.Resources>
+    
     <DockPanel>
         <DockPanel.Resources>
             <src:TreeViewModel x:Key="TreeViewList"/>
-            
+
             <Style x:Key="MenuItemStyle" TargetType="MenuItem">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Path=IsLastNode}" Value="true">
@@ -42,11 +46,11 @@
                 <MenuItem Name="EditItem" Header="선택한 항목 수정" DataContext="{Binding}" Click="EditItem_Click" />
                 <MenuItem Name="DelItem" Header="선택한 항목 삭제" DataContext="{Binding}" Click="DelItem_Click" />
                 <Separator/>
-                <MenuItem Header="위로 이동"/>
-                <MenuItem Header="아래로 이동"/>
-                <Separator/>
-                <MenuItem Header="복사하기"/>
-                <MenuItem Header="붙여넣기"/>
+                <MenuItem Name="MoveToUpItem" Header="위로 이동" Click="MoveToUpItem_Checked"/>
+                <MenuItem Name="MoveToDownIOtem" Header="아래로 이동" Click="MoveToDownIOtem_Checked"/>
+                <!--<Separator/>
+                <MenuItem Name="CopyItem" Header="복사하기" Click="CopyItem_Click"/>
+                <MenuItem Name="PasteItem" Header="붙여넣기" Click="PasteItem_Click"/>-->
             </ContextMenu>
 
             <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
@@ -85,7 +89,7 @@
             </DockPanel>
             <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
             <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
-            <TreeView Name="HostsTreeView" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged" />
+            <TreeView Name="HostsTreeView" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged"/>
         </DockPanel>
     </DockPanel>
 </Window>

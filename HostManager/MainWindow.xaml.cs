@@ -31,6 +31,7 @@ namespace HostManager
         private HostIOController hostIOController = new HostIOController();
         private TreeViewModel treeViewModel = new TreeViewModel();
         private List<String> headerIsMatchedList = new List<String>();
+        public Node nodeCopy = null;
 
         public MainWindow()
         {
@@ -109,20 +110,21 @@ namespace HostManager
                         MessageBox.Show("도메인이 중복으로 적용되어 체크할 수 없습니다.\r\n검색을 통해 적용되어 있는 도메인을 찾으세요.\r\n\r\n도메인명 : " + node.Domain, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         ChangeInfoLabel("Info", "중복되는 도메인명 : " + node.Domain, null);
                         node.IsChecked = false;
-                        Console.WriteLine(headerIsMatchedList.Count);
+                        if (node.ParentNode.IsExpanded)
+                        {
+                            node.ParentNode.IsExpanded = true;
+                        }
                     }
                     else
                     {
                         ChangeInfoLabel("None", "", true);
                     }
-                    Console.WriteLine(headerIsMatchedList.Count);
                 }
                 else
                 {
                     if (headerIsMatchedList.Contains(node.Domain))
                     {
                         headerIsMatchedList.RemoveAt(headerIsMatchedList.LastIndexOf(node.Domain));
-                        Console.WriteLine(headerIsMatchedList.Count);
                     }
 
                     ChangeInfoLabel("None", "", true);
@@ -791,7 +793,82 @@ namespace HostManager
 
         private void DelItem_Click(object sender, RoutedEventArgs e)
         {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = menuItem.DataContext as Node;
 
+            if (node.ParentNode == null)
+            {
+                treeViewModel.NodeList.Remove(node);
+            }
+            else
+            {
+                node.ParentNode.NodeList.Remove(node);
+            }
+
+            headerIsMatchedList = treeViewModel.DomainList();
+            ChangeInfoLabel("Success", "선택한 항목이 삭제되었습니다.", true);
+        }
+
+        private void MoveToUpItem_Checked(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = menuItem.DataContext as Node;
+
+            if (node.ParentNode == null)
+            {
+                if (treeViewModel.NodeList.IndexOf(node) > 0)
+                {
+                    treeViewModel.NodeList.Move(treeViewModel.NodeList.IndexOf(node), treeViewModel.NodeList.IndexOf(node) - 1);
+                }
+                else
+                {
+                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                }
+            }
+            else
+            {
+                if (node.ParentNode.NodeList.IndexOf(node) > 0)
+                {
+                    node.ParentNode.NodeList.Move(node.ParentNode.NodeList.IndexOf(node), node.ParentNode.NodeList.IndexOf(node) - 1);
+                }
+                else
+                {
+                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                }
+            }
+        }
+
+        private void MoveToDownIOtem_Checked(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = menuItem.DataContext as Node;
+
+            if (node.ParentNode == null)
+            {
+                if (treeViewModel.NodeList.IndexOf(node) < (treeViewModel.NodeList.Count - 1))
+                {
+                    treeViewModel.NodeList.Move(treeViewModel.NodeList.IndexOf(node), treeViewModel.NodeList.IndexOf(node) + 1);
+                }
+                else
+                {
+                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                }
+            }
+            else
+            {
+                if (node.ParentNode.NodeList.IndexOf(node) < (node.ParentNode.NodeList.Count - 1))
+                {
+                    node.ParentNode.NodeList.Move(node.ParentNode.NodeList.IndexOf(node), node.ParentNode.NodeList.IndexOf(node) + 1);
+                }
+                else
+                {
+                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                }
+            }
         }
     }
 }
