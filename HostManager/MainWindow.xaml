@@ -30,11 +30,48 @@
                     <Border BorderThickness="1" BorderBrush="#FFABADB3">
                         <StackPanel Orientation="Horizontal">
                             <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp"/>
-                            <Button Name="SearchButton" Width="18" Background="White" BorderThickness="0" Margin="1" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="1" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Search">
+                                                <Setter Property="ToolTip" Value="검색"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Cancel">
+                                                <Setter Property="ToolTip" Value="취소"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
                             </Button>
                         </StackPanel>
                     </Border>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style x:Key="ButtonStyle" TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Opacity" Value="0.3" />
+                                </Trigger>
+                            </Style.Triggers>
+                            <Setter Property="Background" Value="White" />
+                            <Setter Property="BorderBrush" Value="White" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장으로 열기">
+                        <Image Source="Resources/NotePad.png"/>
+                    </Button>
+                    <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="TreeView_Button_Click">
+                        <Image Source="Resources/TreeView.png"/>
+                    </Button>
+                    <Button Name="TextEdit_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트 원본으로 보기" Click="TextEdit_Button_Click">
+                        <Image Source="Resources/TextEdit.png"/>
+                    </Button>
+                    <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침">
+                        <Image Source="Resources/Refresh.png"/>
+                    </Button>
                 </StackPanel>
                 <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="False" Click="Apply_Button_Click">적용</Button>
             </DockPanel>
@@ -97,7 +134,7 @@
                             <MenuItem Header="호스트 추가" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="Root_Add_TreeViewItem" />
                             <Separator/>
                             <MenuItem Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="NotePadOpen_TreeView" />
-                            <MenuItem Header="원본으로 편집" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="DirectEdit_TreeView" />
+                            <MenuItem Name="TextEdit_MenuItem" Header="원본으로 편집" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Checked="TextEdit_MenuItem_Checked" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
@@ -109,7 +146,7 @@
                             <MenuItem Header="붙여넣기" Command="Paste" />
                             <Separator/>
                             <MenuItem Header="메모장에서 보기" />
-                            <MenuItem Header="카테고리로 보기" Click="MenuItem_Click_1" />
+                            <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" Click="TreeView_MenuItem_Click" />
                         </ContextMenu>
                     </TextBox.ContextMenu>
                 </TextBox>

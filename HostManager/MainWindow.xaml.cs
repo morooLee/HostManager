@@ -221,7 +221,7 @@ namespace HostManager
                                 
                 if (SearchBox.Text != "" && SearchBox.Text != null)
                 {
-                    SearchButtonImage.Tag = "Cancle";
+                    SearchButtonImage.Tag = "Cancel";
                     SearchButton_Click(SearchButton, null);
                 }
             }
@@ -317,7 +317,7 @@ namespace HostManager
                     bi.UriSource = new Uri("Resources/Cancel.png", UriKind.Relative);
                     bi.EndInit();
                     SearchButtonImage.Source = bi;
-                    SearchButtonImage.Tag = "Cancle";
+                    SearchButtonImage.Tag = "Cancel";
 
                     int Count = 0;
 
@@ -386,7 +386,7 @@ namespace HostManager
                     return;
                 }
 
-                SearchButtonImage.Tag = "Cancle";
+                SearchButtonImage.Tag = "Cancel";
                 SearchButton_Click(SearchButton, null);
             }
             else if (e.Key == Key.Return && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
@@ -396,7 +396,7 @@ namespace HostManager
             }
             else if (e.Key == Key.Escape && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
             {
-                SearchButtonImage.Tag = "Cancle";
+                SearchButtonImage.Tag = "Cancel";
                 SearchButton_Click(SearchButton, null);
             }
         }
@@ -937,8 +937,12 @@ namespace HostManager
 
         }
 
-        private void DirectEdit_TreeView(object sender, RoutedEventArgs e)
+        private void TextToTreeView()
         {
+            NodePad_Button.IsEnabled = false;
+            TreeView_Button.IsEnabled = true;
+            TextEdit_Button.IsEnabled = false;
+            Refresh_Button.IsEnabled = false;
             HostsTreeView.Visibility = Visibility.Hidden;
             DirectEdit_TextBox.Visibility = Visibility.Visible;
 
@@ -946,14 +950,79 @@ namespace HostManager
             DirectEdit_TextBox.AppendText(nodeString);
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void TreeViewToText()
         {
+            MessageBoxResult result = MessageBox.Show("저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            
+            if(result == MessageBoxResult.Yes)
+            {
+                NodePad_Button.IsEnabled = true;
+                TreeView_Button.IsEnabled = false;
+                TextEdit_Button.IsEnabled = true;
+                Refresh_Button.IsEnabled = true;
 
+                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
+                headerIsMatchedList = treeViewModel.DomainList();
+
+                if (treeViewModel == null)
+                {
+                    treeViewModel = new TreeViewModel();
+                }
+                else
+                {
+                    HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                    treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                    if (treeViewModel.Pass == false)
+                    {
+                        MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", null);
+                    }
+                }
+
+                if (treeViewModel.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+                }
+
+                HostsTreeView.Visibility = Visibility.Visible;
+                DirectEdit_TextBox.Visibility = Visibility.Hidden;
+                DirectEdit_TextBox.Clear();
+            }
+            else if(result == MessageBoxResult.No)
+            {
+                NodePad_Button.IsEnabled = true;
+                TreeView_Button.IsEnabled = false;
+                TextEdit_Button.IsEnabled = true;
+                Refresh_Button.IsEnabled = true;
+                HostsTreeView.Visibility = Visibility.Visible;
+                DirectEdit_TextBox.Visibility = Visibility.Hidden;
+                DirectEdit_TextBox.Clear();
+            }
+            else
+            {
+                return;
+            }
         }
 
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        private void TextEdit_Button_Click(object sender, RoutedEventArgs e)
         {
+            TextToTreeView();
+        }
 
+        private void TextEdit_MenuItem_Checked(object sender, RoutedEventArgs e)
+        {
+            TextToTreeView();
+        }
+
+        private void TreeView_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TreeViewToText();
+        }
+
+        private void TreeView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            TreeViewToText();
         }
     }
 }
