@@ -312,11 +312,11 @@ namespace HostManager
 
             if (applyCheck)
             {
-                ChangeInfoLabel("Success", "적용되었습니다.", true);
+                ChangeInfoLabel("Success", "호스트에 적용되었습니다.", true);
             }
             else
             {
-                ChangeInfoLabel("Warning", "실패하였습니다.", true);
+                ChangeInfoLabel("Warning", "호스트 적용에 실패하였습니다.", true);
             }
 
             ChangeButtonUI(false);
@@ -505,12 +505,13 @@ namespace HostManager
 
         private void BindTree()
         {
+            DirectEdit_TextBox.Text = hostIOController.HostToString();
             treeViewModel = hostIOController.HostLoad();
 
             if (treeViewModel == null)
             {
                 treeViewModel = new TreeViewModel();
-                TextToTreeView(hostIOController.HostToString());
+                TextToTreeView(DirectEdit_TextBox.Text);
             }
             else
             {
@@ -521,14 +522,14 @@ namespace HostManager
                 if(treeViewModel.Pass == false)
                 {
                     MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", null);
-                }
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                }  
+            }
 
-                if (treeViewModel.NodeList.Count == 0)
-                {
-                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
-                }
-            } 
+            if (DirectEdit_TextBox.Text == "" || ( DirectEdit_TextBox.Text == "" && treeViewModel.NodeList.Count == 0))
+            {
+                ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+            }
         }
 
         private void ChangeInfoLabel(String type, String msg, bool? setEdit)
@@ -955,101 +956,115 @@ namespace HostManager
 
         private void TextToTreeView()
         {
-            NodePad_Button.IsEnabled = false;
-            TreeView_Button.IsEnabled = true;
-            TextEdit_Button.IsEnabled = false;
-            Refresh_Button.IsEnabled = false;
-            HostsTreeView.Visibility = Visibility.Hidden;
-            DirectEdit_TextBox.Visibility = Visibility.Visible;
+            if (Apply_Button.IsEnabled == true)
+            {
+                MessageBoxResult result = MessageBox.Show("변경된 사항을 저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
-            String nodeString = treeViewModelController.ConverterToString(treeViewModel);
-            DirectEdit_TextBox.AppendText(nodeString);
+                if (result == MessageBoxResult.Yes)
+                {
+                    DoApply();
+
+                    TreeView_Button.IsEnabled = true;
+                    TextEdit_Button.IsEnabled = false;
+                    HostsTreeView.Visibility = Visibility.Hidden;
+                    DirectEdit_TextBox.Visibility = Visibility.Visible;
+
+                    BindTree();
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    TreeView_Button.IsEnabled = true;
+                    TextEdit_Button.IsEnabled = false;
+                    HostsTreeView.Visibility = Visibility.Hidden;
+                    DirectEdit_TextBox.Visibility = Visibility.Visible;
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                TreeView_Button.IsEnabled = true;
+                TextEdit_Button.IsEnabled = false;
+                HostsTreeView.Visibility = Visibility.Hidden;
+                DirectEdit_TextBox.Visibility = Visibility.Visible;
+            }
+
         }
 
         private void TextToTreeView(String hostString)
         {
-            NodePad_Button.IsEnabled = false;
+            Apply_Button.IsEnabled = true;
             TreeView_Button.IsEnabled = true;
             TextEdit_Button.IsEnabled = false;
-            Refresh_Button.IsEnabled = false;
             HostsTreeView.Visibility = Visibility.Hidden;
             DirectEdit_TextBox.Visibility = Visibility.Visible;
-            DirectEdit_TextBox.AppendText(hostString);
+            DirectEdit_TextBox.Text = hostString;
+
+            ChangeInfoLabel("Warning", "변환에 실패하여 텍스트 모드로 전환되었습니다.", null);
         }
 
         private void TreeViewToText()
         {
-            MessageBoxResult result = MessageBox.Show("저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-            
-            if(result == MessageBoxResult.Yes)
+            if (Apply_Button.IsEnabled == true)
             {
-                TreeViewModel tmpTreeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
+                MessageBoxResult result = MessageBox.Show("변경된 사항을 저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
-                if (tmpTreeViewModel == null)
+                if (result == MessageBoxResult.Yes)
+                {
+                    DoApply();
+
+                    TreeView_Button.IsEnabled = false;
+                    TextEdit_Button.IsEnabled = true;
+                    HostsTreeView.Visibility = Visibility.Visible;
+                    DirectEdit_TextBox.Visibility = Visibility.Hidden;
+
+                    BindTree();
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    TreeView_Button.IsEnabled = false;
+                    TextEdit_Button.IsEnabled = true;
+                    HostsTreeView.Visibility = Visibility.Visible;
+                    DirectEdit_TextBox.Visibility = Visibility.Hidden;
+                }
+                else if (result == MessageBoxResult.Cancel)
                 {
                     return;
                 }
-                else
-                {
-                    treeViewModel = tmpTreeViewModel;
-                    NodePad_Button.IsEnabled = true;
-                    TreeView_Button.IsEnabled = false;
-                    TextEdit_Button.IsEnabled = true;
-                    Refresh_Button.IsEnabled = true;
-
-                    headerIsMatchedList = treeViewModel.DomainList();
-                    HostsTreeView.ItemsSource = treeViewModel.NodeList;
-                    treeViewModel.DomainIsMatched(headerIsMatchedList);
-
-                    if (treeViewModel.Pass == false)
-                    {
-                        MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
-                    }
-                }
-
-                if (treeViewModel.NodeList.Count == 0)
-                {
-                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
-                }
-
-                HostsTreeView.Visibility = Visibility.Visible;
-                DirectEdit_TextBox.Visibility = Visibility.Hidden;
-                DirectEdit_TextBox.Clear();
-            }
-            else if(result == MessageBoxResult.No)
-            {
-                NodePad_Button.IsEnabled = true;
-                TreeView_Button.IsEnabled = false;
-                TextEdit_Button.IsEnabled = true;
-                Refresh_Button.IsEnabled = true;
-                HostsTreeView.Visibility = Visibility.Visible;
-                DirectEdit_TextBox.Visibility = Visibility.Hidden;
-                DirectEdit_TextBox.Clear();
             }
             else
             {
-                return;
+                TreeView_Button.IsEnabled = false;
+                TextEdit_Button.IsEnabled = true;
+                HostsTreeView.Visibility = Visibility.Visible;
+                DirectEdit_TextBox.Visibility = Visibility.Hidden;
             }
         }
 
         private void TextEdit_Button_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             TextToTreeView();
         }
 
         private void TreeView_MenuItem_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             TreeViewToText();
         }
 
         private void TreeView_Button_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             TreeViewToText();
         }
 
         private void Refresh_Button_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
+
             if (Apply_Button.IsEnabled == true)
             {
                 MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n새로고침을 할 경우 저장되지 않은 정보는 삭제됩니다.\r\n그래도 새로고침을 하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -1060,6 +1075,10 @@ namespace HostManager
                 }
                 else
                 {
+                    if (InfoLabel.Content.ToString() == "")
+                    {
+                        ChangeInfoLabel("Info", "새로고침을 취소하였습니다.", null);
+                    }
                     return;
                 }
             }
@@ -1068,7 +1087,10 @@ namespace HostManager
                 BindTree();
             }
 
-            ChangeInfoLabel("Info", "호스트 정보를 새로 가져왔습니다.", false);
+            if (InfoLabel.Content.ToString() == "")
+            {
+                ChangeInfoLabel("Info", "호스트 정보가 갱신되었습니다.", null);
+            }
         }
 
         private void DirectEdit_TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1081,16 +1103,19 @@ namespace HostManager
 
         private void NodePad_Button_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             OpenNotepad();
         }
 
         private void TreeView_Notpad_Item_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             OpenNotepad();
         }
 
         private void TextBox_Notepad_Item_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             OpenNotepad();
         }
 
@@ -1103,15 +1128,19 @@ namespace HostManager
                 if (result == MessageBoxResult.Yes)
                 {
                     DoApply();
+                    ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", false);
+                }
+                else
+                {
+                    ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", null);
                 }
             }
             hostIOController.OpenNotepad();
-
-            ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", false);
         }
 
         private void TextEdit_MenuItem_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             TextToTreeView();
         }
     }
