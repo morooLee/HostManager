@@ -105,7 +105,7 @@ namespace HostManager
                 {
                     treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEditTextBox.Text);
 
-                    if (treeViewModel.NodeList.Count == 0)
+                    if (treeViewModel == null || treeViewModel.NodeList.Count == 0)
                     {
                         //MessageBox.Show("변환된 내용이 없습니다.\r\n작성된 내용을 확인하세요.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;

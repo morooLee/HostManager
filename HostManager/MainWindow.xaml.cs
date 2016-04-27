@@ -289,9 +289,29 @@ namespace HostManager
 
         private void Apply_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (hostIOController.HostSave(treeViewModel))
+            DoApply();
+        }
+
+        private void DoApply()
+        {
+            bool applyCheck = false;
+
+            if (HostsTreeView.Visibility == Visibility.Visible)
             {
-                treeViewModel.IsChangedCancel();
+                applyCheck = hostIOController.HostSave(treeViewModel);
+
+                if (applyCheck)
+                {
+                    treeViewModel.IsChangedCancel();
+                }
+            }
+            else
+            {
+                applyCheck = hostIOController.HostSave(DirectEdit_TextBox.Text);
+            }
+
+            if (applyCheck)
+            {
                 ChangeInfoLabel("Success", "적용되었습니다.", true);
             }
             else
@@ -486,14 +506,15 @@ namespace HostManager
         private void BindTree()
         {
             treeViewModel = hostIOController.HostLoad();
-            headerIsMatchedList = treeViewModel.DomainList();
 
             if (treeViewModel == null)
             {
                 treeViewModel = new TreeViewModel();
+                TextToTreeView(hostIOController.HostToString());
             }
             else
             {
+                headerIsMatchedList = treeViewModel.DomainList();
                 HostsTreeView.ItemsSource = treeViewModel.NodeList;
                 treeViewModel.DomainIsMatched(headerIsMatchedList);
 
@@ -502,12 +523,12 @@ namespace HostManager
                     MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", null);
                 }
-            }
 
-            if (treeViewModel.NodeList.Count == 0)
-            {
-                ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
-            }
+                if (treeViewModel.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+                }
+            } 
         }
 
         private void ChangeInfoLabel(String type, String msg, bool? setEdit)
@@ -932,11 +953,6 @@ namespace HostManager
             editTreeViewWindow.Close();
         }
 
-        private void NotePadOpen_TreeView(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void TextToTreeView()
         {
             NodePad_Button.IsEnabled = false;
@@ -950,33 +966,45 @@ namespace HostManager
             DirectEdit_TextBox.AppendText(nodeString);
         }
 
+        private void TextToTreeView(String hostString)
+        {
+            NodePad_Button.IsEnabled = false;
+            TreeView_Button.IsEnabled = true;
+            TextEdit_Button.IsEnabled = false;
+            Refresh_Button.IsEnabled = false;
+            HostsTreeView.Visibility = Visibility.Hidden;
+            DirectEdit_TextBox.Visibility = Visibility.Visible;
+            DirectEdit_TextBox.AppendText(hostString);
+        }
+
         private void TreeViewToText()
         {
             MessageBoxResult result = MessageBox.Show("저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
             
             if(result == MessageBoxResult.Yes)
             {
-                NodePad_Button.IsEnabled = true;
-                TreeView_Button.IsEnabled = false;
-                TextEdit_Button.IsEnabled = true;
-                Refresh_Button.IsEnabled = true;
+                TreeViewModel tmpTreeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
 
-                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
-                headerIsMatchedList = treeViewModel.DomainList();
-
-                if (treeViewModel == null)
+                if (tmpTreeViewModel == null)
                 {
-                    treeViewModel = new TreeViewModel();
+                    return;
                 }
                 else
                 {
+                    treeViewModel = tmpTreeViewModel;
+                    NodePad_Button.IsEnabled = true;
+                    TreeView_Button.IsEnabled = false;
+                    TextEdit_Button.IsEnabled = true;
+                    Refresh_Button.IsEnabled = true;
+
+                    headerIsMatchedList = treeViewModel.DomainList();
                     HostsTreeView.ItemsSource = treeViewModel.NodeList;
                     treeViewModel.DomainIsMatched(headerIsMatchedList);
 
                     if (treeViewModel.Pass == false)
                     {
                         MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", null);
+                        ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
                     }
                 }
 
@@ -1010,11 +1038,6 @@ namespace HostManager
             TextToTreeView();
         }
 
-        private void TextEdit_MenuItem_Checked(object sender, RoutedEventArgs e)
-        {
-            TextToTreeView();
-        }
-
         private void TreeView_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             TreeViewToText();
@@ -1023,6 +1046,73 @@ namespace HostManager
         private void TreeView_Button_Click(object sender, RoutedEventArgs e)
         {
             TreeViewToText();
+        }
+
+        private void Refresh_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (Apply_Button.IsEnabled == true)
+            {
+                MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n새로고침을 할 경우 저장되지 않은 정보는 삭제됩니다.\r\n그래도 새로고침을 하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    BindTree();
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                BindTree();
+            }
+
+            ChangeInfoLabel("Info", "호스트 정보를 새로 가져왔습니다.", false);
+        }
+
+        private void DirectEdit_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (Apply_Button.IsEnabled ==false && (e.OriginalSource as TextBox).IsKeyboardFocused)
+            {
+                Apply_Button.IsEnabled = true;
+            }
+        }
+
+        private void NodePad_Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenNotepad();
+        }
+
+        private void TreeView_Notpad_Item_Click(object sender, RoutedEventArgs e)
+        {
+            OpenNotepad();
+        }
+
+        private void TextBox_Notepad_Item_Click(object sender, RoutedEventArgs e)
+        {
+            OpenNotepad();
+        }
+
+        private void OpenNotepad()
+        {
+            if (Apply_Button.IsEnabled == true)
+            {
+                MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n저장하지 않은 정보는 메모장에 반영이 되지 않습니다.\r\n저장하고 메모장으로 여시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    DoApply();
+                }
+            }
+            hostIOController.OpenNotepad();
+
+            ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", false);
+        }
+
+        private void TextEdit_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TextToTreeView();
         }
     }
 }

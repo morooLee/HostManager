@@ -128,10 +128,8 @@ namespace HostManager.Controllers
 
                         if (NodeDepth < 0)
                         {
-                            MessageBox.Show("카테고리 구성에 실패하였습니다.", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
-
-                            treeViewModel.NodeList.Clear();
-                            return treeViewModel;
+                            MessageBox.Show("변환에 실패하였습니다.\r\n닫는 명령어가 먼저 입력되었거나 여는 명령어가 없습니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return null;
                         }
                         else if (NodeDepth > 0)
                         {
@@ -203,10 +201,8 @@ namespace HostManager.Controllers
 
                 if (OpenNode != CloseNode)
                 {
-                    MessageBox.Show("카테고리 구성에 실패하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    treeViewModel.NodeList.Clear();
-                    return treeViewModel;
+                    MessageBox.Show("변환에 실패하였습니다.\r\n항목을 열고 닫는 명령어의 수는 같아야 합니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return null;
                 }
                 else if (LostTxt != "")
                 {

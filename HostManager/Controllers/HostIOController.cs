@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,28 @@ namespace HostManager.Controllers
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return null;
+            }
+        }
+
+        public String HostToString()
+        {
+            String hostString = "";
+
+            try
+            {
+                StreamReader streamReader = new StreamReader(@"C:\Windows\System32\drivers\etc\Hosts");
+
+                hostString = streamReader.ReadToEnd();
+                streamReader.Close();
+
+
+                return hostString;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return hostString;
             }
         }
 
@@ -86,6 +109,36 @@ namespace HostManager.Controllers
             else
             {
                 return false;
+            }
+        }
+
+        public bool HostSave(String hostString)
+        {
+            try
+            {
+                StreamWriter hostsStreamWriter = new StreamWriter(@"C:\Windows\System32\drivers\etc\Hosts");
+
+                hostsStreamWriter.WriteLine(hostString);
+                hostsStreamWriter.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        public void OpenNotepad()
+        {
+            try
+            {
+                Process.Start("Notepad.exe", @"C:\Windows\System32\drivers\etc\Hosts");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
