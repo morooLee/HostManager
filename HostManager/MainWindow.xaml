@@ -30,7 +30,7 @@
                     <Border BorderThickness="1" BorderBrush="#FFABADB3">
                         <StackPanel Orientation="Horizontal">
                             <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp"/>
-                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="1" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
                                 <Button.Style>
                                     <Style TargetType="Button">
                                         <Style.Triggers>
@@ -65,11 +65,11 @@
                         <Image Source="Resources/TreeView.png"/>
                     </Button>
                     <Border BorderBrush="White" BorderThickness="1" />
-                    <Button Name="TextEdit_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트 원본으로 보기" Click="TextEdit_Button_Click">
+                    <Button Name="TextEdit_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="TextEdit_Button_Click">
                         <Image Source="Resources/TextEdit.png"/>
                     </Button>
-                    <Border Margin="5,2,5,2" BorderBrush="LightGray" BorderThickness="1" />
-                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장으로 열기" Click="NodePad_Button_Click">
+                    <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
+                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="NodePad_Button_Click">
                         <Image Source="Resources/NotePad.png"/>
                     </Button>
                     <Border BorderBrush="White" BorderThickness="1" />
@@ -132,13 +132,13 @@
                     </HierarchicalDataTemplate>
                 </Grid.Resources>
 
-                <TreeView Name="HostsTreeView" BorderThickness="0" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
+                <TreeView Name="HostsTreeView" BorderThickness="1" BorderBrush="#B5B5B5" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
                     <TreeView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="호스트 추가" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="Root_Add_TreeViewItem" />
                             <Separator/>
                             <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="TreeView_Notpad_Item_Click" />
-                            <MenuItem Name="TextEdit_MenuItem" Header="원본으로 편집" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="TextEdit_MenuItem_Click" />
+                            <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="TextEdit_MenuItem_Click" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>

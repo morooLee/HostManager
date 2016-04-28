@@ -889,8 +889,8 @@ namespace HostManager
                 }
                 else
                 {
-                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                    MessageBox.Show("이미 최하위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 아래로 이동할 수 없습니다.", true);
                 }
             }
             else
@@ -901,8 +901,8 @@ namespace HostManager
                 }
                 else
                 {
-                    MessageBox.Show("이미 최상위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ChangeInfoLabel("Warning", "더이상 위로 이동할 수 없습니다.", true);
+                    MessageBox.Show("이미 최하위에 있으므로 더이상 이동할 수 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "더이상 아래로 이동할 수 없습니다.", true);
                 }
             }
         }
@@ -991,6 +991,7 @@ namespace HostManager
                 DirectEdit_TextBox.Visibility = Visibility.Visible;
             }
 
+            Apply_Button.IsEnabled = false;
         }
 
         private void TextToTreeView(String hostString)
@@ -1041,6 +1042,8 @@ namespace HostManager
                 HostsTreeView.Visibility = Visibility.Visible;
                 DirectEdit_TextBox.Visibility = Visibility.Hidden;
             }
+
+            Apply_Button.IsEnabled = false;
         }
 
         private void TextEdit_Button_Click(object sender, RoutedEventArgs e)
@@ -1071,6 +1074,7 @@ namespace HostManager
 
                 if (result == MessageBoxResult.Yes)
                 {
+                    Apply_Button.IsEnabled = false;
                     BindTree();
                 }
                 else
@@ -1098,6 +1102,7 @@ namespace HostManager
             if (Apply_Button.IsEnabled ==false && (e.OriginalSource as TextBox).IsKeyboardFocused)
             {
                 Apply_Button.IsEnabled = true;
+                ChangeInfoLabel("Info", "수정된 항목이 있습니다.", null);
             }
         }
 
@@ -1128,14 +1133,11 @@ namespace HostManager
                 if (result == MessageBoxResult.Yes)
                 {
                     DoApply();
-                    ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", false);
-                }
-                else
-                {
-                    ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", null);
                 }
             }
+
             hostIOController.OpenNotepad();
+            ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", null);
         }
 
         private void TextEdit_MenuItem_Click(object sender, RoutedEventArgs e)
