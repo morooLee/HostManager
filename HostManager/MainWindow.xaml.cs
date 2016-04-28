@@ -40,7 +40,7 @@ namespace HostManager
 
         private void UI_Loaded(object sender, RoutedEventArgs e)
         {
-            BindTree();
+            BindTree(false, false);
         }
 
         private void CheckBox_Loaded(object sender, RoutedEventArgs e)
@@ -289,10 +289,11 @@ namespace HostManager
 
         private void Apply_Button_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             DoApply();
         }
 
-        private void DoApply()
+        private bool DoApply()
         {
             bool applyCheck = false;
 
@@ -302,24 +303,36 @@ namespace HostManager
 
                 if (applyCheck)
                 {
-                    treeViewModel.IsChangedCancel();
+                    BindTree(true, false);
                 }
             }
             else
             {
-                applyCheck = hostIOController.HostSave(DirectEdit_TextBox.Text);
+                BindTree(false, true);
+
+                if (treeViewModel != null)
+                {
+                    applyCheck = hostIOController.HostSave(DirectEdit_TextBox.Text);
+                }
             }
 
             if (applyCheck)
             {
-                ChangeInfoLabel("Success", "호스트에 적용되었습니다.", true);
+                if (InfoLabel.Content.ToString() == "")
+                {
+                    ChangeInfoLabel("Success", "호스트에 적용되었습니다.", true);
+                }
             }
             else
             {
-                ChangeInfoLabel("Warning", "호스트 적용에 실패하였습니다.", true);
+                if (InfoLabel.Content.ToString() == "")
+                {
+                    ChangeInfoLabel("Warning", "호스트 적용에 실패하였습니다.", true);
+                }
             }
 
             ChangeButtonUI(false);
+            return applyCheck;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -447,6 +460,8 @@ namespace HostManager
 
         private void HostsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            ChangeInfoLabel("None", "", null);
+
             #region 상태표시줄에 전체 경로 출력하기
             Node item = e.NewValue as Node;
             String sbText = "";
@@ -498,15 +513,29 @@ namespace HostManager
 
             statusBar.Items.Clear();
             statusBar.Items.Add(sbText);
-            #endregion  
-
-            ChangeInfoLabel("None", "", null);
+            #endregion
         }
 
-        private void BindTree()
+        private void BindTree(bool isTreeView, bool isTextBox)
         {
-            DirectEdit_TextBox.Text = hostIOController.HostToString();
-            treeViewModel = hostIOController.HostLoad();
+            if (isTreeView == false && isTextBox == false)
+            {
+                DirectEdit_TextBox.Text = hostIOController.HostToString();
+                treeViewModel = hostIOController.HostLoad();
+            }
+            else if (isTreeView == true && isTextBox == false)
+            {
+                DirectEdit_TextBox.Text = treeViewModelController.ConverterToString(treeViewModel);
+            }
+            else if (isTreeView == false && isTextBox == true)
+            {
+                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
+
+                if (treeViewModel == null)
+                {
+                    return;
+                }
+            }
 
             if (treeViewModel == null)
             {
@@ -962,14 +991,15 @@ namespace HostManager
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    DoApply();
+                    bool isApply = DoApply();
 
-                    TreeView_Button.IsEnabled = true;
-                    TextEdit_Button.IsEnabled = false;
-                    HostsTreeView.Visibility = Visibility.Hidden;
-                    DirectEdit_TextBox.Visibility = Visibility.Visible;
-
-                    BindTree();
+                    if (isApply)
+                    {
+                        TreeView_Button.IsEnabled = true;
+                        TextEdit_Button.IsEnabled = false;
+                        HostsTreeView.Visibility = Visibility.Hidden;
+                        DirectEdit_TextBox.Visibility = Visibility.Visible;
+                    }
                 }
                 else if (result == MessageBoxResult.No)
                 {
@@ -1014,14 +1044,15 @@ namespace HostManager
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    DoApply();
+                    bool isApply = DoApply();
 
-                    TreeView_Button.IsEnabled = false;
-                    TextEdit_Button.IsEnabled = true;
-                    HostsTreeView.Visibility = Visibility.Visible;
-                    DirectEdit_TextBox.Visibility = Visibility.Hidden;
-
-                    BindTree();
+                    if (isApply)
+                    {
+                        TreeView_Button.IsEnabled = false;
+                        TextEdit_Button.IsEnabled = true;
+                        HostsTreeView.Visibility = Visibility.Visible;
+                        DirectEdit_TextBox.Visibility = Visibility.Hidden;
+                    }
                 }
                 else if (result == MessageBoxResult.No)
                 {
@@ -1075,7 +1106,7 @@ namespace HostManager
                 if (result == MessageBoxResult.Yes)
                 {
                     Apply_Button.IsEnabled = false;
-                    BindTree();
+                    BindTree(false, false);
                 }
                 else
                 {
@@ -1088,7 +1119,7 @@ namespace HostManager
             }
             else
             {
-                BindTree();
+                BindTree(false, false);
             }
 
             if (InfoLabel.Content.ToString() == "")

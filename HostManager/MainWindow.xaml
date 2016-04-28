@@ -131,7 +131,7 @@
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </Grid.Resources>
-
+                
                 <TreeView Name="HostsTreeView" BorderThickness="1" BorderBrush="#B5B5B5" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}" SelectedItemChanged="HostsTreeView_SelectedItemChanged">
                     <TreeView.ContextMenu>
                         <ContextMenu>
