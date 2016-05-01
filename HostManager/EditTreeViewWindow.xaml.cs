@@ -30,6 +30,7 @@ namespace HostManager
         {
             InitializeComponent();
             this.Title = stringTitle;
+
             if (node != null)
             {
                 tmpNode = node;

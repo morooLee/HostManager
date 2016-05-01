@@ -6,10 +6,7 @@
         xmlns:local="clr-namespace:HostManager"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" x:Name="UI" Height="530" MinHeight="152" MinWidth="400" Icon="Resources/Sign_Icon.ico" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="UI_Loaded">
-    <Window.Resources>
-        <AlternationConverter x:Key="AlternationConverter"/>
-    </Window.Resources>
+        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Icon="Resources/Sign_Icon.ico" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="Window_Loaded">
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="22">
@@ -142,8 +139,8 @@
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
-                <TextBox Name="DirectEdit_TextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" TextWrapping="NoWrap" Visibility="Hidden" TextChanged="DirectEdit_TextBox_TextChanged">
-                    <TextBox.ContextMenu>
+                <RichTextBox Name="Text_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="DirectEdit_TextBox_TextChanged">
+                    <RichTextBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="복사하기" Command="Copy" />
                             <MenuItem Header="잘라내기" Command="Cut" />
@@ -152,8 +149,8 @@
                             <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" Click="TextBox_Notepad_Item_Click" />
                             <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" Click="TreeView_MenuItem_Click" />
                         </ContextMenu>
-                    </TextBox.ContextMenu>
-                </TextBox>
+                    </RichTextBox.ContextMenu>
+                </RichTextBox>
             </Grid>
         </DockPanel>
     </DockPanel>

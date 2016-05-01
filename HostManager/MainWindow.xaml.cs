@@ -33,14 +33,75 @@ namespace HostManager
         private List<String> headerIsMatchedList = new List<String>();
         public Node nodeCopy = null;
 
+        public System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            SubWindow subWindow = new SubWindow();
+            subWindow.Show();
+
+            System.Windows.Forms.ContextMenu trayContextMenu = new System.Windows.Forms.ContextMenu();
+            System.Windows.Forms.MenuItem trayMenuItem1 = new System.Windows.Forms.MenuItem();
+            System.Windows.Forms.MenuItem trayMenuItem2 = new System.Windows.Forms.MenuItem();
+
+            trayMenuItem1.Index = 0;
+            trayMenuItem1.Text = "프로그램 열기";
+            trayMenuItem1.Click += delegate (object click, EventArgs e)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
+
+            trayMenuItem2.Index = 1;
+            trayMenuItem2.Text = "프로그램 닫기";
+            trayMenuItem2.Click += delegate (object click, EventArgs e)
+            {
+                notifyIcon.Visible = false;
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            };
+
+            trayContextMenu.MenuItems.Add(trayMenuItem1);
+            trayContextMenu.MenuItems.Add(trayMenuItem2);
+
+            notifyIcon.Icon = Properties.Resources.Sign_Icon;
+            notifyIcon.Text = "Moroo | Host Manager";
+            notifyIcon.Visible = true;
+            notifyIcon.ContextMenu = trayContextMenu;
+            notifyIcon.DoubleClick += delegate (object senders, EventArgs e)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
         }
 
-        private void UI_Loaded(object sender, RoutedEventArgs e)
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            BindTree(false, false);
+            e.Cancel = true;
+            this.Hide();
+            base.OnClosing(e);
+        }
+
+        public void BringToForeground()
+        {
+            if (this.WindowState == WindowState.Minimized || this.Visibility == Visibility.Hidden)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            }
+
+            // According to some sources these steps gurantee that an app will be brought to foreground.
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            this.Focus();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            BindTree();
+            //BindTree(false, false);
         }
 
         private void CheckBox_Loaded(object sender, RoutedEventArgs e)
@@ -303,17 +364,13 @@ namespace HostManager
 
                 if (applyCheck)
                 {
-                    BindTree(true, false);
+                    treeViewModel.IsChangedCancel();
                 }
             }
             else
             {
-                BindTree(false, true);
-
-                if (treeViewModel != null)
-                {
-                    applyCheck = hostIOController.HostSave(DirectEdit_TextBox.Text);
-                }
+                TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                applyCheck = hostIOController.HostSave(textRange.Text);
             }
 
             if (applyCheck)
@@ -331,7 +388,7 @@ namespace HostManager
                 }
             }
 
-            ChangeButtonUI(false);
+            ChangeApplyButtonUI(false);
             return applyCheck;
         }
 
@@ -354,20 +411,39 @@ namespace HostManager
 
                     int Count = 0;
 
-                    for (int i = 0; i < treeViewModel.NodeList.Count; i++)
+                    if (HostsTreeView.Visibility == Visibility.Visible)
                     {
-                        Count += treeViewModel.NodeList[i].Search(SearchBox.Text);
+                        for (int i = 0; i < treeViewModel.NodeList.Count; i++)
+                        {
+                            Count += treeViewModel.NodeList[i].Search(SearchBox.Text);
+                        }
 
-                    }
-
-                    if (Count == 0)
-                    {
-                        ChangeInfoLabel("Info", SearchBox.Text + "에 대한 검색 결과가 없습니다.", null);
+                        if (Count == 0)
+                        {
+                            ChangeInfoLabel("Info", SearchBox.Text + "에 대한 검색 결과가 없습니다.", null);
+                        }
+                        else
+                        {
+                            FindTreeViewItem(HostsTreeView);
+                            ChangeInfoLabel("Info", Count + "개 검색되었습니다.", null);
+                        }
                     }
                     else
                     {
-                        FindTreeViewItem(HostsTreeView);
-                        ChangeInfoLabel("Info", Count + "개 검색되었습니다.", null);
+                        Regex rg = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
+                        TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                        MatchCollection matches = rg.Matches(textRange.Text);
+                        Count = matches.Count;
+
+                        if (Count == 0)
+                        {
+                            ChangeInfoLabel("Info", SearchBox.Text + "에 대한 검색 결과가 없습니다.", null);
+                        }
+                        else
+                        {
+                            FindRichTextBox(Text_RichTextBox);
+                            ChangeInfoLabel("Info", Count + "개 검색되었습니다.", null);
+                        }
                     }
                 }
             }
@@ -382,7 +458,14 @@ namespace HostManager
                 SearchButtonImage.Source = bi;
                 SearchButtonImage.Tag = "Search";
 
-                FindTreeViewItem(HostsTreeView);
+                if (HostsTreeView.Visibility == Visibility.Visible)
+                {
+                    FindTreeViewItem(HostsTreeView);
+                }
+                else
+                {
+                    FindRichTextBox(Text_RichTextBox);
+                }
 
                 ChangeInfoLabel("Info", "검색을 취소하였습니다.", null);
             }
@@ -516,20 +599,51 @@ namespace HostManager
             #endregion
         }
 
+        private void BindTree()
+        {
+            treeViewModel = hostIOController.HostLoad();
+
+            if (treeViewModel == null)
+            {
+                TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                TextToTreeView(textRange.Text);
+            }
+            else
+            {
+                headerIsMatchedList = treeViewModel.DomainList();
+                HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (treeViewModel.Pass == false)
+                {
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 모든 체크를 해제하였습니다.", true);
+                }
+
+                if (treeViewModel.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+                }
+            }
+        }
+
         private void BindTree(bool isTreeView, bool isTextBox)
         {
+            TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+
             if (isTreeView == false && isTextBox == false)
             {
-                DirectEdit_TextBox.Text = hostIOController.HostToString();
                 treeViewModel = hostIOController.HostLoad();
             }
             else if (isTreeView == true && isTextBox == false)
             {
-                DirectEdit_TextBox.Text = treeViewModelController.ConverterToString(treeViewModel);
+                Text_RichTextBox.Document.Blocks.Clear();
+                Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewModelController.ConverterToString(treeViewModel))));
             }
             else if (isTreeView == false && isTextBox == true)
             {
-                treeViewModel = treeViewModelController.ConverterToTreeViewModel(DirectEdit_TextBox.Text);
+                textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                treeViewModel = treeViewModelController.ConverterToTreeViewModel(textRange.Text);
 
                 if (treeViewModel == null)
                 {
@@ -540,7 +654,8 @@ namespace HostManager
             if (treeViewModel == null)
             {
                 treeViewModel = new TreeViewModel();
-                TextToTreeView(DirectEdit_TextBox.Text);
+                textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                TextToTreeView(textRange.Text);
             }
             else
             {
@@ -555,7 +670,7 @@ namespace HostManager
                 }  
             }
 
-            if (DirectEdit_TextBox.Text == "" || ( DirectEdit_TextBox.Text == "" && treeViewModel.NodeList.Count == 0))
+            if (textRange.Text == "" || (textRange.Text == "" && treeViewModel.NodeList.Count == 0))
             {
                 ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
             }
@@ -592,10 +707,49 @@ namespace HostManager
             InfoLabel.Foreground = (Brush)Conv.ConvertFromString(ForegroundColor);
             InfoLabel.Content = msg;
 
-            ChangeButtonUI(setEdit);
+            ChangeApplyButtonUI(setEdit);
         }
 
-        private void ChangeButtonUI(bool? isChanged)
+        private void ChangeButtonUI()
+        {
+            if (SearchButtonImage.Tag.ToString() == "Cancel")
+            {
+                SearchBox.Text = "";
+
+                BitmapImage bi = new BitmapImage();
+                bi.BeginInit();
+                bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                bi.EndInit();
+                SearchButtonImage.Source = bi;
+                SearchButtonImage.Tag = "Search";
+
+                if (HostsTreeView.Visibility == Visibility.Visible)
+                {
+                    FindTreeViewItem(HostsTreeView);
+                }
+                else
+                {
+                    FindRichTextBox(Text_RichTextBox);
+                }
+            }
+
+            if (HostsTreeView.Visibility == Visibility.Visible)
+            {
+                TreeView_Button.IsEnabled = true;
+                TextEdit_Button.IsEnabled = false;
+                HostsTreeView.Visibility = Visibility.Hidden;
+                Text_RichTextBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TreeView_Button.IsEnabled = false;
+                TextEdit_Button.IsEnabled = true;
+                HostsTreeView.Visibility = Visibility.Visible;
+                Text_RichTextBox.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void ChangeApplyButtonUI(bool? isChanged)
         {
             if (isChanged == null)
             {
@@ -615,7 +769,7 @@ namespace HostManager
                     Apply_Button.IsEnabled = false;
                 }
             }
-        } 
+        }
 
         private void FindTreeViewItem(DependencyObject obj)
         {
@@ -630,13 +784,26 @@ namespace HostManager
             }
         }
 
+        private void FindRichTextBox(DependencyObject obj)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                RichTextBox textBlock = obj as RichTextBox;
+                if (textBlock != null)
+                {
+                    HighlightText(textBlock);
+                }
+                FindRichTextBox(VisualTreeHelper.GetChild(obj as DependencyObject, i));
+            }
+        }
+
         private void HighlightText(Object itx)
         {
             if (itx != null)
             {
+                Regex regex = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
                 if (itx is TextBlock)
                 {
-                    Regex regex = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
                     TextBlock textBlock = itx as TextBlock;
                     if (SearchBox.Text.Length == 0)
                     {
@@ -647,7 +814,7 @@ namespace HostManager
                     }
                     string[] substrings = regex.Split(textBlock.Text);
                     textBlock.Inlines.Clear();
-                    foreach (var item in substrings)
+                    foreach (string item in substrings)
                     {
                         if (regex.Match(item).Success)
                         {
@@ -663,6 +830,38 @@ namespace HostManager
                         }
                     }
                     return;
+                }
+                else if (itx is RichTextBox)
+                {
+                    TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                    textRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.White));
+                    textRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
+                    textRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
+
+                    if (SearchBox.Text.Length == 0)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        TextPointer start = Text_RichTextBox.Document.ContentStart;
+
+                        while (start != null && start.CompareTo(Text_RichTextBox.Document.ContentEnd) < 0)
+                        {
+                            if (start.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+                            {
+                                Match match = regex.Match(start.GetTextInRun(LogicalDirection.Forward));
+
+                                TextRange searchRange = new TextRange(start.GetPositionAtOffset(match.Index, LogicalDirection.Forward), start.GetPositionAtOffset(match.Index + match.Length, LogicalDirection.Backward));
+                                searchRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Red));
+                                searchRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.White));
+                                searchRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                                start = textRange.End; // I'm not sure if this is correct or skips ahead too far, try it out!!!
+                            }
+                            start = start.GetNextContextPosition(LogicalDirection.Forward);
+                        }
+                        return;
+                    }
                 }
                 else
                 {
@@ -985,96 +1184,48 @@ namespace HostManager
 
         private void TextToTreeView()
         {
-            if (Apply_Button.IsEnabled == true)
-            {
-                MessageBoxResult result = MessageBox.Show("변경된 사항을 저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    bool isApply = DoApply();
-
-                    if (isApply)
-                    {
-                        TreeView_Button.IsEnabled = true;
-                        TextEdit_Button.IsEnabled = false;
-                        HostsTreeView.Visibility = Visibility.Hidden;
-                        DirectEdit_TextBox.Visibility = Visibility.Visible;
-                    }
-                }
-                else if (result == MessageBoxResult.No)
-                {
-                    TreeView_Button.IsEnabled = true;
-                    TextEdit_Button.IsEnabled = false;
-                    HostsTreeView.Visibility = Visibility.Hidden;
-                    DirectEdit_TextBox.Visibility = Visibility.Visible;
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                TreeView_Button.IsEnabled = true;
-                TextEdit_Button.IsEnabled = false;
-                HostsTreeView.Visibility = Visibility.Hidden;
-                DirectEdit_TextBox.Visibility = Visibility.Visible;
-            }
-
-            Apply_Button.IsEnabled = false;
+            Text_RichTextBox.Document.Blocks.Clear();
+            Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewModelController.ConverterToString(treeViewModel))));
+            ChangeButtonUI();
         }
 
         private void TextToTreeView(String hostString)
         {
-            Apply_Button.IsEnabled = true;
-            TreeView_Button.IsEnabled = true;
-            TextEdit_Button.IsEnabled = false;
-            HostsTreeView.Visibility = Visibility.Hidden;
-            DirectEdit_TextBox.Visibility = Visibility.Visible;
-            DirectEdit_TextBox.Text = hostString;
-
+            Text_RichTextBox.Document.Blocks.Clear();
+            Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(hostString)));
             ChangeInfoLabel("Warning", "변환에 실패하여 텍스트 모드로 전환되었습니다.", null);
+            ChangeButtonUI();
         }
 
         private void TreeViewToText()
         {
-            if (Apply_Button.IsEnabled == true)
+            TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+            treeViewModel = treeViewModelController.ConverterToTreeViewModel(textRange.Text);
+
+            if (treeViewModel == null)
             {
-                MessageBoxResult result = MessageBox.Show("변경된 사항을 저장하시겠습니까?", null, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    bool isApply = DoApply();
-
-                    if (isApply)
-                    {
-                        TreeView_Button.IsEnabled = false;
-                        TextEdit_Button.IsEnabled = true;
-                        HostsTreeView.Visibility = Visibility.Visible;
-                        DirectEdit_TextBox.Visibility = Visibility.Hidden;
-                    }
-                }
-                else if (result == MessageBoxResult.No)
-                {
-                    TreeView_Button.IsEnabled = false;
-                    TextEdit_Button.IsEnabled = true;
-                    HostsTreeView.Visibility = Visibility.Visible;
-                    DirectEdit_TextBox.Visibility = Visibility.Hidden;
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
+                headerIsMatchedList.Clear();
+                ChangeInfoLabel("Warning", "변환에 실패하여 텍스트 모드로 전환되었습니다.", null);
             }
             else
             {
-                TreeView_Button.IsEnabled = false;
-                TextEdit_Button.IsEnabled = true;
-                HostsTreeView.Visibility = Visibility.Visible;
-                DirectEdit_TextBox.Visibility = Visibility.Hidden;
-            }
+                headerIsMatchedList = treeViewModel.DomainList();
+                HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                treeViewModel.DomainIsMatched(headerIsMatchedList);
 
-            Apply_Button.IsEnabled = false;
+                if (treeViewModel.Pass == false)
+                {
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 모든 체크를 해제하였습니다.", true);
+                }
+
+                if (treeViewModel.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+                }
+
+                ChangeButtonUI();
+            }
         }
 
         private void TextEdit_Button_Click(object sender, RoutedEventArgs e)
@@ -1105,21 +1256,61 @@ namespace HostManager
 
                 if (result == MessageBoxResult.Yes)
                 {
+                    if (HostsTreeView.Visibility == Visibility.Visible)
+                    {
+                        BindTree();
+                    }
+                    else
+                    {
+                        Text_RichTextBox.Document.Blocks.Clear();
+                        Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(hostIOController.HostToString())));
+                    }
+
+                    if (SearchButtonImage.Tag.ToString() == "Cancel")
+                    {
+                        SearchBox.Text = "";
+
+                        BitmapImage bi = new BitmapImage();
+                        bi.BeginInit();
+                        bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                        bi.EndInit();
+                        SearchButtonImage.Source = bi;
+                        SearchButtonImage.Tag = "Search";
+                    }
+
                     Apply_Button.IsEnabled = false;
-                    BindTree(false, false);
                 }
                 else
                 {
-                    if (InfoLabel.Content.ToString() == "")
-                    {
-                        ChangeInfoLabel("Info", "새로고침을 취소하였습니다.", null);
-                    }
+                    ChangeInfoLabel("Info", "새로고침을 취소하였습니다.", null);
                     return;
                 }
             }
             else
             {
-                BindTree(false, false);
+                if (HostsTreeView.Visibility == Visibility.Visible)
+                {
+                    BindTree();
+                }
+                else
+                {
+                    Text_RichTextBox.Document.Blocks.Clear();
+                    Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(hostIOController.HostToString())));
+                }
+
+                if (SearchButtonImage.Tag.ToString() == "Cancel")
+                {
+                    SearchBox.Text = "";
+
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                    bi.EndInit();
+                    SearchButtonImage.Source = bi;
+                    SearchButtonImage.Tag = "Search";
+                }
+
+                Apply_Button.IsEnabled = false;
             }
 
             if (InfoLabel.Content.ToString() == "")
@@ -1130,7 +1321,7 @@ namespace HostManager
 
         private void DirectEdit_TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (Apply_Button.IsEnabled ==false && (e.OriginalSource as TextBox).IsKeyboardFocused)
+            if (Apply_Button.IsEnabled ==false && (e.OriginalSource as RichTextBox).IsKeyboardFocused)
             {
                 Apply_Button.IsEnabled = true;
                 ChangeInfoLabel("Info", "수정된 항목이 있습니다.", null);
