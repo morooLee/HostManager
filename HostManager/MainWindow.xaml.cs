@@ -29,6 +29,7 @@ namespace HostManager
     {
         private TreeViewModelController treeViewModelController = new TreeViewModelController();
         private HostIOController hostIOController = new HostIOController();
+        private BrowserController browserController = new BrowserController();
         private TreeViewModel treeViewModel = new TreeViewModel();
         private List<String> headerIsMatchedList = new List<String>();
         public Node nodeCopy = null;
@@ -352,6 +353,7 @@ namespace HostManager
         {
             ChangeInfoLabel("None", "", null);
             DoApply();
+            browserController.CheckDoBrowsers();
         }
 
         private bool DoApply()
