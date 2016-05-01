@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HostManager.Controllers
@@ -12,13 +13,13 @@ namespace HostManager.Controllers
         public void CheckDoBrowsers()
         {
             bool isIE = false;
-            string pathIE = "";
+            String pathIE = "";
             bool isEdge = false;
-            string pathEdge = "";
+            String pathEdge = "";
             bool isChrome = false;
-            string pathChrome = "";
+            String pathChrome = "";
             bool isFireFox = false;
-            string pathFireFox = "";
+            String pathFireFox = "";
 
             Process[] processList = Process.GetProcesses();
             List<Process> tmpList = new List<Process>();
@@ -50,32 +51,35 @@ namespace HostManager.Controllers
                     tmpList.Add(item);
                 }
             }
+
             foreach (Process _item in tmpList)
             {
-                Console.WriteLine(_item.ProcessName);
+                _item.Kill();
             }
-            foreach (Process _item in tmpList)
-            {
-                _item.Close();
-            }
+
+            Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 8");
+            Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 2");
+
             if (isIE)
             {
-                Console.WriteLine(pathIE);
+                Process.Start(pathIE);
+                Thread.Sleep(500);
             }
             if (isEdge)
             {
-                Console.WriteLine(pathEdge);
+                Process.Start("microsoft-edge:http://www.nexon.com");
+                Thread.Sleep(500);
             }
             if (isChrome)
             {
-                Console.WriteLine(pathChrome);
+                Process.Start(pathChrome);
+                Thread.Sleep(500);
             }
             if (isFireFox)
             {
-                Console.WriteLine(pathFireFox);
+                Process.Start(pathFireFox);
+                Thread.Sleep(500);
             }
-            Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 8");
-            Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 2");
         }
     }
 }

@@ -40,8 +40,8 @@ namespace HostManager
         {
             InitializeComponent();
 
-            SubWindow subWindow = new SubWindow();
-            subWindow.Show();
+            //SubWindow subWindow = new SubWindow();
+            //subWindow.Show();
 
             System.Windows.Forms.ContextMenu trayContextMenu = new System.Windows.Forms.ContextMenu();
             System.Windows.Forms.MenuItem trayMenuItem1 = new System.Windows.Forms.MenuItem();
