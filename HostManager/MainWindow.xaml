@@ -140,6 +140,11 @@
                     </TreeView.ContextMenu>
                 </TreeView>
                 <RichTextBox Name="Text_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="DirectEdit_TextBox_TextChanged">
+                    <RichTextBox.Resources>
+                        <Style TargetType="{x:Type Paragraph}">
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+                    </RichTextBox.Resources>
                     <RichTextBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="복사하기" Command="Copy" />
@@ -150,6 +155,9 @@
                             <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" Click="TreeView_MenuItem_Click" />
                         </ContextMenu>
                     </RichTextBox.ContextMenu>
+                    <RichTextBox.Document>
+                        <FlowDocument PageWidth="1000" />
+                    </RichTextBox.Document>
                 </RichTextBox>
             </Grid>
         </DockPanel>

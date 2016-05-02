@@ -39,7 +39,7 @@ namespace HostManager
         public MainWindow()
         {
             InitializeComponent();
-
+            //Text_RichTextBox.Document.PageWidth = 1000;
             //SubWindow subWindow = new SubWindow();
             //subWindow.Show();
 
@@ -607,8 +607,7 @@ namespace HostManager
 
             if (treeViewModel == null)
             {
-                TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
-                TextToTreeView(textRange.Text);
+                TextToTreeView(hostIOController.HostToString());
             }
             else
             {
