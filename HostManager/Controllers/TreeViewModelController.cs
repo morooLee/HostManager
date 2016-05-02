@@ -138,23 +138,31 @@ namespace HostManager.Controllers
 
                             foreach (Node item in tmpNode.NodeList)
                             {
-                                if (item.IsChecked == true)
+                                if (item.IsChecked == null)
+                                {
+                                    tmpNode.IsChecked = null;
+                                    break;
+                                }
+                                else if (item.IsChecked == true)
                                 {
                                     CheckCount++;
                                 }
                             }
 
-                            if (CheckCount == 0)
+                            if (tmpNode.IsChecked != null)
                             {
-                                tmpNode.IsChecked = false;
-                            }
-                            else if (CheckCount == tmpNode.NodeList.Count)
-                            {
-                                tmpNode.IsChecked = true;
-                            }
-                            else
-                            {
-                                tmpNode.IsChecked = null;
+                                if (CheckCount == tmpNode.NodeList.Count && tmpNode.NodeList.Count != 0)
+                                {
+                                    tmpNode.IsChecked = true;
+                                }
+                                else if (CheckCount > 0)
+                                {
+                                    tmpNode.IsChecked = null;
+                                }
+                                else if (CheckCount == 0)
+                                {
+                                    tmpNode.IsChecked = false;
+                                }
                             }
 
                             nodeList.Remove(nodeList.Last());
@@ -165,23 +173,31 @@ namespace HostManager.Controllers
                         {
                             foreach (Node item in nodeList.Last().NodeList)
                             {
-                                if (item.IsChecked == true)
+                                if (item.IsChecked == null)
+                                {
+                                    nodeList.Last().IsChecked = null;
+                                    break;
+                                }
+                                else if (item.IsChecked == true)
                                 {
                                     CheckCount++;
                                 }
                             }
 
-                            if (CheckCount == 0)
+                            if (nodeList.Last().IsChecked != null)
                             {
-                                nodeList.Last().IsChecked = false;
-                            }
-                            else if (CheckCount == nodeList.Last().NodeList.Count)
-                            {
-                                nodeList.Last().IsChecked = true;
-                            }
-                            else
-                            {
-                                nodeList.Last().IsChecked = null;
+                                if (CheckCount == nodeList.Last().NodeList.Count && nodeList.Last().NodeList.Count != 0)
+                                {
+                                    nodeList.Last().IsChecked = true;
+                                }
+                                else if (CheckCount > 0)
+                                {
+                                    nodeList.Last().IsChecked = null;
+                                }
+                                else if (CheckCount == 0)
+                                {
+                                    nodeList.Last().IsChecked = false;
+                                }
                             }
 
                             treeViewModel.NodeList.Add(nodeList.Last());
@@ -226,9 +242,9 @@ namespace HostManager.Controllers
             }
             else
             {
-                foreach (Node item in treeViewModel.NodeList)
+                foreach (Node Item in treeViewModel.NodeList)
                 {
-                    item.Initialize();
+                    Item.Initialize();
                 }
                 return treeViewModel;
             }
@@ -288,22 +304,6 @@ namespace HostManager.Controllers
             }
             else
             {
-                if (tmpString != "")
-                {
-                    if (node.NodeList != null && regex.IsMatch(node.NodeList.FirstOrDefault().Header) == false)
-                    {
-                        if (tmpString != "")
-                        {
-                            tmpString += "\r\n";
-                            tmpString += "\r\n";
-                        }
-                    }
-                    else if (node.NodeList != null)
-                    {
-                        tmpString += "\r\n";
-                    }
-                }
-
                 if (node.Tooltip == null || node.Tooltip == "")
                 {
                     tmpString += ("#{{" + node.Header + "\r\n");
@@ -312,7 +312,7 @@ namespace HostManager.Controllers
                 {
                     tmpString += ("#{{" + node.Header + "\t\t#" + node.Tooltip + "\r\n");
                 }
-                
+
                 if (node.NodeList != null || node.NodeList.Count == 0)
                 {
                     foreach (Node _node in node.NodeList)
@@ -322,6 +322,19 @@ namespace HostManager.Controllers
                 }
 
                 tmpString += "#}}\r\n";
+
+                if (node.ParentNode != null)
+                {
+                    if (node.ParentNode.NodeList.IndexOf(node) != (node.ParentNode.NodeList.Count - 1))
+                    {
+                        tmpString += "\r\n";
+                    }
+                }
+                else
+                {
+                    tmpString += "\r\n";
+                    tmpString += "\r\n";
+                }
             }
 
             return tmpString;

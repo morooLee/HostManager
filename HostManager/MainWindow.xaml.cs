@@ -39,7 +39,6 @@ namespace HostManager
         public MainWindow()
         {
             InitializeComponent();
-            //Text_RichTextBox.Document.PageWidth = 1000;
             //SubWindow subWindow = new SubWindow();
             //subWindow.Show();
 
