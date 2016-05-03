@@ -1083,6 +1083,7 @@ namespace HostManager
                 if (treeViewModel.NodeList.IndexOf(node) > 0)
                 {
                     treeViewModel.NodeList.Move(treeViewModel.NodeList.IndexOf(node), treeViewModel.NodeList.IndexOf(node) - 1);
+                    ChangeApplyButtonUI(true);
                 }
                 else
                 {
@@ -1095,6 +1096,7 @@ namespace HostManager
                 if (node.ParentNode.NodeList.IndexOf(node) > 0)
                 {
                     node.ParentNode.NodeList.Move(node.ParentNode.NodeList.IndexOf(node), node.ParentNode.NodeList.IndexOf(node) - 1);
+                    ChangeApplyButtonUI(true);
                 }
                 else
                 {
@@ -1114,6 +1116,7 @@ namespace HostManager
                 if (treeViewModel.NodeList.IndexOf(node) < (treeViewModel.NodeList.Count - 1))
                 {
                     treeViewModel.NodeList.Move(treeViewModel.NodeList.IndexOf(node), treeViewModel.NodeList.IndexOf(node) + 1);
+                    ChangeApplyButtonUI(true);
                 }
                 else
                 {
@@ -1126,6 +1129,7 @@ namespace HostManager
                 if (node.ParentNode.NodeList.IndexOf(node) < (node.ParentNode.NodeList.Count - 1))
                 {
                     node.ParentNode.NodeList.Move(node.ParentNode.NodeList.IndexOf(node), node.ParentNode.NodeList.IndexOf(node) + 1);
+                    ChangeApplyButtonUI(true);
                 }
                 else
                 {

@@ -208,17 +208,17 @@ namespace HostManager
                           WS_MINIMIZEBOX = 0x20000;
 
         [DllImport("user32.dll")]
-        extern private static int GetWindowLong(IntPtr hwnd, int index);
+        extern private static int GetWindowLongPtr(IntPtr hwnd, int index);
 
         [DllImport("user32.dll")]
-        extern private static int SetWindowLong(IntPtr hwnd, int index, int value);
+        extern private static int SetWindowLongPtr(IntPtr hwnd, int index, int value);
 
         internal static void HideMinimizeAndMaximizeButtons(this Window window)
         {
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
-            var currentStyle = GetWindowLong(hwnd, GWL_STYLE);
+            var currentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
-            SetWindowLong(hwnd, GWL_STYLE, (currentStyle & ~WS_MINIMIZEBOX));
+            SetWindowLongPtr(hwnd, GWL_STYLE, (currentStyle & ~WS_MINIMIZEBOX));
         }
     }
 }
