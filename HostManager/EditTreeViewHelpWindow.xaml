@@ -55,9 +55,9 @@
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Margin="5" Header="항목 작성법">
                 <StackPanel>
-                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{항목명  #도움말" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{부모 항목명  #도움말" />
+                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{자식 항목명" />
                     <TextBlock FontSize="10" Foreground="Gray" Text="#}}" />
-                    <TextBlock FontSize="10" Foreground="Gray" Text="#{{항목명" />
                     <TextBlock FontSize="10" Foreground="Gray" Text="#}}" />
                 </StackPanel>
             </GroupBox>
