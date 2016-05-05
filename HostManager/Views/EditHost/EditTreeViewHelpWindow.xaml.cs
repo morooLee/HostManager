@@ -11,14 +11,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace HostManager.Views.Edit
+namespace HostManager.Views.EditHost
 {
     /// <summary>
-    /// PreferencesWindow.xaml에 대한 상호 작용 논리
+    /// EditTreeViewHelpWindow.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class PreferencesWindow : Window
+    public partial class EditTreeViewHelpWindow : Window
     {
-        public PreferencesWindow()
+        public EditTreeViewHelpWindow()
         {
             InitializeComponent();
         }

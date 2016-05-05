@@ -1,5 +1,7 @@
 ﻿using HostManager.Controllers;
 using HostManager.Models;
+using HostManager.Views.EditHost;
+using HostManager.Views.Menu;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1370,6 +1372,14 @@ namespace HostManager
         {
             ChangeInfoLabel("None", "", null);
             TextToTreeView();
+        }
+
+        private void Menu_Edit_Pref_Click(object sender, RoutedEventArgs e)
+        {
+            SettingWindow settingWindow = new SettingWindow();
+            settingWindow.Owner = Application.Current.MainWindow;
+            settingWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            settingWindow.ShowDialog();
         }
     }
 }

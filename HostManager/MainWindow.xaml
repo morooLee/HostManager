@@ -10,9 +10,22 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="22">
-            <MenuItem Header="파일"/>
-            <MenuItem Header="편집"/>
-            <MenuItem Header="도움말"/>
+            <MenuItem Header="파일">
+                <MenuItem Header="불러오기"/>
+                <MenuItem Header="저장하기"/>
+                <MenuItem Header="내보내기"/>
+                <MenuItem Header="종료"/>
+            </MenuItem>
+            <MenuItem Header="편집">
+                <MenuItem Header="호스트 추가하기"/>
+                <MenuItem Header="호스트 수정하기"/>
+                <MenuItem Name="Menu_Edit_Pref" Header="속성" Click="Menu_Edit_Pref_Click"/>
+            </MenuItem>
+            <MenuItem Header="도움말">
+                <MenuItem Header="About"/>
+                <MenuItem Header="사용법"/>
+                <MenuItem Header="업데이트"/>
+            </MenuItem>
         </Menu>
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="2, 0, 2, 0">

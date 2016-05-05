@@ -136,17 +136,15 @@
     <Compile Include="SubWindow.xaml.cs">
       <DependentUpon>SubWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Edit\PreferencesWindow.xaml.cs">
-      <DependentUpon>PreferencesWindow.xaml</DependentUpon>
+    <Compile Include="Views\EditHost\EditTreeViewHelpWindow.xaml.cs">
+      <DependentUpon>EditTreeViewHelpWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="EditTreeViewHelpWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="EditTreeViewWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Compile Include="Views\EditHost\EditTreeViewWindow.xaml.cs">
+      <DependentUpon>EditTreeViewWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Menu\Edit\SettingWindow.xaml.cs">
+      <DependentUpon>SettingWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -157,12 +155,6 @@
     </Compile>
     <Compile Include="Controllers\HostIOController.cs" />
     <Compile Include="Controllers\TreeViewModelController.cs" />
-    <Compile Include="EditTreeViewHelpWindow.xaml.cs">
-      <DependentUpon>EditTreeViewHelpWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="EditTreeViewWindow.xaml.cs">
-      <DependentUpon>EditTreeViewWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -171,7 +163,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Edit\PreferencesWindow.xaml">
+    <Page Include="Views\EditHost\EditTreeViewHelpWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditHost\EditTreeViewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Menu\Edit\SettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -244,6 +244,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Menu\File\" />
+    <Folder Include="Views\Menu\Help\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

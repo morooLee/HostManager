@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace HostManager
+namespace HostManager.Views.EditHost
 {
     /// <summary>
     /// EditTreeViewWindow.xaml에 대한 상호 작용 논리
@@ -58,7 +57,7 @@ namespace HostManager
             {
                 String nodeString = treeViewModelController.ConverterToString(tmpNode);
                 DirectEditTextBox.AppendText(nodeString);
-                
+
                 if (tmpNode.IsLastNode)
                 {
                     Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
@@ -174,7 +173,7 @@ namespace HostManager
                         MessageBox.Show("IP주소를 입력하지 않았거나 형식에 어긋납니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    
+
                     tmpNode.IsLastNode = true;
 
                     if (HostTooltipTextBox.Text != "")
@@ -207,11 +206,43 @@ namespace HostManager
                           //WS_MAXIMIZEBOX = 0x10000,
                           WS_MINIMIZEBOX = 0x20000;
 
-        [DllImport("user32.dll")]
-        extern private static int GetWindowLongPtr(IntPtr hwnd, int index);
+        [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+        private static extern int GetWindowLongPtr32(IntPtr hWnd, int index);
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+        private static extern int GetWindowLongPtr64(IntPtr hWnd, int index);
 
-        [DllImport("user32.dll")]
-        extern private static int SetWindowLongPtr(IntPtr hwnd, int index, int value);
+        // This static method is required because Win32 does not support
+        // GetWindowLongPtr directly
+        public static int GetWindowLongPtr(IntPtr hWnd, int index)
+        {
+            if (IntPtr.Size == 8)
+            {
+                return GetWindowLongPtr64(hWnd, index);
+            }
+            else
+            {
+                return GetWindowLongPtr32(hWnd, index);
+            }
+        }
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+        private static extern int SetWindowLongPtr32(IntPtr hwnd, int index, int value);
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+        private static extern int SetWindowLongPtr64(IntPtr hwnd, int index, int value);
+
+        // This static method is required because Win32 does not support
+        // GetWindowLongPtr directly
+        public static int SetWindowLongPtr(IntPtr hwnd, int index, int value)
+        {
+            if (IntPtr.Size == 8)
+            {
+                return SetWindowLongPtr64(hwnd, index, value);
+            }
+            else
+            {
+                return SetWindowLongPtr32(hwnd, index, value);
+            }
+        }
 
         internal static void HideMinimizeAndMaximizeButtons(this Window window)
         {
