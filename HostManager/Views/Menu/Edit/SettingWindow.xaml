@@ -6,65 +6,57 @@
         xmlns:local="clr-namespace:HostManager.Views.Menu"
         xmlns:appSettings="clr-namespace:HostManager.Properties"
         mc:Ignorable="d"
-        Title="속성" Height="300" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" >
+        Title="속성" Height="400" Width="400" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <GroupBox Header="Host 적용 시 실행중인 브라우저 자동 닫고 열기">
+            <GroupBox Margin="5" Header="브라우저 설정">
                 <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" Content="IE 계열"/>
-                        <CheckBox Grid.Column="1" Content="캐시 및 쿠기 삭제하기" IsEnabled="False" Foreground="Gray"/>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" Content="Edge"/>
-                        <CheckBox Grid.Column="1" Content="Edge" IsEnabled="False" Foreground="Gray"/>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" Content="Chrome"/>
-                        <CheckBox Grid.Column="1" Content="Chrome" IsEnabled="False" Foreground="Gray"/>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" Content="Firefox"/>
-                        <CheckBox Grid.Column="1" Content="Firefox" IsEnabled="False" Foreground="Gray"/>
-                    </Grid>
+                    <GroupBox Margin="5" Header="브라우저 자동 재시작">
+                        <StackPanel>
+                            <TextBlock Margin="0,5,0,10" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저가 실행 중이라면 자동으로 종료 후 재시작됩니다." FontSize="10"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox Content="IE 계열"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Edge"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Chrome"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Firefox"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="캐시 및 쿠키 삭제하기">
+                        <StackPanel>
+                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Text="자동 재시작이 설정된 브라우저에 한해 해당 브라우저가 자동 재시작 시 캐시와 쿠기도 같이 제거됩니다." FontSize="10"/>
+                            <TextBlock Margin="0,0,0,10" TextWrapping="Wrap" Text="( Edge / Chrome / Firefox는 미 구현 )" Foreground="Red" FontSize="10"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <CheckBox Content="IE 계열" IsEnabled="False" Foreground="Gray"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Edge" IsEnabled="False" Foreground="Gray" Visibility="Hidden"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Chrome" IsEnabled="False" Foreground="Gray" Visibility="Hidden"/>
+                                <Border Width="10"/>
+                                <CheckBox Content="Firefox" IsEnabled="False" Foreground="Gray" Visibility="Hidden"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Host 적용 시 캐시 및 쿠키 삭제하기">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <CheckBox Content="IE 계열"/>
-                        <CheckBox Content="Edge" IsEnabled="False" Foreground="Gray"/>
-                        <CheckBox Content="Chrome" IsEnabled="False" Foreground="Gray"/>
-                        <CheckBox Content="Firefox" IsEnabled="False" Foreground="Gray"/>
+            <GroupBox Margin="5" Header="Host 설정">
+                <GroupBox Margin="5" Header="경로 수동 설정">
+                    <StackPanel>
+                        <StackPanel>
+                            <TextBlock Margin="0,5,0,10" TextWrapping="Wrap" Text="Host 파일의 경로를 수동으로 설정합니다." FontSize="10"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBox></TextBox>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Host 경로 강제로 설정하기">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" >
-                        <TextBox></TextBox>
-                    </StackPanel>
-                </StackPanel>
+                </GroupBox>
             </GroupBox>
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" >
