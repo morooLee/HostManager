@@ -17,7 +17,7 @@
                 <MenuItem Header="종료"/>
             </MenuItem>
             <MenuItem Header="편집">
-                <MenuItem Header="호스트 추가하기"/>
+                <MenuItem Header="호스트 추가하기" Click="Root_Add_TreeViewItem"/>
                 <MenuItem Header="호스트 수정하기"/>
                 <MenuItem Name="Menu_Edit_Pref" Header="속성" Click="Menu_Edit_Pref_Click"/>
             </MenuItem>

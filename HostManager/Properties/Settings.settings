@@ -2,34 +2,34 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HostManager.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="IE_Auto_Closing" Type="System.Boolean" Scope="Application">
+    <Setting Name="IE_Auto_Restart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Edge_Auto_Closing" Type="System.Boolean" Scope="Application">
+    <Setting Name="Edge_Auto_Restart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Chrome_Auto_Closing" Type="System.Boolean" Scope="Application">
+    <Setting Name="Chrome_Auto_Restart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="FF_Auto_Closing" Type="System.Boolean" Scope="Application">
+    <Setting Name="FF_Auto_Restart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="IE_TmpFile_Del" Type="System.Boolean" Scope="Application">
+    <Setting Name="IE_TmpFile_Del" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Edge_TmpFile_Del" Type="System.Boolean" Scope="Application">
+    <Setting Name="Edge_TmpFile_Del" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Chrome_TmpFile_Del" Type="System.Boolean" Scope="Application">
+    <Setting Name="Chrome_TmpFile_Del" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="FF_TmpFile_Del" Type="System.Boolean" Scope="Application">
+    <Setting Name="FF_TmpFile_Del" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Host_Setting" Type="System.Boolean" Scope="Application">
+    <Setting Name="Host_Setting" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Host_File_Path" Type="System.String" Scope="Application">
+    <Setting Name="Host_File_Path" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
