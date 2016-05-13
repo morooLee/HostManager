@@ -121,19 +121,7 @@ namespace HostManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Host_Setting {
-            get {
-                return ((bool)(this["Host_Setting"]));
-            }
-            set {
-                this["Host_Setting"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Windows\\System32\\drivers\\etc")]
         public string Host_File_Path {
             get {
                 return ((string)(this["Host_File_Path"]));

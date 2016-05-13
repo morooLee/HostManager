@@ -34,7 +34,7 @@ namespace HostManager
         private BrowserController browserController = new BrowserController();
         private TreeViewModel treeViewModel = new TreeViewModel();
         private List<String> headerIsMatchedList = new List<String>();
-        public Node nodeCopy = null;
+        public Node SelectedNode = null;
 
         public System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
 
@@ -60,8 +60,8 @@ namespace HostManager
             trayMenuItem2.Text = "프로그램 닫기";
             trayMenuItem2.Click += delegate (object click, EventArgs e)
             {
-                notifyIcon.Visible = false;
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                ChangeInfoLabel("None", "", null);
+                DoExit();
             };
 
             trayContextMenu.MenuItems.Add(trayMenuItem1);
@@ -550,6 +550,7 @@ namespace HostManager
 
             #region 상태표시줄에 전체 경로 출력하기
             Node item = e.NewValue as Node;
+            SelectedNode = item;
             String sbText = "";
 
             if (item != null)
@@ -997,64 +998,84 @@ namespace HostManager
         private void Edit_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node node = menuItem.DataContext as Node;
+            Node node = null;
 
-            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, menuItem.Header.ToString());
-            editTreeViewWindow.Owner = Application.Current.MainWindow;
-            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            editTreeViewWindow.ShowDialog();
-
-            if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+            if (menuItem.Name == "Menu_Edit_HostEdit")
             {
-                foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
+                if(SelectedNode != null)
                 {
-                    item.ParentNode = node.ParentNode;
-                    item.IsChanged = true;
-                    item.IsChecked = true;
-                    item.IsExpanded = true;
-
-                    if (node.ParentNode == null)
-                    {
-                        treeViewModel.NodeList.Insert(treeViewModel.NodeList.IndexOf(node), item);
-                    }
-                    else
-                    {
-                        node.ParentNode.NodeList.Insert(node.ParentNode.NodeList.IndexOf(node), item);
-                    }
-                }
-
-                if (node.ParentNode == null)
-                {
-                    treeViewModel.NodeList.RemoveAt(treeViewModel.NodeList.IndexOf(node));
+                    node = SelectedNode;
+                    return;
                 }
                 else
                 {
-                    node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
-                    node.ParentNode.IsSelected = false;
-                }
-
-                headerIsMatchedList = treeViewModel.DomainList();
-                editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
-
-                if (editTreeViewWindow.treeViewModel.Pass == false)
-                {
-                    headerIsMatchedList = treeViewModel.DomainList();
-
-                    MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
-                }
-                else
-                {
-                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                    MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else
             {
-                ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+                node = menuItem.DataContext as Node;
             }
 
-            editTreeViewWindow.treeViewModel = null;
-            editTreeViewWindow.Close();
+            if (node != null)
+            {
+                EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, menuItem.Header.ToString());
+                editTreeViewWindow.Owner = Application.Current.MainWindow;
+                editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                editTreeViewWindow.ShowDialog();
+
+                if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
+                {
+                    foreach (Node item in editTreeViewWindow.treeViewModel.NodeList)
+                    {
+                        item.ParentNode = node.ParentNode;
+                        item.IsChanged = true;
+                        item.IsChecked = true;
+                        item.IsExpanded = true;
+
+                        if (node.ParentNode == null)
+                        {
+                            treeViewModel.NodeList.Insert(treeViewModel.NodeList.IndexOf(node), item);
+                        }
+                        else
+                        {
+                            node.ParentNode.NodeList.Insert(node.ParentNode.NodeList.IndexOf(node), item);
+                        }
+                    }
+
+                    if (node.ParentNode == null)
+                    {
+                        treeViewModel.NodeList.RemoveAt(treeViewModel.NodeList.IndexOf(node));
+                    }
+                    else
+                    {
+                        node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
+                        node.ParentNode.IsSelected = false;
+                    }
+
+                    headerIsMatchedList = treeViewModel.DomainList();
+                    editTreeViewWindow.treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                    if (editTreeViewWindow.treeViewModel.Pass == false)
+                    {
+                        headerIsMatchedList = treeViewModel.DomainList();
+
+                        MessageBox.Show("중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
+                    }
+                    else
+                    {
+                        ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                    }
+                }
+                else
+                {
+                    ChangeInfoLabel("Warning", "작업이 취소되었습니다.", null);
+                }
+
+                editTreeViewWindow.treeViewModel = null;
+                editTreeViewWindow.Close();
+            }
         }
 
         private void Del_TreeViewItem(object sender, RoutedEventArgs e)
@@ -1176,7 +1197,7 @@ namespace HostManager
                 }
                 else
                 {
-                    ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", true);
+                    ChangeInfoLabel("Success", "호스트가 추가되었습니다.", true);
                 }
             }
             else
@@ -1255,7 +1276,11 @@ namespace HostManager
         private void Refresh_Button_Click(object sender, RoutedEventArgs e)
         {
             ChangeInfoLabel("None", "", null);
+            DoRefresh();
+        }
 
+        private void DoRefresh()
+        {
             if (Apply_Button.IsEnabled == true)
             {
                 MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n새로고침을 할 경우 저장되지 않은 정보는 삭제됩니다.\r\n그래도 새로고침을 하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -1379,7 +1404,96 @@ namespace HostManager
             SettingWindow settingWindow = new SettingWindow();
             settingWindow.Owner = Application.Current.MainWindow;
             settingWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            settingWindow.ShowDialog();
+
+            bool? result = settingWindow.ShowDialog();
+
+            if (result == true)
+            {
+                ChangeInfoLabel("Success", "저장되었습니다.", null);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "취소되었습니다.", null);
+            }
+        }
+
+        private void Menu_Edit_Text_Click(object sender, RoutedEventArgs e)
+        {
+            if (Text_RichTextBox.IsVisible == false)
+            {
+                ChangeInfoLabel("None", "", null);
+                TextToTreeView();
+            }
+        }
+
+        private void Menu_Edit_Categoty_Click(object sender, RoutedEventArgs e)
+        {
+            if (HostsTreeView.IsVisible == false)
+            {
+                ChangeInfoLabel("None", "", null);
+                TreeViewToText();
+            }
+        }
+
+        private void Menu_Edit_Notepad_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+            OpenNotepad();
+        }
+
+        private void Menu_Edit_Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+            DoRefresh();
+        }
+
+        private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Menu_File_Export_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Menu_File_Save_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Menu_File_AsSave_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Menu_File_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            ChangeInfoLabel("None", "", null);
+            DoExit();
+        }
+
+        private void DoExit()
+        {
+            if (Apply_Button.IsEnabled == true)
+            {
+                MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n그래도 종료하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    notifyIcon.Visible = false;
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                }
+                else
+                {
+                    ChangeInfoLabel("Info", "프로그램 종료를 취소하였습니다.", null);
+                }
+            }
+            else
+            {
+                notifyIcon.Visible = false;
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            }
         }
     }
 }

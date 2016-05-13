@@ -1,4 +1,5 @@
 ﻿using HostManager.Models;
+using HostManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,7 +22,7 @@ namespace HostManager.Controllers
             try
             {
                 TreeViewModel treeViewModel = new TreeViewModel();
-                StreamReader streamReader = new StreamReader(@"C:\Windows\System32\drivers\etc\Hosts");
+                StreamReader streamReader = new StreamReader(Settings.Default.Host_File_Path + @"\Hosts", Encoding.UTF8);
 
                 treeViewModel = treeViewModelController.ConverterToTreeViewModel(streamReader.ReadToEnd());
                 streamReader.Close();
@@ -43,7 +44,7 @@ namespace HostManager.Controllers
 
             try
             {
-                StreamReader streamReader = new StreamReader(@"C:\Windows\System32\drivers\etc\Hosts");
+                StreamReader streamReader = new StreamReader(Settings.Default.Host_File_Path + @"\Hosts", Encoding.UTF8);
 
                 hostString = streamReader.ReadToEnd();
                 streamReader.Close();
@@ -116,7 +117,7 @@ namespace HostManager.Controllers
         {
             try
             {
-                StreamWriter hostsStreamWriter = new StreamWriter(@"C:\Windows\System32\drivers\etc\Hosts");
+                StreamWriter hostsStreamWriter = new StreamWriter(Settings.Default.Host_File_Path + @"\Hosts");
 
                 hostsStreamWriter.WriteLine(hostString);
                 hostsStreamWriter.Close();
@@ -134,11 +135,32 @@ namespace HostManager.Controllers
         {
             try
             {
-                Process.Start("Notepad.exe", @"C:\Windows\System32\drivers\etc\Hosts");
+                Process.Start("Notepad.exe", Settings.Default.Host_File_Path + @"\Hosts");
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public void FileOpen()
+        {
+            System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+
+            // Set filter for file extension and default file extension
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "텍스트 파일 (*.txt)|*.txt|모든파일|*.*";
+
+
+            // Display OpenFileDialog by calling ShowDialog method
+            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+
+
+            // Get the selected file name and display in a TextBox
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                // Open document
+                //hostPath = dlg.FileName;
             }
         }
     }

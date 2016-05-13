@@ -26,11 +26,8 @@
     <Setting Name="FF_TmpFile_Del" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Host_Setting" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="Host_File_Path" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">C:\Windows\System32\drivers\etc</Value>
     </Setting>
   </Settings>
 </SettingsFile>
