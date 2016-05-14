@@ -11,9 +11,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="22">
             <MenuItem Header="파일">
+                <MenuItem Name="Menu_File_Clear" Header="새로 만들기" Click="Menu_File_Clear_Click"/>
                 <MenuItem Name="Menu_File_Open" Header="불러오기" Click="Menu_File_Open_Click"/>
-                <MenuItem Name="Menu_File_Export" Header="내보내기" Click="Menu_File_Export_Click"/>
-                <Separator/>
                 <MenuItem Name="Menu_File_Save" Header="저장하기" Click="Menu_File_Save_Click"/>
                 <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" Click="Menu_File_AsSave_Click"/>
                 <Separator/>

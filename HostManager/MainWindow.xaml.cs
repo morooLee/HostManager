@@ -361,6 +361,8 @@ namespace HostManager
         {
             bool applyCheck = false;
 
+            SearchBoxClear();
+
             if (HostsTreeView.Visibility == Visibility.Visible)
             {
                 applyCheck = hostIOController.HostSave(treeViewModel);
@@ -520,6 +522,30 @@ namespace HostManager
             }
         }
 
+        private void SearchBoxClear()
+        {
+            if (SearchButtonImage.Tag.ToString() == "Cancel")
+            {
+                SearchBox.Text = "";
+
+                BitmapImage bi = new BitmapImage();
+                bi.BeginInit();
+                bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                bi.EndInit();
+                SearchButtonImage.Source = bi;
+                SearchButtonImage.Tag = "Search";
+
+                if (HostsTreeView.Visibility == Visibility.Visible)
+                {
+                    FindTreeViewItem(HostsTreeView);
+                }
+                else
+                {
+                    FindRichTextBox(Text_RichTextBox);
+                }
+            }
+        }
+
         private void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
             TextBlock tb = (TextBlock)sender;
@@ -630,6 +656,33 @@ namespace HostManager
             }
         }
 
+        private void BindTree(String path)
+        {
+            treeViewModel = hostIOController.HostLoad(path);
+
+            if (treeViewModel == null)
+            {
+                TextToTreeView(hostIOController.HostToString(path));
+            }
+            else
+            {
+                headerIsMatchedList = treeViewModel.DomainList();
+                HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                treeViewModel.DomainIsMatched(headerIsMatchedList);
+
+                if (treeViewModel.Pass == false)
+                {
+                    MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 모든 체크를 해제하였습니다.", true);
+                }
+
+                if (treeViewModel.NodeList.Count == 0)
+                {
+                    ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
+                }
+            }
+        }
+
         private void BindTree(bool isTreeView, bool isTextBox)
         {
             TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
@@ -715,26 +768,7 @@ namespace HostManager
 
         private void ChangeButtonUI()
         {
-            if (SearchButtonImage.Tag.ToString() == "Cancel")
-            {
-                SearchBox.Text = "";
-
-                BitmapImage bi = new BitmapImage();
-                bi.BeginInit();
-                bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
-                bi.EndInit();
-                SearchButtonImage.Source = bi;
-                SearchButtonImage.Tag = "Search";
-
-                if (HostsTreeView.Visibility == Visibility.Visible)
-                {
-                    FindTreeViewItem(HostsTreeView);
-                }
-                else
-                {
-                    FindRichTextBox(Text_RichTextBox);
-                }
-            }
+            SearchBoxClear();
 
             if (HostsTreeView.Visibility == Visibility.Visible)
             {
@@ -1231,8 +1265,9 @@ namespace HostManager
 
             if (treeViewModel == null)
             {
+                SearchBoxClear();
                 headerIsMatchedList.Clear();
-                ChangeInfoLabel("Warning", "변환에 실패하여 텍스트 모드로 전환되었습니다.", null);
+                ChangeInfoLabel("Warning", "전환에 실패하였습니다.", null);
             }
             else
             {
@@ -1281,6 +1316,8 @@ namespace HostManager
 
         private void DoRefresh()
         {
+            SearchBoxClear();
+
             if (Apply_Button.IsEnabled == true)
             {
                 MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n새로고침을 할 경우 저장되지 않은 정보는 삭제됩니다.\r\n그래도 새로고침을 하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -1401,6 +1438,8 @@ namespace HostManager
 
         private void Menu_Edit_Pref_Click(object sender, RoutedEventArgs e)
         {
+            SearchBoxClear();
+
             SettingWindow settingWindow = new SettingWindow();
             settingWindow.Owner = Application.Current.MainWindow;
             settingWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -1447,19 +1486,93 @@ namespace HostManager
             DoRefresh();
         }
 
-        private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
+        private void Menu_File_Clear_Click(object sender, RoutedEventArgs e)
         {
-            
+            SearchBoxClear();
+
+            MessageBoxResult result = MessageBox.Show("모든 호스트 정보가 삭제됩니다.\r\n 그래도 새로 만드시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                TreeViewModel tmpTreeViewModel = new TreeViewModel();
+                treeViewModel = tmpTreeViewModel;
+                HostsTreeView.ItemsSource = treeViewModel.NodeList;
+                headerIsMatchedList.Clear();
+                Text_RichTextBox.Document.Blocks.Clear();
+
+                ChangeApplyButtonUI(false);
+                ChangeInfoLabel("Success", "모든 호스트 정보가 삭제되었습니다.", null);
+            }
+            else
+            {
+                ChangeInfoLabel("Warning", "새로 만들기를 취소하였습니다.", null);
+            }
         }
 
-        private void Menu_File_Export_Click(object sender, RoutedEventArgs e)
+        private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
         {
+            bool IsFileOpen = false;
 
+            if (Apply_Button.IsEnabled == true)
+            {
+                MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n그래도 불러오시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    IsFileOpen = true;
+                }
+                else
+                {
+                    ChangeInfoLabel("Warning", "불러오기를 취소하였습니다.", null);
+                }
+            }
+            else
+            {
+                IsFileOpen = true;
+            }
+
+            if(IsFileOpen)
+            {
+                System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+
+                // Set filter for file extension and default file extension
+                //dlg.DefaultExt = ".txt";
+                dlg.Filter = "모든파일 (*.*)|*.*|텍스트 파일 (*.txt)|*.txt";
+
+                // Display OpenFileDialog by calling ShowDialog method
+                System.Windows.Forms.DialogResult dlgResult = dlg.ShowDialog();
+
+                // Get the selected file name and display in a TextBox
+                if (dlgResult == System.Windows.Forms.DialogResult.OK)
+                {
+                    // Open document
+                    //hostPath = dlg.FileName;
+                    if (HostsTreeView.IsEnabled != true)
+                    {
+                        ChangeButtonUI();
+                    }
+                    else
+                    {
+                        SearchBoxClear();
+                    }
+
+                    BindTree(dlg.FileName);
+                    ChangeApplyButtonUI(true);
+                    ChangeInfoLabel("Success", dlg.SafeFileName + "을 불러왔습니다.", null);
+                }
+                else
+                {
+                    SearchBoxClear();
+                    ChangeInfoLabel("Warning", "불러오기를 취소하였습니다.", null);
+                }
+            }
         }
 
         private void Menu_File_Save_Click(object sender, RoutedEventArgs e)
         {
-
+            ChangeInfoLabel("None", "", null);
+            DoApply();
+            //browserController.CheckDoBrowsers();
         }
 
         private void Menu_File_AsSave_Click(object sender, RoutedEventArgs e)
@@ -1486,7 +1599,7 @@ namespace HostManager
                 }
                 else
                 {
-                    ChangeInfoLabel("Info", "프로그램 종료를 취소하였습니다.", null);
+                    ChangeInfoLabel("Warning", "프로그램 종료를 취소하였습니다.", null);
                 }
             }
             else
