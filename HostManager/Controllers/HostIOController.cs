@@ -103,7 +103,7 @@ namespace HostManager.Controllers
             }
         }
 
-        public bool HostSave(TreeViewModel treeViewModel)
+        public bool HostSave(TreeViewModel treeViewModel, String path)
         {
             if (treeViewModel != null)
             {
@@ -137,7 +137,16 @@ namespace HostManager.Controllers
 
                 try
                 {
-                    StreamWriter hostsStreamWriter = new StreamWriter(Settings.Default.Host_File_Path + @"\Hosts");
+                    StreamWriter hostsStreamWriter = null;
+
+                    if (path == null)
+                    {
+                        hostsStreamWriter = new StreamWriter(Settings.Default.Host_File_Path + @"\Hosts");
+                    }
+                    else
+                    {
+                        hostsStreamWriter = new StreamWriter(path);
+                    }
 
                     hostsStreamWriter.WriteLine(HostTxt);
                     hostsStreamWriter.Close();
@@ -156,11 +165,20 @@ namespace HostManager.Controllers
             }
         }
 
-        public bool HostSave(String hostString)
+        public bool HostSave(String hostString, String path)
         {
             try
             {
-                StreamWriter hostsStreamWriter = new StreamWriter(Settings.Default.Host_File_Path + @"\Hosts");
+                StreamWriter hostsStreamWriter = null;
+
+                if (path == null)
+                {
+                    hostsStreamWriter = new StreamWriter(Settings.Default.Host_File_Path + @"\Hosts");
+                }
+                else
+                {
+                    hostsStreamWriter = new StreamWriter(path);
+                }
 
                 hostsStreamWriter.WriteLine(hostString);
                 hostsStreamWriter.Close();
@@ -183,27 +201,6 @@ namespace HostManager.Controllers
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        public void FileOpen()
-        {
-            System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-
-            // Set filter for file extension and default file extension
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "텍스트 파일 (*.txt)|*.txt|모든파일|*.*";
-
-
-            // Display OpenFileDialog by calling ShowDialog method
-            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
-
-
-            // Get the selected file name and display in a TextBox
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                // Open document
-                //hostPath = dlg.FileName;
             }
         }
     }

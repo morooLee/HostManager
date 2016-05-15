@@ -284,8 +284,24 @@ namespace HostManager
                                 
                 if (SearchBox.Text != "" && SearchBox.Text != null)
                 {
-                    SearchButtonImage.Tag = "Cancel";
-                    SearchButton_Click(SearchButton, null);
+                    SearchBoxClear();
+                }
+            }
+            else if (e.Key == Key.Delete)
+            {
+                if (node == SelectedNode)
+                {
+                    if (node.ParentNode == null)
+                    {
+                        treeViewModel.NodeList.Remove(node);
+                    }
+                    else
+                    {
+                        node.ParentNode.NodeList.Remove(node);
+                    }
+                    
+                    headerIsMatchedList = treeViewModel.DomainList();
+                    ChangeInfoLabel("Success", "선택한 항목이 삭제되었습니다.", true);
                 }
             }
         }
@@ -365,7 +381,7 @@ namespace HostManager
 
             if (HostsTreeView.Visibility == Visibility.Visible)
             {
-                applyCheck = hostIOController.HostSave(treeViewModel);
+                applyCheck = hostIOController.HostSave(treeViewModel, null);
 
                 if (applyCheck)
                 {
@@ -375,7 +391,7 @@ namespace HostManager
             else
             {
                 TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
-                applyCheck = hostIOController.HostSave(textRange.Text);
+                applyCheck = hostIOController.HostSave(textRange.Text, null);
             }
 
             if (applyCheck)
@@ -390,6 +406,46 @@ namespace HostManager
                 if (InfoLabel.Content.ToString() == "")
                 {
                     ChangeInfoLabel("Warning", "호스트 적용에 실패하였습니다.", true);
+                }
+            }
+
+            ChangeApplyButtonUI(false);
+            return applyCheck;
+        }
+
+        private bool DoApply(String path)
+        {
+            bool applyCheck = false;
+
+            SearchBoxClear();
+
+            if (HostsTreeView.Visibility == Visibility.Visible)
+            {
+                applyCheck = hostIOController.HostSave(treeViewModel, path);
+
+                if (applyCheck)
+                {
+                    treeViewModel.IsChangedCancel();
+                }
+            }
+            else
+            {
+                TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
+                applyCheck = hostIOController.HostSave(textRange.Text, path);
+            }
+
+            if (applyCheck)
+            {
+                if (InfoLabel.Content.ToString() == "")
+                {
+                    ChangeInfoLabel("Success", path + "에 저장하였습니다.", true);
+                }
+            }
+            else
+            {
+                if (InfoLabel.Content.ToString() == "")
+                {
+                    ChangeInfoLabel("Warning", path + "저장에 실패하였습니다.", true);
                 }
             }
 
@@ -543,6 +599,15 @@ namespace HostManager
                 {
                     FindRichTextBox(Text_RichTextBox);
                 }
+                
+                if (HostsTreeView.IsEnabled == true)
+                {
+                    HostsTreeView.Focus();
+                }
+                else
+                {
+                    Text_RichTextBox.Focus();
+                }
             }
         }
 
@@ -680,55 +745,6 @@ namespace HostManager
                 {
                     ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
                 }
-            }
-        }
-
-        private void BindTree(bool isTreeView, bool isTextBox)
-        {
-            TextRange textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
-
-            if (isTreeView == false && isTextBox == false)
-            {
-                treeViewModel = hostIOController.HostLoad();
-            }
-            else if (isTreeView == true && isTextBox == false)
-            {
-                Text_RichTextBox.Document.Blocks.Clear();
-                Text_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewModelController.ConverterToString(treeViewModel))));
-            }
-            else if (isTreeView == false && isTextBox == true)
-            {
-                textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
-                treeViewModel = treeViewModelController.ConverterToTreeViewModel(textRange.Text);
-
-                if (treeViewModel == null)
-                {
-                    return;
-                }
-            }
-
-            if (treeViewModel == null)
-            {
-                treeViewModel = new TreeViewModel();
-                textRange = new TextRange(Text_RichTextBox.Document.ContentStart, Text_RichTextBox.Document.ContentEnd);
-                TextToTreeView(textRange.Text);
-            }
-            else
-            {
-                headerIsMatchedList = treeViewModel.DomainList();
-                HostsTreeView.ItemsSource = treeViewModel.NodeList;
-                treeViewModel.DomainIsMatched(headerIsMatchedList);
-
-                if(treeViewModel.Pass == false)
-                {
-                    MessageBox.Show("중복으로 적용된 도메인이 있어 모든 항목들의 체크를 해제하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ChangeInfoLabel("Warning", "중복으로 적용된 도메인이 있어 체크를 해제하였습니다.", true);
-                }  
-            }
-
-            if (textRange.Text == "" || (textRange.Text == "" && treeViewModel.NodeList.Count == 0))
-            {
-                ChangeInfoLabel("Info", "호스트 내용이 없습니다.", null);
             }
         }
 
@@ -1039,7 +1055,6 @@ namespace HostManager
                 if(SelectedNode != null)
                 {
                     node = SelectedNode;
-                    return;
                 }
                 else
                 {
@@ -1488,6 +1503,7 @@ namespace HostManager
 
         private void Menu_File_Clear_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             SearchBoxClear();
 
             MessageBoxResult result = MessageBox.Show("모든 호스트 정보가 삭제됩니다.\r\n 그래도 새로 만드시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -1511,6 +1527,7 @@ namespace HostManager
 
         private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
             bool IsFileOpen = false;
 
             if (Apply_Button.IsEnabled == true)
@@ -1577,7 +1594,38 @@ namespace HostManager
 
         private void Menu_File_AsSave_Click(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
 
+            System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+
+            // Set filter for file extension and default file extension
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "모든파일 (*.*)|*.*|텍스트 파일 (*.txt)|*.txt";
+
+            // Display OpenFileDialog by calling ShowDialog method
+            System.Windows.Forms.DialogResult dlgResult = dlg.ShowDialog();
+
+            // Get the selected file name and display in a TextBox
+            if (dlgResult == System.Windows.Forms.DialogResult.OK)
+            {
+                // Open document
+                //hostPath = dlg.FileName;
+                if (HostsTreeView.IsEnabled != true)
+                {
+                    ChangeButtonUI();
+                }
+                else
+                {
+                    SearchBoxClear();
+                }
+
+                DoApply(dlg.FileName);
+            }
+            else
+            {
+                SearchBoxClear();
+                ChangeInfoLabel("Warning", "다른이름으로 저장하기를 취소하였습니다.", null);
+            }
         }
 
         private void Menu_File_Exit_Click(object sender, RoutedEventArgs e)
@@ -1607,6 +1655,17 @@ namespace HostManager
                 notifyIcon.Visible = false;
                 System.Diagnostics.Process.GetCurrentProcess().Kill();
             }
+        }
+
+        private void Menu_Help_About_Click(object sender, RoutedEventArgs e)
+        {
+            SearchBoxClear();
+
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.Owner = Application.Current.MainWindow;
+            aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            aboutWindow.ShowDialog();
         }
     }
 }

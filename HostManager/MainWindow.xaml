@@ -31,7 +31,7 @@
                 <MenuItem Name="Menu_Edit_Pref" Header="속성" Click="Menu_Edit_Pref_Click"/>
             </MenuItem>
             <MenuItem Header="도움말">
-                <MenuItem Header="About"/>
+                <MenuItem Name="Menu_Help_About" Header="About" Click="Menu_Help_About_Click" />
                 <MenuItem Header="사용법"/>
                 <MenuItem Header="업데이트"/>
             </MenuItem>
