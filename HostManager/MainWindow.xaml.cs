@@ -1211,6 +1211,46 @@ namespace HostManager
             }
         }
 
+        private void AllCollapsed(object sender, RoutedEventArgs e)
+        {
+            foreach (Node node in treeViewModel.NodeList)
+            {
+                node.IsExpanded = false;
+
+                if (node.IsLastNode == false)
+                {
+                    foreach (Node childNode in node.NodeList)
+                    {
+                        DoCollapse(childNode);
+                    }
+                }
+            }
+        }
+
+        private void DoCollapse(Node node)
+        {
+            node.IsExpanded = false;
+
+            if (node.IsLastNode == false)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    if (childNode.IsLastNode == false)
+                    {
+                        DoCollapse(childNode);
+                    }
+                }
+            }
+        }
+
+        private void AllUnchecked(object sender, RoutedEventArgs e)
+        {
+            foreach (Node node in treeViewModel.NodeList)
+            {
+                node.IsChecked = false;
+            }
+        }
+
         private void Root_Add_TreeViewItem(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
@@ -1256,6 +1296,11 @@ namespace HostManager
 
             editTreeViewWindow.treeViewModel = null;
             editTreeViewWindow.Close();
+        }
+
+        private void OpenFolder(object sender, RoutedEventArgs e)
+        {
+            hostIOController.OpenFolder();
         }
 
         private void TextToTreeView()

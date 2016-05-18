@@ -203,5 +203,13 @@ namespace HostManager.Controllers
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        public void OpenFolder()
+        {
+            Process process = new Process();
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.FileName = Settings.Default.Host_File_Path;
+            process.Start();
+        }
     }
 }

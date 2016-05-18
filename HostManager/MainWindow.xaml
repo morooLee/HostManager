@@ -25,6 +25,7 @@
                 <MenuItem Name="Menu_Edit_Text" Header="텍스트로 보기" Click="Menu_Edit_Text_Click" />
                 <MenuItem Name="Menu_Edit_Categoty" Header="카테고리로 보기" Click="Menu_Edit_Categoty_Click" />
                 <Separator/>
+                <MenuItem Header="기본폴더 열기" Click="OpenFolder"/>
                 <MenuItem Name="Menu_Edit_Notepad" Header="메모장에서 열기" Click="Menu_Edit_Notepad_Click" />
                 <MenuItem Name="Menu_Edit_Refresh" Header="동기화 하기" Click="Menu_Edit_Refresh_Click" />
                 <Separator/>
@@ -142,6 +143,10 @@
                                     <Separator/>
                                     <MenuItem Header="위로 이동" Click="MoveToUp_TreeViewItem"/>
                                     <MenuItem Header="아래로 이동" Click="MoveToDown_TreeViewItem"/>
+                                    <Separator/>
+                                    <MenuItem Header="기본폴더 열기" Click="OpenFolder"/>
+                                    <MenuItem Header="모두 접기" Click="AllCollapsed"/>
+                                    <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
                                 </ContextMenu>
                             </StackPanel.ContextMenu>
 
@@ -156,8 +161,12 @@
                         <ContextMenu>
                             <MenuItem Header="호스트 추가" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="Root_Add_TreeViewItem" />
                             <Separator/>
+                            <MenuItem Header="기본폴더 열기" Click="OpenFolder"/>
                             <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="TreeView_Notpad_Item_Click" />
                             <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewList}}" Click="TextEdit_MenuItem_Click" />
+                            <Separator/>
+                            <MenuItem Header="모두 접기" Click="AllCollapsed"/>
+                            <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
