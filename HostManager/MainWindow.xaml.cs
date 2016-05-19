@@ -106,6 +106,18 @@ namespace HostManager
             //BindTree(false, false);
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F)
+            {
+                // ignore alt+space which invokes the system menu
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                {
+                    SearchBox.Focus();
+                }
+            }
+        }
+
         private void CheckBox_Loaded(object sender, RoutedEventArgs e)
         {
             CheckBox ckb = (CheckBox)sender;
@@ -1219,6 +1231,8 @@ namespace HostManager
 
                 if (node.IsLastNode == false)
                 {
+                    ChangeInfoLabel("None", "", null);
+
                     foreach (Node childNode in node.NodeList)
                     {
                         DoCollapse(childNode);
@@ -1245,6 +1259,8 @@ namespace HostManager
 
         private void AllUnchecked(object sender, RoutedEventArgs e)
         {
+            ChangeInfoLabel("None", "", null);
+
             foreach (Node node in treeViewModel.NodeList)
             {
                 node.IsChecked = false;

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HostManager"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="Window_Loaded">
+        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Width="400" Loaded="Window_Loaded" KeyDown="Window_KeyDown">
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="22">

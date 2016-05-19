@@ -72,20 +72,20 @@ namespace HostManager.Controllers
                     _item.Kill();
                 }
 
-                if (Settings.Default.IE_Auto_Restart && Settings.Default.IE_TmpFile_Del)
+                if (Settings.Default.IE_TmpFile_Del)
                 {
                     Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 8");
                     Process.Start("rundll32.exe", "InetCpl.cpl,ClearMyTracksByProcess 2");
                 }
-                if (Settings.Default.Edge_Auto_Restart && Settings.Default.Edge_TmpFile_Del)
+                if (Settings.Default.Edge_TmpFile_Del)
                 {
 
                 }
-                if (Settings.Default.Chrome_Auto_Restart && Settings.Default.Chrome_TmpFile_Del)
+                if (Settings.Default.Chrome_TmpFile_Del)
                 {
 
                 }
-                if (Settings.Default.FF_Auto_Restart && Settings.Default.FF_TmpFile_Del)
+                if (Settings.Default.FF_TmpFile_Del)
                 {
 
                 }

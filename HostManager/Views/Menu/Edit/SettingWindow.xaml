@@ -40,11 +40,11 @@
                             <TextBlock FontWeight="Bold" Text="캐시 및 쿠키 삭제하기"/>
                         </GroupBox.Header>
                         <StackPanel>
-                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Text="자동 재시작이 설정된 브라우저에 한해 해당 브라우저가 자동 재시작 시 캐시와 쿠기도 같이 제거됩니다." FontSize="10"/>
+                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저의 캐시와 쿠기를 제거합니다." FontSize="10"/>
                             <TextBlock Margin="0,0,0,10" TextWrapping="Wrap" Text="( Edge / Chrome / Firefox는 미 구현 )" Foreground="Red" FontSize="10"/>
                             <StackPanel Orientation="Horizontal" >
                                 <CheckBox Name="AutoDelIE" Content="IE 계열" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IE_TmpFile_Del}">
-                                    <CheckBox.Style>
+                                    <!--<CheckBox.Style>
                                         <Style TargetType="CheckBox">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsChecked, ElementName=RestartIE}" Value="false">
@@ -53,7 +53,7 @@
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </CheckBox.Style>
+                                    </CheckBox.Style>-->
                                 </CheckBox>
                                 <Border Width="10"/>
                                 <CheckBox Name="AutoDelEdge" Content="Edge" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Edge_TmpFile_Del}" Visibility="Hidden">
