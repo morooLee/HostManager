@@ -22,5 +22,11 @@ namespace HostManager.Views.Menu
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Version.Text = version;
+        }
     }
 }

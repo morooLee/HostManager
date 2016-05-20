@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HostManager.Views.Menu"
         mc:Ignorable="d"
-        Title="About" Height="300" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize">
+        Title="About" Height="300" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        
+        <TextBlock Name="Version" />
     </Grid>
 </Window>

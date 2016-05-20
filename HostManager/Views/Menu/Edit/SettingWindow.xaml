@@ -110,8 +110,11 @@
                     <StackPanel>
                         <StackPanel>
                             <DockPanel>
-                                <TextBlock DockPanel.Dock="Left" Margin="0,5,0,10" TextWrapping="Wrap" Text="Host 파일의 경로를 수동으로 설정합니다." FontSize="10"/>
-                                <TextBlock DockPanel.Dock="Right" Margin="50,5,0,10" Name="PathInit" Cursor="Hand" TextWrapping="Wrap" Text="경로 초기화" FontSize="10" FontWeight="Bold" FontStyle="Oblique" TextDecorations="Underline" ToolTip="Host 경로를 초기화합니다." MouseLeftButtonUp="PathInit_MouseLeftButtonUp" />
+                                <StackPanel DockPanel.Dock="Left" Margin="0,5,0,5">
+                                    <TextBlock TextWrapping="Wrap" Text="Host 파일의 경로를 수동으로 설정합니다." FontSize="10"/>
+                                    <TextBlock TextWrapping="Wrap" Text="※ 호스트 적용이 되지 않을 경우에만 변경하세요." FontSize="10" Foreground="red"/>
+                                </StackPanel>
+                                <TextBlock DockPanel.Dock="Right" Name="PathInit" Cursor="Hand" TextWrapping="Wrap" Text="경로 초기화" FontSize="10" FontWeight="Bold" FontStyle="Oblique" TextDecorations="Underline" ToolTip="Host 경로를 초기화합니다." MouseLeftButtonUp="PathInit_MouseLeftButtonUp" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </DockPanel>
                             
                             <StackPanel Orientation="Horizontal" >

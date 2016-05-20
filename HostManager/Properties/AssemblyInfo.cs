@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("HostManager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("MorooSoft")]
 [assembly: AssemblyProduct("HostManager")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
