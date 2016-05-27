@@ -2,6 +2,7 @@
 using HostManager.Models;
 using HostManager.Views.EditHost;
 using HostManager.Views.Menu;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,6 +41,11 @@ namespace HostManager
 
         public MainWindow()
         {
+            if (UpdateCheck())
+            {
+
+            }
+
             InitializeComponent();
             //SubWindow subWindow = new SubWindow();
             //subWindow.Show();
@@ -76,6 +82,38 @@ namespace HostManager
                 this.Show();
                 this.WindowState = WindowState.Normal;
             };
+        }
+
+        private bool UpdateCheck()
+        {
+            bool isUpdated = false;
+
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(); //AssemblyVersion을 가져온다.
+            string updateurl = "http://localhost:49980/Application/HostManager?version=" + version;
+
+            System.Net.WebClient wclient = new System.Net.WebClient();
+            wclient.BaseAddress = updateurl;
+
+            dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
+            string supdate = json["version"];
+
+            MessageBox.Show(supdate);
+
+            // 업데이트는 이렇게 이루어진다.
+            // 페이지 이름과 파라미터로 버전정보를 보낸다.
+            // 페이지를 호출한 결과에서 다른 버전 정보가 있으면 새 버전 경고가 뜬다.
+            int iurl = json.IndexOf("version");
+            if (iurl > -1)
+            {
+                if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "새 버전이 나왔습니다.", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    System.Diagnostics.Process.Start(updateurl);
+                }
+
+                isUpdated = true;
+            }
+
+            return isUpdated;
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
