@@ -7,6 +7,21 @@
         mc:Ignorable="d"
         Title="About" Height="300" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <TextBlock Name="Version" />
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="HostManager" FontSize="18" FontWeight="Bold"/>
+                <TextBlock Margin="5, 0, 0, 0" Name="Version" Text="(Ver.1.2.3.4)" VerticalAlignment="Bottom" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock Text="최신버전이 있습니다." VerticalAlignment="Center" />
+                <TextBlock Margin="5, 0, 0, 0" Name="NewVersion" Text="(1.2.3.4)" VerticalAlignment="Center" />
+                <Button Margin="5, 0, 0, 0" Name="Update" Content="업데이트" VerticalAlignment="Bottom" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock Text="만든이 : " FontWeight="Bold" />
+                <TextBlock Margin="5, 0, 0, 0" Text="moroo" />
+                <TextBlock Margin="5, 0, 0, 0" Text="http://www.moroosoft.com" FontWeight="Bold" TextDecorations="Underline" Foreground="DarkBlue" Cursor="Hand"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>

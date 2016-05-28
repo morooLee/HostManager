@@ -43,7 +43,7 @@ namespace HostManager
         {
             if (UpdateCheck())
             {
-
+                DoExit();
             }
 
             InitializeComponent();
@@ -89,29 +89,43 @@ namespace HostManager
             bool isUpdated = false;
 
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(); //AssemblyVersion을 가져온다.
-            string updateurl = "http://localhost:49980/Application/HostManager?version=" + version;
+            string updateurl;
+            
+            if (IntPtr.Size == 8)
+            {
+                updateurl = "http://www.moroosoft.com/Application/HostManager?version=64";
+            }
+            else
+            {
+                updateurl = "http://www.moroosoft.com/Application/HostManager?version=32";
+            }           
 
             System.Net.WebClient wclient = new System.Net.WebClient();
             wclient.BaseAddress = updateurl;
 
-            dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
-            string supdate = json["version"];
-
-            MessageBox.Show(supdate);
-
-            // 업데이트는 이렇게 이루어진다.
-            // 페이지 이름과 파라미터로 버전정보를 보낸다.
-            // 페이지를 호출한 결과에서 다른 버전 정보가 있으면 새 버전 경고가 뜬다.
-            int iurl = json.IndexOf("version");
-            if (iurl > -1)
+            try
             {
-                if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "새 버전이 나왔습니다.", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                {
-                    System.Diagnostics.Process.Start(updateurl);
-                }
+                dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
 
-                isUpdated = true;
+                string supdate = json["version"];
+
+                // 업데이트는 이렇게 이루어진다.
+                // 페이지 이름과 파라미터로 버전정보를 보낸다.
+                // 페이지를 호출한 결과에서 다른 버전 정보가 있으면 새 버전 경고가 뜬다.
+                if (supdate != version)
+                {
+                    if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "Info", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    {
+                        System.Diagnostics.Process.Start("http://www.moroosoft.com/Application/HostManager");
+                        //System.Diagnostics.Process.Start("http://www.moroosoft.com/Files/HostManager/64Bit/HostManager.exe");
+                        isUpdated = true;
+                    }
+                }
             }
+            catch
+            {
+                
+            }          
 
             return isUpdated;
         }

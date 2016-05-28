@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,31 @@ namespace HostManager.Views.Menu
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string updateurl;
+
+            if (IntPtr.Size == 8)
+            {
+                updateurl = "http://www.moroosoft.com/Application/HostManager?version=64";
+            }
+            else
+            {
+                updateurl = "http://www.moroosoft.com/Application/HostManager?version=32";
+            }
+
+            System.Net.WebClient wclient = new System.Net.WebClient();
+            wclient.BaseAddress = updateurl;
+
+            try
+            {
+                dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
+                string newVersion = json["version"];
+
+                NewVersion.Text = newVersion;
+            }
+            catch
+            {
+
+            }
             Version.Text = version;
         }
     }
