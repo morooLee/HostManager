@@ -191,7 +191,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\JsonModel.cs" />
     <Compile Include="Models\ContextMenuModel.cs" />
     <Compile Include="Models\TreeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
