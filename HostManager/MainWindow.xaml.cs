@@ -114,7 +114,7 @@ namespace HostManager
                 // 페이지를 호출한 결과에서 다른 버전 정보가 있으면 새 버전 경고가 뜬다.
                 if (supdate != version)
                 {
-                    if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "Info", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "Update", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
                         System.Diagnostics.Process.Start("http://www.moroosoft.com/Application/HostManager");
                         //System.Diagnostics.Process.Start("http://www.moroosoft.com/Files/HostManager/64Bit/HostManager.exe");

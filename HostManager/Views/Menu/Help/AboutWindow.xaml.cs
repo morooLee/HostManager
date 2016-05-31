@@ -30,7 +30,7 @@ namespace HostManager.Views.Menu
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             string newVersion = null;
             string updateurl;
-
+            
             if (IntPtr.Size == 8)
             {
                 updateurl = "http://www.moroosoft.com/Application/HostManager?version=64";
@@ -71,10 +71,8 @@ namespace HostManager.Views.Menu
                 Update_Button.Visibility = Visibility.Hidden;
                 Update_Button.Height = 0;
             }
-            else
-            {
-                Version.Text = "(Ver. " + version + ")";
-            }
+
+            Version.Text = "(Ver. " + version + ")";
         }
 
         private void Update_Button_Click(object sender, RoutedEventArgs e)
@@ -90,7 +88,7 @@ namespace HostManager.Views.Menu
 
         private void Manual_Button_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("작성하고 있습니다!");
         }
     }
 }
