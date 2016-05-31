@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -27,6 +28,7 @@ namespace HostManager.Views.Menu
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string newVersion = null;
             string updateurl;
 
             if (IntPtr.Size == 8)
@@ -44,15 +46,51 @@ namespace HostManager.Views.Menu
             try
             {
                 dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
-                string newVersion = json["version"];
+                newVersion = json["version"];
 
-                NewVersion.Text = newVersion;
+                NewVersion_Text.Text = "(Ver. " + newVersion + ")";
             }
             catch
             {
 
             }
-            Version.Text = version;
+            
+            if (newVersion == null)
+            {
+                Help_Update_Panel.Visibility = Visibility.Hidden;
+                Help_Update_Panel.Height = 0;
+            }
+            else if (newVersion == version)
+            {
+                UpdateCheck_Text.Text = "최신버전입니다.";
+                UpdateCheck_Text.Foreground = Brushes.Black;
+
+                NewVersion_Text.Visibility = Visibility.Hidden;
+                NewVersion_Text.Height = 0;
+
+                Update_Button.Visibility = Visibility.Hidden;
+                Update_Button.Height = 0;
+            }
+            else
+            {
+                Version.Text = "(Ver. " + version + ")";
+            }
+        }
+
+        private void Update_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("http://www.moroosoft.com/Application/HostManager");
+        }
+
+        private void OnNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            Process.Start(e.Uri.AbsoluteUri);
+            e.Handled = true;
+        }
+
+        private void Manual_Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

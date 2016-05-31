@@ -33,8 +33,8 @@
             </MenuItem>
             <MenuItem Header="도움말">
                 <MenuItem Name="Menu_Help_About" Header="About" Click="Menu_Help_About_Click" />
-                <MenuItem Header="사용법"/>
-                <MenuItem Header="업데이트"/>
+                <!--<MenuItem Header="사용법"/>
+                <MenuItem Header="업데이트"/>-->
             </MenuItem>
         </Menu>
         <DockPanel>

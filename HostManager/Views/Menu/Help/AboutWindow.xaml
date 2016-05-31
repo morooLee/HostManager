@@ -7,21 +7,30 @@
         mc:Ignorable="d"
         Title="About" Height="300" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="HostManager" FontSize="18" FontWeight="Bold"/>
-                <TextBlock Margin="5, 0, 0, 0" Name="Version" Text="(Ver.1.2.3.4)" VerticalAlignment="Bottom" />
+        <StackPanel Margin="0, 10, 0, 0">
+            <TextBlock Text="HostManager" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Name="Version" Text="(Ver.1.2.3.4)" VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+            <StackPanel Name="Help_Update_Panel">
+                <StackPanel HorizontalAlignment="Center" >
+                    <TextBlock Name="UpdateCheck_Text" Text="최신버전이 나왔습니다." Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" />
+                    <TextBlock Name="NewVersion_Text" Text="(1.2.3.4)" HorizontalAlignment="Center" />
+                    <Button Name="Update_Button" Margin="0, 2, 0, 0" Width="60" Content="업데이트" Click="Update_Button_Click" />
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="최신버전이 있습니다." VerticalAlignment="Center" />
-                <TextBlock Margin="5, 0, 0, 0" Name="NewVersion" Text="(1.2.3.4)" VerticalAlignment="Center" />
-                <Button Margin="5, 0, 0, 0" Name="Update" Content="업데이트" VerticalAlignment="Bottom" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="만든이 : " FontWeight="Bold" />
-                <TextBlock Margin="5, 0, 0, 0" Text="moroo" />
-                <TextBlock Margin="5, 0, 0, 0" Text="http://www.moroosoft.com" FontWeight="Bold" TextDecorations="Underline" Foreground="DarkBlue" Cursor="Hand"/>
-            </StackPanel>
+            <Button Name="Manual_Button" Margin="0, 5, 0, 0" Width="100" Content="메뉴얼 다운로드" Click="Manual_Button_Click" />
+            <Image Width="80" Margin="0, 10, 0, 0" Source="/HostManager;component/Resources/Sign_moroo.png" />
+            <TextBlock Text="moroo" HorizontalAlignment="Center" FontWeight="Bold"/>
+            <TextBlock Name="Email_Text" HorizontalAlignment="Center">
+                <Hyperlink NavigateUri="mailto:example@stackoverflow.com?subject=SubjectExample&amp;body=BodyExample" RequestNavigate="OnNavigate">
+                    moroo.lee@gmail.com
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock Name="Homepage_Text" HorizontalAlignment="Center">
+                <Hyperlink NavigateUri="http://www.moroosoft.com" RequestNavigate="OnNavigate">
+                    http://www.moroosoft.com
+                </Hyperlink>
+            </TextBlock>
+            <!--<TextBlock Text="ⓒ 2016 Moroosoft" HorizontalAlignment="Center" FontWeight="Bold"/>-->
         </StackPanel>
     </Grid>
 </Window>
