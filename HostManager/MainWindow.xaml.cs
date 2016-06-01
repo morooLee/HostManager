@@ -87,8 +87,9 @@ namespace HostManager
         private bool UpdateCheck()
         {
             bool isUpdated = false;
-
+            MessageBox.Show("a");
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(); //AssemblyVersion을 가져온다.
+            MessageBox.Show("sd");
             string updateurl;
             
             if (IntPtr.Size == 8)
