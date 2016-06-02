@@ -9,16 +9,20 @@
     <Grid>
         <StackPanel Margin="0, 10, 0, 0">
             <TextBlock Text="HostManager" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Name="Version" Text="(Ver.1.2.3.4)" VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+            <TextBlock Name="Version" Text="(Ver. ?.?.?.?)" VerticalAlignment="Bottom" HorizontalAlignment="Center" />
             <StackPanel Name="Help_Update_Panel">
                 <StackPanel HorizontalAlignment="Center" >
                     <TextBlock Name="UpdateCheck_Text" Text="최신버전이 나왔습니다." Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" />
-                    <TextBlock Name="NewVersion_Text" Text="(1.2.3.4)" HorizontalAlignment="Center" />
-                    <Button Name="Update_Button" Margin="0, 2, 0, 0" Width="60" Content="업데이트" Click="Update_Button_Click" />
+                    <StackPanel Name="NewVersion_Panel" Orientation="Horizontal" HorizontalAlignment="Center" >
+                        <!--<TextBlock Text="New" VerticalAlignment="Center"/>
+                        <TextBlock Name="NewVersion_Text" Margin="2, 0, 5, 0" Text="(1.2.3.4)" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                        <Button Name="Update_Button" Margin="0, 2, 0, 0" Width="80" Content="업데이트" Click="Update_Button_Click" />
+                    </StackPanel>
+                    
                 </StackPanel>
             </StackPanel>
             <Button Name="Manual_Button" Margin="0, 5, 0, 0" Width="100" Content="메뉴얼 다운로드" Click="Manual_Button_Click" />
-            <Image Width="80" Margin="0, 10, 0, 0" Source="/HostManager;component/Resources/Sign_moroo.png" />
+            <Image Width="80" Margin="0, 10, 0, 0" Source="/HostManager;component/Resources/Sign_moroo.jpg" />
             <TextBlock Text="moroo" HorizontalAlignment="Center" FontWeight="Bold"/>
             <TextBlock Name="Email_Text" HorizontalAlignment="Center">
                 <Hyperlink NavigateUri="mailto:example@stackoverflow.com?subject=SubjectExample&amp;body=BodyExample" RequestNavigate="OnNavigate">

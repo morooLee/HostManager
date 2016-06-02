@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Web.Script.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,28 +27,21 @@ namespace HostManager.Views.Menu
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            string updateurl = "http://www.moroosoft.com/Application/HostManager?version=Check";
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             string newVersion = null;
-            string updateurl;
-            
-            if (IntPtr.Size == 8)
-            {
-                updateurl = "http://www.moroosoft.com/Application/HostManager?version=64";
-            }
-            else
-            {
-                updateurl = "http://www.moroosoft.com/Application/HostManager?version=32";
-            }
 
             System.Net.WebClient wclient = new System.Net.WebClient();
             wclient.BaseAddress = updateurl;
 
             try
             {
-                dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
+                JavaScriptSerializer jsonSer = new JavaScriptSerializer();
+                dynamic json = jsonSer.DeserializeObject(wclient.DownloadString(updateurl));
                 newVersion = json["version"];
 
-                NewVersion_Text.Text = "(Ver. " + newVersion + ")";
+                //NewVersion_Text.Text = "(Ver. " + newVersion + ")";
+                Update_Button.Content = "Ver. " + newVersion;
             }
             catch
             {
@@ -65,11 +58,9 @@ namespace HostManager.Views.Menu
                 UpdateCheck_Text.Text = "최신버전입니다.";
                 UpdateCheck_Text.Foreground = Brushes.Black;
 
-                NewVersion_Text.Visibility = Visibility.Hidden;
-                NewVersion_Text.Height = 0;
-
                 Update_Button.Visibility = Visibility.Hidden;
-                Update_Button.Height = 0;
+                //NewVersion_Text.Visibility = Visibility.Hidden;
+                NewVersion_Panel.Height = 0;
             }
 
             Version.Text = "(Ver. " + version + ")";

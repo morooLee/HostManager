@@ -2,7 +2,6 @@
 using HostManager.Models;
 using HostManager.Views.EditHost;
 using HostManager.Views.Menu;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Web.Script.Serialization;
 
 namespace HostManager
 {
@@ -87,26 +87,25 @@ namespace HostManager
         private bool UpdateCheck()
         {
             bool isUpdated = false;
-            MessageBox.Show("a");
-            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString(); //AssemblyVersion을 가져온다.
-            MessageBox.Show("sd");
-            string updateurl;
-            
-            if (IntPtr.Size == 8)
+            string version = "";
+            try
             {
-                updateurl = "http://www.moroosoft.com/Application/HostManager?version=64";
+                version = Assembly.GetExecutingAssembly().GetName().Version.ToString(); //AssemblyVersion을 가져온다.
             }
-            else
+            catch(Exception e)
             {
-                updateurl = "http://www.moroosoft.com/Application/HostManager?version=32";
-            }           
+                MessageBox.Show(e.ToString());
+            }
+            
+            string updateurl = "http://www.moroosoft.com/Application/HostManager?version=Check";
 
             System.Net.WebClient wclient = new System.Net.WebClient();
             wclient.BaseAddress = updateurl;
 
             try
             {
-                dynamic json = JsonConvert.DeserializeObject(wclient.DownloadString(updateurl));
+                JavaScriptSerializer jsonSer = new JavaScriptSerializer();
+                dynamic json = jsonSer.DeserializeObject(wclient.DownloadString(updateurl));
 
                 string supdate = json["version"];
 

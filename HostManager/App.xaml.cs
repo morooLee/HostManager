@@ -69,7 +69,6 @@ namespace HostManager
 
             // Terminate this instance.
 
-
             System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
 
