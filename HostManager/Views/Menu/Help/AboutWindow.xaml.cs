@@ -79,7 +79,7 @@ namespace HostManager.Views.Menu
 
         private void Manual_Button_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("작성하고 있습니다!");
+            Process.Start("http://www.moroosoft.com/Application/HostManager");
         }
     }
 }
