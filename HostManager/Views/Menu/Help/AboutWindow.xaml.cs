@@ -27,7 +27,7 @@ namespace HostManager.Views.Menu
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string updateurl = "http://www.moroosoft.com/Application/HostManager?version=Check";
+            string updateurl = "http://moroosoft.azurewebsites.net/Application/HostManager?version=Check";
             string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             string newVersion = null;
 
@@ -68,7 +68,7 @@ namespace HostManager.Views.Menu
 
         private void Update_Button_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("http://www.moroosoft.com/Application/HostManager");
+            Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");
         }
 
         private void OnNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
@@ -79,7 +79,7 @@ namespace HostManager.Views.Menu
 
         private void Manual_Button_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("http://www.moroosoft.com/Application/HostManager");
+            Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");
         }
     }
 }

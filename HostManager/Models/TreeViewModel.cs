@@ -47,6 +47,47 @@ namespace HostManager.Models
             }
         }
 
+        public Node SearchNode(String domain)
+        {
+            Node tmpNode = null;
+
+            foreach(Node node in _nodeList)
+            {
+                if((tmpNode = SetSearchNode(node, domain)) != null)
+                {
+                    return tmpNode;
+                }
+            }
+
+            return tmpNode;
+        }
+
+        private Node SetSearchNode(Node node, String domain)
+        {
+            Node tmpNode = null;
+
+            foreach (Node item in node.NodeList)
+            {
+                if (item.IsLastNode)
+                {
+                    if (item.Domain == domain && item.IsChecked == true)
+                    {
+                        item.IsChecked = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    foreach (Node childNode in node.NodeList)
+                    {
+                        SetSearchNode(item, domain);
+                    }
+                }
+            }
+
+            return tmpNode;
+        }
+
         public void IsChangedCancel()
         {
             foreach (Node node in _nodeList)

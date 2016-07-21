@@ -97,7 +97,7 @@ namespace HostManager
                 MessageBox.Show(e.ToString());
             }
             
-            string updateurl = "http://www.moroosoft.com/Application/HostManager?version=Check";
+            string updateurl = "http://moroosoft.azurewebsites.net/Application/HostManager?version=Check";
 
             System.Net.WebClient wclient = new System.Net.WebClient();
             wclient.BaseAddress = updateurl;
@@ -116,8 +116,8 @@ namespace HostManager
                 {
                     if (MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "Update", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
-                        System.Diagnostics.Process.Start("http://www.moroosoft.com/Application/HostManager");
-                        //System.Diagnostics.Process.Start("http://www.moroosoft.com/Files/HostManager/64Bit/HostManager.exe");
+                        System.Diagnostics.Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");
+                        //System.Diagnostics.Process.Start("http://moroosoft.azurewebsites.net/Files/HostManager/64Bit/HostManager.exe");
                         isUpdated = true;
                     }
                 }
@@ -234,13 +234,16 @@ namespace HostManager
 
                     if (headerIsMatchedList.Count(x => x == node.Domain) > 1)
                     {
-                        MessageBox.Show("도메인이 중복으로 적용되어 체크할 수 없습니다.\r\n검색을 통해 적용되어 있는 도메인을 찾으세요.\r\n\r\n도메인명 : " + node.Domain, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        ChangeInfoLabel("Info", "중복되는 도메인명 : " + node.Domain, null);
-                        node.IsChecked = false;
-                        if (node.ParentNode.IsExpanded)
-                        {
-                            node.ParentNode.IsExpanded = true;
-                        }
+                        treeViewModel.SearchNode(node.Domain);
+                        //MessageBox.Show("도메인이 중복으로 적용되어 체크할 수 없습니다.\r\n검색을 통해 적용되어 있는 도메인을 찾으세요.\r\n\r\n도메인명 : " + node.Domain, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        //ChangeInfoLabel("Info", "중복되는 도메인명 : " + node.Domain, null);
+                        //node.IsChecked = false;
+                        //if (node.ParentNode.IsExpanded)
+                        //{
+                        //    node.ParentNode.IsExpanded = true;
+                        //}
+                        headerIsMatchedList.RemoveAt(headerIsMatchedList.LastIndexOf(node.Domain));
+                        node.IsChecked = true;
                     }
                     else
                     {

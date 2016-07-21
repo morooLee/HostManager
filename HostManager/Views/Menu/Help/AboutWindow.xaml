@@ -30,8 +30,8 @@
                 </Hyperlink>
             </TextBlock>
             <TextBlock Name="Homepage_Text" HorizontalAlignment="Center">
-                <Hyperlink NavigateUri="http://www.moroosoft.com" RequestNavigate="OnNavigate">
-                    http://www.moroosoft.com
+                <Hyperlink NavigateUri="http://moroosoft.azurewebsites.net" RequestNavigate="OnNavigate">
+                    http://moroosoft.azurewebsites.net
                 </Hyperlink>
             </TextBlock>
             <!--<TextBlock Text="ⓒ 2016 Moroosoft" HorizontalAlignment="Center" FontWeight="Bold"/>-->
