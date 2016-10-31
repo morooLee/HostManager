@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HostManager.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,16 @@ namespace HostManager
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void HostsTreeView_Loaded(object sender, RoutedEventArgs e)
+        {
+            BindTree();
+        }
+
+        private void BindTree()
+        {
+            HostsTreeView.ItemsSource = TreeViewItemModel.NodeListGetAll();
         }
     }
 }
