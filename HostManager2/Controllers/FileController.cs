@@ -18,7 +18,7 @@ namespace HostManager.Controllers
             {
                 StreamReader streamReader = new StreamReader(Settings.Default.HostFilePath + @"\Hosts", Encoding.UTF8);
                 string host = streamReader.ReadToEnd();
-
+                
                 streamReader.Close();
 
                 return host;
@@ -35,14 +35,14 @@ namespace HostManager.Controllers
             TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
             Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
             string[] hostArr = HostLoad().Split('\n');
-            string LostTxt = "";
-            int OpenNode = 0;
-            int CloseNode = 0;
+            string lostTxt = "";
+            int openNodeCount = 0;
+            int closeNodeCount = 0;
 
             if (hostArr.Length != 0)
             {
-                List<Node> tmpNodeList = new List<Node>();
-                int NodeDepth = 0;
+                List<Node> nodeList = new List<Node>();
+                int nodeDepth = 0;
 
                 for (int i = 0; i < hostArr.Length; i++)
                 {
@@ -63,9 +63,9 @@ namespace HostManager.Controllers
                             }
                         }
 
-                        tmpNodeList.Add(node);
-                        NodeDepth++;
-                        OpenNode++;
+                        nodeList.Add(node);
+                        nodeDepth++;
+                        openNodeCount++;
                     }
                     #endregion
 
@@ -75,20 +75,20 @@ namespace HostManager.Controllers
                         Node node = new Node();
                         hostArr[i] = hostArr[i].Replace("\t", "").Replace("\r", "").Replace("\n", "").Trim();
                         string[] tmpString = hostArr[i].Split('#');
-                        string IP = regex.Match(hostArr[i]).Value;
-                        string Domain = tmpString[1].Replace(IP, "").Trim();
+                        string ip = regex.Match(hostArr[i]).Value;
 
                         if (hostArr[i].StartsWith("#"))
                         {
-                            node.Check = false;
+                            node.IsChecked = false;
+                            node.Domain = tmpString[1].Replace(ip, "").Trim();
 
-                            if (IP.Length < 16)
+                            if (ip.Length < 16)
                             {
-                                node.Header = IP + "\t\t" + Domain;
+                                node.Header = ip + "\t\t" + node.Domain;
                             }
                             else
                             {
-                                node.Header = IP + "\t" + Domain;
+                                node.Header = ip + "\t" + node.Domain;
                             }
 
                             if (tmpString.Length >= 3)
@@ -101,16 +101,16 @@ namespace HostManager.Controllers
                         }
                         else
                         {
-                            node.Check = true;
-                            Domain = tmpString[0].Replace(IP, "").Trim();
+                            node.IsChecked = true;
+                            node.Domain = tmpString[0].Replace(ip, "").Trim();
 
-                            if (IP.Length < 16)
+                            if (ip.Length < 16)
                             {
-                                node.Header = IP + "\t\t" + Domain;
+                                node.Header = ip + "\t\t" + node.Domain;
                             }
                             else
                             {
-                                node.Header = IP + "\t" + Domain;
+                                node.Header = ip + "\t" + node.Domain;
                             }
 
                             if (tmpString.Length >= 2)
@@ -124,13 +124,13 @@ namespace HostManager.Controllers
 
                         node.NodeList = null;
 
-                        if (NodeDepth == 0)
+                        if (nodeDepth == 0)
                         {
                             treeViewItemModel.NodeList.Add(node);
                         }
                         else
                         {
-                            tmpNodeList.Last().NodeList.Add(node);
+                            nodeList.Last().NodeList.Add(node);
                         }
                     }
                     #endregion
@@ -138,129 +138,125 @@ namespace HostManager.Controllers
                     #region 노드를 닫을 때
                     else if (hostArr[i].StartsWith("#}}"))
                     {
-                        NodeDepth--;
-                        int CheckCount = 0;
+                        nodeDepth--;
+                        int checkCount = 0;
 
-                        if (NodeDepth < 0)
+                        if (nodeDepth < 0)
                         {
                             MessageBox.Show("변환에 실패하였습니다.\r\n닫는 명령어가 먼저 입력되었거나 여는 명령어가 없습니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             return null;
                         }
-                        else if (NodeDepth > 0)
+                        else if (nodeDepth > 0)
                         {
                             Node tmpNode = new Node();
-                            tmpNode = tmpNodeList.Last();
+                            tmpNode = nodeList.Last();
 
                             foreach (Node item in tmpNode.NodeList)
                             {
-                                if (item.Check == null)
+                                if (item.IsChecked == null)
                                 {
-                                    tmpNode.Check = null;
+                                    tmpNode.IsChecked = null;
                                     break;
                                 }
-                                else if (item.Check == true)
+                                else if (item.IsChecked == true)
                                 {
-                                    CheckCount++;
+                                    checkCount++;
                                 }
                             }
 
-                            if (tmpNode.Check != null)
+                            if (tmpNode.IsChecked != null)
                             {
-                                if (CheckCount == tmpNode.NodeList.Count && tmpNode.NodeList.Count != 0)
+                                if (checkCount == tmpNode.NodeList.Count && tmpNode.NodeList.Count != 0)
                                 {
-                                    tmpNode.Check = true;
+                                    tmpNode.IsChecked = true;
                                 }
-                                else if (CheckCount > 0)
+                                else if (checkCount > 0)
                                 {
-                                    tmpNode.Check = null;
+                                    tmpNode.IsChecked = null;
                                 }
-                                else if (CheckCount == 0)
+                                else if (checkCount == 0)
                                 {
-                                    tmpNode.Check = false;
+                                    tmpNode.IsChecked = false;
                                 }
                             }
 
-                            tmpNodeList.Remove(tmpNodeList.Last());
-                            tmpNodeList.Last().NodeList.Add(tmpNode);
-                            CloseNode++;
+                            nodeList.Remove(nodeList.Last());
+                            nodeList.Last().NodeList.Add(tmpNode);
+                            closeNodeCount++;
                         }
                         else
                         {
-                            foreach (Node item in tmpNodeList.Last().NodeList)
+                            foreach (Node item in nodeList.Last().NodeList)
                             {
-                                if (item.Check == null)
+                                if (item.IsChecked == null)
                                 {
-                                    tmpNodeList.Last().Check = null;
+                                    nodeList.Last().IsChecked = null;
                                     break;
                                 }
-                                else if (item.Check == true)
+                                else if (item.IsChecked == true)
                                 {
-                                    CheckCount++;
+                                    checkCount++;
                                 }
                             }
 
-                            if (tmpNodeList.Last().Check != null)
+                            if (nodeList.Last().IsChecked != null)
                             {
-                                if (CheckCount == tmpNodeList.Last().NodeList.Count && tmpNodeList.Last().NodeList.Count != 0)
+                                if (checkCount == nodeList.Last().NodeList.Count && nodeList.Last().NodeList.Count != 0)
                                 {
-                                    tmpNodeList.Last().Check = true;
+                                    nodeList.Last().IsChecked = true;
                                 }
-                                else if (CheckCount > 0)
+                                else if (checkCount > 0)
                                 {
-                                    tmpNodeList.Last().Check = null;
+                                    nodeList.Last().IsChecked = null;
                                 }
-                                else if (CheckCount == 0)
+                                else if (checkCount == 0)
                                 {
-                                    tmpNodeList.Last().Check = false;
+                                    nodeList.Last().IsChecked = false;
                                 }
                             }
 
-                            treeViewItemModel.NodeList.Add(tmpNodeList.Last());
-                            tmpNodeList.Remove(tmpNodeList.Last());
-                            CloseNode++;
+                            treeViewItemModel.NodeList.Add(nodeList.Last());
+                            nodeList.Remove(nodeList.Last());
+                            closeNodeCount++;
                         }
                     }
                     else
                     {
                         if (hostArr[i].Replace("\r", "").Replace("\n", "").Trim() != "")
                         {
-                            LostTxt += (i + 1) + "\t" + hostArr[i];
+                            lostTxt += (i + 1) + "\t" + hostArr[i];
                         }
                     }
                     #endregion
                 }
 
-                if (OpenNode != CloseNode)
+                if (openNodeCount != closeNodeCount)
                 {
-                    MessageBox.Show("변환에 실패하였습니다.\r\n항목을 열고 닫는 명령어의 수는 같아야 합니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return null;
+                    MessageBox.Show("변환에 실패하였습니다.\r\n항목을 열고 닫는 명령어의 수는 동일해야 합니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                else if (LostTxt != "")
+                else if (treeViewItemModel.NodeList.Count == 0)
                 {
-                    MessageBox.Show("변환 중 형식에 어긋나 포함되지 않은 내역\r\n\r\n줄번호\t텍스트 내용\r\n" + LostTxt, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("변환될 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    treeViewItemModel.NodeList.Clear();
                 }
+                else
+                {
+                    if (lostTxt != "")
+                    {
+                        MessageBox.Show("변환 중 형식에 어긋나 포함되지 않은 내역\r\n\r\n줄번호\t텍스트 내용\r\n" + lostTxt, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+
+                    foreach (Node Item in treeViewItemModel.NodeList)
+                    {
+                        Item.Initialize();
+                    }
+                }
+
+                return treeViewItemModel.NodeList;
             }
             else
             {
-                MessageBox.Show("변환된 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                treeViewItemModel.NodeList.Clear();
-                return treeViewItemModel.NodeList;
-            }
-
-            if (treeViewItemModel.NodeList == null || treeViewItemModel.NodeList.Count == 0)
-            {
-                MessageBox.Show("변환된 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                treeViewItemModel.NodeList.Clear();
-                return treeViewItemModel.NodeList;
-            }
-            else
-            {
-                foreach (Node Item in treeViewItemModel.NodeList)
-                {
-                    //Item.Initialize();
-                }
+                MessageBox.Show("변환될 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return treeViewItemModel.NodeList;
             }
         }

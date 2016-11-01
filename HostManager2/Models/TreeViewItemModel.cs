@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -7,12 +8,17 @@ namespace HostManager.Models
 {
     public class TreeViewItemModel
     {
-        private List<Node> _nodeList = new List<Node>();
+        private List<Node> _nodeList = null;
 
         public List<Node> NodeList
         {
             get
             {
+                if (_nodeList == null)
+                {
+                    _nodeList = new List<Node>();
+                }
+
                 return _nodeList;
             }
             set
@@ -20,59 +26,79 @@ namespace HostManager.Models
                 _nodeList = value;
             }
         }
-
-        public static List<Node> NodeListGetAll()
-        {
-            List<Node> parentList = new List<Node>();
-            List<Node> childrenList1 = new List<Node>();
-            List<Node> childrenList2 = new List<Node>();
-            List<Node> childrenList3 = new List<Node>();
-
-            childrenList1.Add(new Node("child_A"));
-            childrenList1.Add(new Node("child_B"));
-            childrenList1.Add(new Node("child_C"));
-            childrenList1.Add(new Node("child_D"));
-            childrenList1.Add(new Node("child_E"));
-            childrenList1.Add(new Node("child_F"));
-
-            foreach(Node node in childrenList1)
-            {
-                childrenList2.Add((Node)node.Clone());
-            }
-
-            foreach (Node node in childrenList1)
-            {
-                childrenList3.Add((Node)node.Clone());
-            }
-
-            parentList.Add(new Node("parent_A"));
-            parentList[0].NodeList = childrenList1;
-            parentList.Add(new Node("parent_B"));
-            parentList[1].NodeList = childrenList2;
-            parentList.Add(new Node("parent_C"));
-            parentList[2].NodeList = childrenList3;
-
-            return parentList;
-        }
     }
 
-    public class Node
+    public class Node : INotifyPropertyChanged
     {
-        private bool? _check = false;
+        private bool _isSelected = false;
+        private bool _isExternalNode = false;
+        private bool? _ischecked = false;
+        private string _ip = "";
+        private string _domain = "";
         private string _header = "";
-        private string _tooltip = "";
+        private string _tooltip = null;
         private Node _parentNode = null;
         private List<Node> _nodeList = null;
 
-        public bool? Check
+        public bool IsSelected
         {
             get
             {
-                return _check;
+                return _isSelected;
             }
             set
             {
-                _check = value;
+                _isSelected = value;
+                this.OnPropertyChanged("IsSelected");
+            }
+        }
+
+        public bool IsExternalNode
+        {
+            get
+            {
+                return _isExternalNode;
+            }
+            set
+            {
+                _isExternalNode = value;
+                this.OnPropertyChanged("IsExternalNode");
+            }
+        }
+
+        public bool? IsChecked
+        {
+            get
+            {
+                return _ischecked;
+            }
+            set
+            {
+                _ischecked = value;
+            }
+        }
+
+        public string IP
+        {
+            get
+            {
+                return _ip;
+            }
+            set
+            {
+                _ip = value;
+            }
+        }
+
+        public string Domain
+        {
+            get
+            {
+                return _domain;
+            }
+            set
+            {
+                _domain = value;
             }
         }
 
@@ -116,6 +142,11 @@ namespace HostManager.Models
         {
             get
             {
+                if (_nodeList == null)
+                {
+                    _nodeList = new List<Node>();
+                }
+
                 return _nodeList;
             }
             set
@@ -134,11 +165,20 @@ namespace HostManager.Models
             _header = header;
         }
 
+        public void Initialize()
+        {
+            foreach (Node childNode in this.NodeList)
+            {
+                childNode._parentNode = this;
+                childNode.Initialize();
+            }
+        }
+
         //깊은 복사
         public object Clone()
         {
             Node node = new Node();
-            node.Check = this._check;
+            node.IsChecked = this._ischecked;
             node.Header = this._header;
             node.Tooltip = this._tooltip;
 
@@ -159,5 +199,13 @@ namespace HostManager.Models
 
             return node;
         }
+
+        private void OnPropertyChanged(string prop)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
