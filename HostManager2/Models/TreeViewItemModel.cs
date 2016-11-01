@@ -7,7 +7,7 @@ namespace HostManager.Models
 {
     public class TreeViewItemModel
     {
-        private List<Node> _nodeList = null;
+        private List<Node> _nodeList = new List<Node>();
 
         public List<Node> NodeList
         {
@@ -19,18 +19,6 @@ namespace HostManager.Models
             {
                 _nodeList = value;
             }
-        }
-
-        // 깊은 복사
-        public object Clone()
-        {
-            List<Node> nodeList = new List<Node>();
-
-            foreach(Node node in this._nodeList)
-            {
-                nodeList.Add((Node)node.Clone());
-            }
-            return nodeList;
         }
 
         public static List<Node> NodeListGetAll()

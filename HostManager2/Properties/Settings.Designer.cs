@@ -22,5 +22,113 @@ namespace HostManager.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoRestart_IE {
+            get {
+                return ((bool)(this["AutoRestart_IE"]));
+            }
+            set {
+                this["AutoRestart_IE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoRestart_Edge {
+            get {
+                return ((bool)(this["AutoRestart_Edge"]));
+            }
+            set {
+                this["AutoRestart_Edge"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoRestart_Chrome {
+            get {
+                return ((bool)(this["AutoRestart_Chrome"]));
+            }
+            set {
+                this["AutoRestart_Chrome"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoRestart_Firefox {
+            get {
+                return ((bool)(this["AutoRestart_Firefox"]));
+            }
+            set {
+                this["AutoRestart_Firefox"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TempFileDel_IE {
+            get {
+                return ((bool)(this["TempFileDel_IE"]));
+            }
+            set {
+                this["TempFileDel_IE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TempFileDel_Edge {
+            get {
+                return ((bool)(this["TempFileDel_Edge"]));
+            }
+            set {
+                this["TempFileDel_Edge"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TempFileDel_Chrome {
+            get {
+                return ((bool)(this["TempFileDel_Chrome"]));
+            }
+            set {
+                this["TempFileDel_Chrome"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TempFileDel_Firefox {
+            get {
+                return ((bool)(this["TempFileDel_Firefox"]));
+            }
+            set {
+                this["TempFileDel_Firefox"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Windows\\System32\\drivers\\etc")]
+        public string HostFilePath {
+            get {
+                return ((string)(this["HostFilePath"]));
+            }
+            set {
+                this["HostFilePath"] = value;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using HostManager.Models;
+﻿using HostManager.Controllers;
+using HostManager.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,9 @@ namespace HostManager
     /// </summary>
     public partial class MainWindow : Window
     {
+        TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
+        FileController fileController = new FileController();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,7 +37,9 @@ namespace HostManager
 
         private void BindTree()
         {
-            HostsTreeView.ItemsSource = TreeViewItemModel.NodeListGetAll();
+            treeViewItemModel.NodeList = fileController.ToNodeList();
+
+            HostsTreeView.ItemsSource = treeViewItemModel.NodeList;
         }
     }
 }
