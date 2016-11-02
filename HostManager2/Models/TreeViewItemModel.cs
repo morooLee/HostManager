@@ -6,10 +6,14 @@ using System.Text;
 
 namespace HostManager.Models
 {
+    /// <summary>
+    /// 트리뷰 아이템 리스트 관리 모델
+    /// </summary>
     public class TreeViewItemModel
     {
+        // TreeView 아이템 리스트
         private List<Node> _nodeList = null;
-
+        
         public List<Node> NodeList
         {
             get
@@ -27,44 +31,72 @@ namespace HostManager.Models
             }
         }
 
-        public void IsDomainDuplication(string domain)
+        /// <summary>
+        /// 중복체크를 위한 트리뷰 아이템 리스트 검색
+        /// </summary>
+        /// <param name="newNode">체크 상태가 갱신된 노드</param>
+        public void IsDomainDuplication(Node newNode)
         {
             if(_nodeList != null)
             {
                 foreach (Node node in _nodeList)
-                {
-                    SetIsChecked(node, domain);
+                { 
+                    SetIsChecked(node, newNode);
                 }
             }
         }
 
-        private void SetIsChecked(Node node, string domain)
+        /// <summary>
+        /// 중복 시 기존 노드의 체크 상태 해제하기
+        /// </summary>
+        /// <param name="oldNode">중복여부를 검사할 노드</param>
+        /// <param name="newNode">중복여부를 확인할 노드</param>
+        private void SetIsChecked(Node oldNode, Node newNode)
         {
-            if (node.IsChecked == true && node.Domain == domain)
+            if(oldNode.IsExternalNode)
             {
-                node.IsChecked = false;
-            }
-
-            if (node.IsExternalNode == false)
-            {
-                foreach (Node childeNode in node.NodeList)
+                if (oldNode.IsChecked == true && oldNode.Domain == newNode.Domain)
                 {
-                    SetIsChecked(childeNode, domain);
+                    if(oldNode.GetHashCode() != newNode.GetHashCode())
+                    {
+                        oldNode.IsChecked = false;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Node childeNode in oldNode.NodeList)
+                {
+                    SetIsChecked(childeNode, newNode);
                 }
             }
         }
     }
 
+
+    /// <summary>
+    /// 트리뷰 아이템 모델
+    /// </summary>
     public class Node : INotifyPropertyChanged
     {
+        // 트리 선택 여부
         private bool _isSelected = false;
+        // 자식 노드 여부
         private bool _isExternalNode = true;
+        // 체크 여부
         private bool? _isChecked = false;
+        // IP
         private string _ip = null;
+        // Domain
         private string _domain = null;
+        // Header
         private string _header = "";
+        // Tooltip
         private string _tooltip = null;
+        // 부모노드
         private Node _parentNode = null;
+        // 자식 노드
         private List<Node> _nodeList = null;
 
         public bool IsSelected
@@ -191,7 +223,7 @@ namespace HostManager.Models
         {
             _header = header;
         }
-
+        // 부모노드 설정
         public void Initialize()
         {
             if(this.IsExternalNode == false)
@@ -204,6 +236,12 @@ namespace HostManager.Models
             }
         }
 
+        /// <summary>
+        /// 체크박스 업데이트
+        /// </summary>
+        /// <param name="value">체크 상태</param>
+        /// <param name="updateChildren">자식노드 업데이트 여부</param>
+        /// <param name="updateParent">부모노드 업데이트 확인</param>
         private void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
         {
             if (value == _isChecked)
@@ -229,6 +267,7 @@ namespace HostManager.Models
             this.OnPropertyChanged("IsChecked");
         }
 
+        // 체크박스 상태 변경
         private void VerifyCheckedState()
         {
             bool? state = null;
@@ -281,6 +320,10 @@ namespace HostManager.Models
             return node;
         }
 
+        /// <summary>
+        /// 이벤트 생성
+        /// </summary>
+        /// <param name="prop">생성할 이벤트명</param>
         private void OnPropertyChanged(string prop)
         {
             if (this.PropertyChanged != null)
@@ -288,7 +331,7 @@ namespace HostManager.Models
                 this.PropertyChanged(this, new PropertyChangedEventArgs(prop));
             }
         }
-
+        // 이벤트 변수
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

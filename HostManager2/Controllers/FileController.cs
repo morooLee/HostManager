@@ -12,6 +12,10 @@ namespace HostManager.Controllers
 {
     public class FileController
     {
+        /// <summary>
+        /// 파일 읽기
+        /// </summary>
+        /// <returns>string</returns>
         private string HostLoad()
         {
             try
@@ -30,7 +34,11 @@ namespace HostManager.Controllers
             }
         }
 
-        public List<Node> ToNodeList()
+        /// <summary>
+        /// string 형태의 hosts 내용을 Node로 변환하여 리스트 만들기
+        /// </summary>
+        /// <returns>List<Node></returns>
+        public List<Node> ConverterToNodeList()
         {
             TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
             Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
@@ -260,6 +268,132 @@ namespace HostManager.Controllers
                 MessageBox.Show("변환될 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return treeViewItemModel.NodeList;
             }
+        }
+
+        /// <summary>
+        /// 파일 쓰기
+        /// </summary>
+        /// <param name="hosts"></param>
+        /// <param name="path"></param>
+        /// <returns>저장여부</returns>
+        public bool HostSave(string hosts, string path)
+        {
+            try
+            {
+                StreamWriter StreamWriter = null;
+
+                if (path == null)
+                {
+                    StreamWriter = new StreamWriter(Settings.Default.HostFilePath + @"\Hosts", false, Encoding.UTF8);
+                }
+                else
+                {
+                    StreamWriter = new StreamWriter(path, false, Encoding.UTF8);
+                }
+
+                StreamWriter.WriteLine(hosts);
+                StreamWriter.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// TreeViewItemModel에서 Node 형태의 hosts 내용을 string로 변환하기
+        /// </summary>
+        /// <param name="treeViewItemModel">변환할 TreeViewItemModel</param>
+        /// <param name="path">다른 이름으로 저장 시의 경로</param>
+        /// <returns>저장 여부</returns>
+        public bool ConverterToString(TreeViewItemModel treeViewItemModel, string path)
+        {
+            bool saveResult = false;
+            string hosts = "";
+
+            foreach(Node node in treeViewItemModel.NodeList)
+            {
+                hosts += SetString(node);
+            }
+
+            saveResult = HostSave(hosts, path);
+
+            return saveResult;
+        }
+
+        /// <summary>
+        /// List<Node>를 정보를 검색하여 Node 당 한문단씩 string으로 변환하기
+        /// </summary>
+        /// <param name="node">string으로 변환할 Node</param>
+        /// <returns>string</returns>
+        private string SetString(Node node)
+        {
+            string hosts = "";
+
+            if (node.IsExternalNode)
+            {
+                if (node.Tooltip == null || node.Tooltip == "")
+                {
+                    if (node.IsChecked == true)
+                    {
+                        hosts += (node.Header + "\r\n");
+                    }
+                    else
+                    {
+                        hosts += ("#" + node.Header + "\r\n");
+                    }
+                }
+                else
+                {
+                    if (node.IsChecked == true)
+                    {
+                        hosts += (node.Header + "\t\t#" + node.Tooltip + "\r\n");
+                    }
+                    else
+                    {
+                        hosts += ("#" + node.Header + "\t\t#" + node.Tooltip + "\r\n");
+                    }
+                }
+            }
+            else
+            {
+                if (node.Tooltip == null || node.Tooltip == "")
+                {
+                    hosts += ("#{{" + node.Header + "\r\n");
+                }
+                else
+                {
+                    hosts += ("#{{" + node.Header + "\t\t#" + node.Tooltip + "\r\n");
+                }
+
+                if (node.NodeList != null || node.NodeList.Count == 0)
+                {
+                    foreach (Node childNode in node.NodeList)
+                    {
+                        hosts += SetString(childNode);
+                    }
+                }
+
+                hosts += "#}}\r\n";
+
+                if (node.ParentNode != null)
+                {
+                    if (node.ParentNode.NodeList.IndexOf(node) != (node.ParentNode.NodeList.Count - 1))
+                    {
+                        hosts += "\r\n";
+                    }
+                }
+                else
+                {
+                    hosts += "\r\n";
+                    hosts += "\r\n";
+                }
+            }
+
+            return hosts;
         }
     }
 }

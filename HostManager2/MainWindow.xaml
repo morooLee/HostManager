@@ -96,12 +96,12 @@
                         <Image Source="Resources/Refresh.png"/>
                     </Button>
                 </StackPanel>
-                <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="False">적용</Button>
+                <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="true" Click="Apply_Button_Click">적용</Button>
             </DockPanel>
             <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
             <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
             <Grid>
-                <TreeView Name="HostsTreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="HostsTreeView_Loaded">
+                <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded">
                     <TreeView.Resources>
                         <Style TargetType="TreeViewItem">
                             <Style.Triggers>
@@ -142,7 +142,12 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <RichTextBox Name="Text_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden">
+                <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden">
+                    <RichTextBox.Resources>
+                        <Style TargetType="{x:Type Paragraph}">
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+                    </RichTextBox.Resources>
                     <RichTextBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="복사하기" Command="Copy" />
