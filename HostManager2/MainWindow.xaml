@@ -136,7 +136,7 @@
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=NodeList}">
                             <StackPanel Height="20" Orientation="Horizontal">
-                                <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=Check}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
+                                <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
                                 <TextBlock Name="HeaderText" Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" />
                             </StackPanel>
                         </HierarchicalDataTemplate>

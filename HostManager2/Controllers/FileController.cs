@@ -54,6 +54,7 @@ namespace HostManager.Controllers
                         string[] tmpString = hostArr[i].Split('#');
 
                         node.Header = tmpString[0].Trim();
+                        node.IsExternalNode = false;
 
                         if (tmpString.Length >= 2)
                         {
@@ -122,7 +123,7 @@ namespace HostManager.Controllers
                             }
                         }
 
-                        node.NodeList = null;
+                        node.IsExternalNode = true;
 
                         if (nodeDepth == 0)
                         {

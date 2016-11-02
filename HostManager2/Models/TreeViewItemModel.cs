@@ -26,15 +26,42 @@ namespace HostManager.Models
                 _nodeList = value;
             }
         }
+
+        public void IsDomainDuplication(string domain)
+        {
+            if(_nodeList != null)
+            {
+                foreach (Node node in _nodeList)
+                {
+                    SetIsChecked(node, domain);
+                }
+            }
+        }
+
+        private void SetIsChecked(Node node, string domain)
+        {
+            if (node.IsChecked == true && node.Domain == domain)
+            {
+                node.IsChecked = false;
+            }
+
+            if (node.IsExternalNode == false)
+            {
+                foreach (Node childeNode in node.NodeList)
+                {
+                    SetIsChecked(childeNode, domain);
+                }
+            }
+        }
     }
 
     public class Node : INotifyPropertyChanged
     {
         private bool _isSelected = false;
-        private bool _isExternalNode = false;
-        private bool? _ischecked = false;
-        private string _ip = "";
-        private string _domain = "";
+        private bool _isExternalNode = true;
+        private bool? _isChecked = false;
+        private string _ip = null;
+        private string _domain = null;
         private string _header = "";
         private string _tooltip = null;
         private Node _parentNode = null;
@@ -70,11 +97,11 @@ namespace HostManager.Models
         {
             get
             {
-                return _ischecked;
+                return _isChecked;
             }
             set
             {
-                _ischecked = value;
+                this.SetIsChecked(value, true, true);
             }
         }
 
@@ -142,7 +169,7 @@ namespace HostManager.Models
         {
             get
             {
-                if (_nodeList == null)
+                if (_isExternalNode == false && _nodeList == null)
                 {
                     _nodeList = new List<Node>();
                 }
@@ -167,20 +194,74 @@ namespace HostManager.Models
 
         public void Initialize()
         {
-            foreach (Node childNode in this.NodeList)
+            if(this.IsExternalNode == false)
             {
-                childNode._parentNode = this;
-                childNode.Initialize();
+                foreach (Node childNode in this._nodeList)
+                {
+                    childNode._parentNode = this;
+                    childNode.Initialize();
+                }
             }
+        }
+
+        private void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
+        {
+            if (value == _isChecked)
+            {
+                return;
+            }
+
+            _isChecked = value;
+
+            if (updateChildren && _isChecked.HasValue && _isExternalNode == false)
+            {
+                foreach (Node childNode in _nodeList)
+                {
+                    childNode.SetIsChecked(_isChecked, true, false);
+                }
+            }
+
+            if (updateParent && _parentNode != null)
+            {
+                _parentNode.VerifyCheckedState();
+            }
+
+            this.OnPropertyChanged("IsChecked");
+        }
+
+        private void VerifyCheckedState()
+        {
+            bool? state = null;
+
+            for (int i = 0; i < this._nodeList.Count; ++i)
+            {
+                bool? current = this._nodeList[i].IsChecked;
+
+                if (i == 0)
+                {
+                    state = current;
+                }
+                else if (state != current)
+                {
+                    state = null;
+                    break;
+                }
+            }
+
+            SetIsChecked(state, false, true);
         }
 
         //깊은 복사
         public object Clone()
         {
             Node node = new Node();
-            node.IsChecked = this._ischecked;
-            node.Header = this._header;
-            node.Tooltip = this._tooltip;
+            node._isSelected = this._isSelected;
+            node._isExternalNode = this._isExternalNode;
+            node._isChecked = this._isChecked;
+            node._ip = this._ip;
+            node._domain = this._domain;
+            node._header = this._header;
+            node._tooltip = this._tooltip;
 
             if (this._parentNode != null)
             {
@@ -191,7 +272,7 @@ namespace HostManager.Models
             {
                 node.NodeList = new List<Node>();
 
-                foreach (Node childNode in this.NodeList)
+                foreach (Node childNode in this._nodeList)
                 {
                     node.NodeList.Add((Node)childNode.Clone());
                 }
@@ -203,7 +284,9 @@ namespace HostManager.Models
         private void OnPropertyChanged(string prop)
         {
             if (this.PropertyChanged != null)
+            {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
