@@ -80,11 +80,11 @@
                             <!--<Setter Property="BorderBrush" Value="White" />-->
                         </Style>
                     </StackPanel.Resources>
-                    <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False">
+                    <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="TreeView_Button_Click">
                         <Image Source="Resources/TreeView.png"/>
                     </Button>
                     <Border BorderBrush="White" BorderThickness="1" />
-                    <Button Name="TextEdit_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기">
+                    <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="RichTextBox_Button_Click">
                         <Image Source="Resources/TextEdit.png"/>
                     </Button>
                     <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
@@ -101,7 +101,7 @@
             <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
             <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
             <Grid>
-                <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded">
+                <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
                     <TreeView.Resources>
                         <Style TargetType="TreeViewItem">
                             <Style.Triggers>
@@ -110,7 +110,7 @@
                                     <Setter Property="Foreground" Value="Red"></Setter>
                                 </DataTrigger>
                             </Style.Triggers>
-                            <!--<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />-->
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                             <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                             <!--<EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />

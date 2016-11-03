@@ -90,7 +90,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controllers\FileController.cs" />
+    <Compile Include="Controllers\HostIOController.cs" />
+    <Compile Include="Controllers\TreeViewItemConverterController.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

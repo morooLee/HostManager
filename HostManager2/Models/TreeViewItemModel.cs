@@ -74,29 +74,20 @@ namespace HostManager.Models
         }
     }
 
-
     /// <summary>
     /// 트리뷰 아이템 모델
     /// </summary>
     public class Node : INotifyPropertyChanged
     {
-        // 트리 선택 여부
         private bool _isSelected = false;
-        // 자식 노드 여부
+        private bool _isExpanded = false;
         private bool _isExternalNode = true;
-        // 체크 여부
         private bool? _isChecked = false;
-        // IP
         private string _ip = null;
-        // Domain
         private string _domain = null;
-        // Header
         private string _header = "";
-        // Tooltip
         private string _tooltip = null;
-        // 부모노드
         private Node _parentNode = null;
-        // 자식 노드
         private List<Node> _nodeList = null;
 
         public bool IsSelected
@@ -109,6 +100,19 @@ namespace HostManager.Models
             {
                 _isSelected = value;
                 this.OnPropertyChanged("IsSelected");
+            }
+        }
+
+        public bool IsExpanded
+        {
+            get
+            {
+                return _isExpanded;
+            }
+            set
+            {
+                _isExpanded = value;
+                this.OnPropertyChanged("IsExpanded");
             }
         }
 
@@ -250,6 +254,17 @@ namespace HostManager.Models
             }
 
             _isChecked = value;
+            
+            // 체크값이 true 또는 null인 경우 노드 확장하기
+            if (_isChecked != false)
+            {
+                this._isExpanded = true;
+                this.OnPropertyChanged("IsExpanded");
+            }
+            else
+            {
+                this._isExpanded = false;
+            }
 
             if (updateChildren && _isChecked.HasValue && _isExternalNode == false)
             {
@@ -263,7 +278,7 @@ namespace HostManager.Models
             {
                 _parentNode.VerifyCheckedState();
             }
-
+            
             this.OnPropertyChanged("IsChecked");
         }
 

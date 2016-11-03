@@ -1,8 +1,6 @@
 ﻿using HostManager.Models;
-using HostManager.Properties;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,42 +8,32 @@ using System.Windows;
 
 namespace HostManager.Controllers
 {
-    public class FileController
+    public class TreeViewItemConverterController
     {
-        /// <summary>
-        /// 파일 읽기
-        /// </summary>
-        /// <returns>string</returns>
-        private string HostLoad()
-        {
-            try
-            {
-                StreamReader streamReader = new StreamReader(Settings.Default.HostFilePath + @"\Hosts", Encoding.UTF8);
-                string host = streamReader.ReadToEnd();
-                
-                streamReader.Close();
-
-                return host;
-            }
-            catch(Exception e)
-            {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return "";
-            }
-        }
+        HostIOController hostIOController = new HostIOController();
 
         /// <summary>
         /// string 형태의 hosts 내용을 Node로 변환하여 리스트 만들기
         /// </summary>
+        /// <param name="hosts">변경할 string</param>
         /// <returns>List<Node></returns>
-        public List<Node> ConverterToNodeList()
+        public List<Node> ConverterToNodeList(string hosts)
         {
             TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
             Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
-            string[] hostArr = HostLoad().Split('\n');
-            string lostTxt = "";
             int openNodeCount = 0;
             int closeNodeCount = 0;
+            string lostTxt = "";
+            string[] hostArr = null;
+
+            if (hosts == null)
+            {
+                hostArr = hostIOController.HostLoad().Split('\n');
+            }
+            else
+            {
+                hostArr = hosts.Split('\n');
+            }
 
             if (hostArr.Length != 0)
             {
@@ -271,57 +259,27 @@ namespace HostManager.Controllers
         }
 
         /// <summary>
-        /// 파일 쓰기
-        /// </summary>
-        /// <param name="hosts"></param>
-        /// <param name="path"></param>
-        /// <returns>저장여부</returns>
-        public bool HostSave(string hosts, string path)
-        {
-            try
-            {
-                StreamWriter StreamWriter = null;
-
-                if (path == null)
-                {
-                    StreamWriter = new StreamWriter(Settings.Default.HostFilePath + @"\Hosts", false, Encoding.UTF8);
-                }
-                else
-                {
-                    StreamWriter = new StreamWriter(path, false, Encoding.UTF8);
-                }
-
-                StreamWriter.WriteLine(hosts);
-                StreamWriter.Close();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
-
-        /// <summary>
         /// TreeViewItemModel에서 Node 형태의 hosts 내용을 string로 변환하기
         /// </summary>
         /// <param name="treeViewItemModel">변환할 TreeViewItemModel</param>
         /// <param name="path">다른 이름으로 저장 시의 경로</param>
-        /// <returns>저장 여부</returns>
-        public bool ConverterToString(TreeViewItemModel treeViewItemModel, string path)
+        /// <param name="isSave">저장 여부</param>
+        /// <returns>변환된 값</returns>
+        public string ConverterToString(TreeViewItemModel treeViewItemModel, string path, bool isSave)
         {
-            bool saveResult = false;
             string hosts = "";
 
-            foreach(Node node in treeViewItemModel.NodeList)
+            foreach (Node node in treeViewItemModel.NodeList)
             {
                 hosts += SetString(node);
             }
 
-            saveResult = HostSave(hosts, path);
+            if (isSave)
+            {
+                hostIOController.HostSave(hosts, path);
+            }
 
-            return saveResult;
+            return hosts;
         }
 
         /// <summary>

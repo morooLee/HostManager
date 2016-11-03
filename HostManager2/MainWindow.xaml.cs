@@ -22,20 +22,8 @@ namespace HostManager
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        /// <summary>
-        /// 트리뷰 아이템 모델 생성
-        /// </summary>
         TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
-
-        /// <summary>
-        /// 파일 컨트롤러 등록
-        /// </summary>
-        FileController fileController = new FileController();
-
-        /// <summary>
-        /// 체크된 Domain 리스트
-        /// </summary>
+        TreeViewItemConverterController treeViewItemConverterController = new TreeViewItemConverterController();
         HashSet<string> domainHashSet = new HashSet<string>();
 
         public MainWindow()
@@ -52,15 +40,37 @@ namespace HostManager
         /// <param name="e"></param>
         private void Hosts_TreeView_Loaded(object sender, RoutedEventArgs e)
         {
-            BindTree();
+            BindTree(null);
+        }
+
+        /// <summary>
+        /// 트리뷰 SelectedItemChanged 이벤트
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Hosts_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            Node selectedNode = e.NewValue as Node;
+            //SelectedNode = item;
+
+            statusBarUpdate(selectedNode);
         }
 
         /// <summary>
         /// 트리뷰 바인딩
         /// </summary>
-        private void BindTree()
+        /// <param name="hosts">바인딩할 string 개체 (null이면  파일에서 string 개체 생성)</param>
+        private void BindTree(string hosts)
         {
-            treeViewItemModel.NodeList = fileController.ConverterToNodeList();
+            if (hosts == null)
+            {
+                treeViewItemModel.NodeList = treeViewItemConverterController.ConverterToNodeList(null);
+            }
+            else
+            {
+                treeViewItemModel.NodeList = treeViewItemConverterController.ConverterToNodeList(hosts);
+            }
+
             Hosts_TreeView.ItemsSource = treeViewItemModel.NodeList;
 
             // 최초 체크상태 UI 업데이트
@@ -238,28 +248,110 @@ namespace HostManager
 
         #region 도구모음 이벤트 및 관련 함수
 
-        /// <summary>
-        /// 적용버튼 클릭 이벤트
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        private void TreeView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            TextRange textRange = new TextRange(Hosts_RichTextBox.Document.ContentStart, Hosts_RichTextBox.Document.ContentEnd);
+
+            BindTree(textRange.Text);
+
+            ChangeButtonUI();
+        }
+
+        private void RichTextBox_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Hosts_RichTextBox.Document.Blocks.Clear();
+            Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel, null, false))));
+
+            ChangeButtonUI();
+        }
+
+        private void ChangeButtonUI()
+        {
+            //SearchBoxClear();
+
+            if (Hosts_TreeView.Visibility == Visibility.Visible)
+            {
+                TreeView_Button.IsEnabled = true;
+                RichTextBox_Button.IsEnabled = false;
+                Hosts_TreeView.Visibility = Visibility.Hidden;
+                Hosts_RichTextBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TreeView_Button.IsEnabled = false;
+                RichTextBox_Button.IsEnabled = true;
+                Hosts_TreeView.Visibility = Visibility.Visible;
+                Hosts_RichTextBox.Visibility = Visibility.Hidden;
+            }
+        }
+
         private void Apply_Button_Click(object sender, RoutedEventArgs e)
         {
             DoApply();
         }
 
-        /// <summary>
-        /// 호스트 저장하기
-        /// </summary>
-        /// <returns></returns>
-        private bool DoApply()
+        // 저장하기
+        private void DoApply()
         {
-            bool applyResult = false;
-            applyResult = fileController.ConverterToString(treeViewItemModel, null);
-
-            return applyResult;
+            treeViewItemConverterController.ConverterToString(treeViewItemModel, null, true);
         }
 
         #endregion
+
+        /// <summary>
+        /// 선택한 노드 경로 출력하기
+        /// </summary>
+        /// <param name="selectedNode">선택한 노드</param>
+        private void statusBarUpdate(Node selectedNode)
+        {
+            string sbText = "";
+
+            if (selectedNode != null)
+            {
+                if (selectedNode.ParentNode != null)
+                {
+                    string path = "";
+                    Node node = selectedNode.ParentNode;
+                    while (true)
+                    {
+                        if (node.Header == "")
+                        {
+                            path = "Empty";
+                        }
+                        else
+                        {
+                            path = node.Header;
+                        }
+
+                        if (sbText == "")
+                        {
+                            sbText = path;
+                        }
+                        else
+                        {
+                            string tmpPath = sbText;
+                            sbText = path + " > " + tmpPath;
+                        }
+
+                        if (node.ParentNode != null)
+                        {
+                            Node tmpNode = node.ParentNode;
+                            node = tmpNode;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    sbText = "Root";
+                }
+            }
+
+            statusBar.Items.Clear();
+            statusBar.Items.Add(sbText);
+        }
     }
 }
