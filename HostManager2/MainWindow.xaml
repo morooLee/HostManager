@@ -88,11 +88,11 @@
                         <Image Source="Resources/TextEdit.png"/>
                     </Button>
                     <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
-                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기">
+                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="NodePad_Button_Click">
                         <Image Source="Resources/NotePad.png"/>
                     </Button>
                     <Border BorderBrush="White" BorderThickness="1" />
-                    <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침">
+                    <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침" Click="Refresh_Button_Click">
                         <Image Source="Resources/Refresh.png"/>
                     </Button>
                 </StackPanel>
@@ -142,7 +142,7 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden">
+                <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="Hosts_RichTextBox_TextChanged">
                     <RichTextBox.Resources>
                         <Style TargetType="{x:Type Paragraph}">
                             <Setter Property="Margin" Value="0"/>

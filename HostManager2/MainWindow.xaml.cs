@@ -23,8 +23,10 @@ namespace HostManager
     public partial class MainWindow : Window
     {
         TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
+        HostIOController hostIOController = new HostIOController();
         TreeViewItemConverterController treeViewItemConverterController = new TreeViewItemConverterController();
         HashSet<string> domainHashSet = new HashSet<string>();
+        bool isChangedHost = false;
 
         public MainWindow()
         {
@@ -33,21 +35,13 @@ namespace HostManager
 
         #region TreeView 이벤트 및 관련 함수
 
-        /// <summary>
-        /// 트리뷰 로드 이벤트
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // 트리뷰 로드 이벤트
         private void Hosts_TreeView_Loaded(object sender, RoutedEventArgs e)
         {
             BindTree(null);
         }
 
-        /// <summary>
-        /// 트리뷰 SelectedItemChanged 이벤트
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // 트리뷰 SelectedItemChanged 이벤트
         private void Hosts_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             Node selectedNode = e.NewValue as Node;
@@ -84,6 +78,17 @@ namespace HostManager
         }
 
         #endregion
+
+        // RichTextBox 이벤트 및 관련 함수
+        private void Hosts_RichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (Hosts_RichTextBox.Document.Blocks == null)
+            {
+                //Console.WriteLine(Hosts_RichTextBox.Document.Blocks.Count);
+            }
+            Console.WriteLine(Hosts_RichTextBox.Document.Blocks.Count);
+            //isChangedHost = true;
+        }
 
         #region CheckBox 이벤트 및 관련 함수
 
@@ -194,6 +199,7 @@ namespace HostManager
 
             // 좌클릭 시 트리뷰 선택하기
             node.IsSelected = true;
+            isChangedHost = true;
         }
 
         /// <summary>
@@ -265,6 +271,21 @@ namespace HostManager
             ChangeButtonUI();
         }
 
+        private void NodePad_Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenNotepad();
+        }
+
+        private void Apply_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DoApply();
+        }
+
+        private void Refresh_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DoRefresh();
+        }
+
         private void ChangeButtonUI()
         {
             //SearchBoxClear();
@@ -285,15 +306,70 @@ namespace HostManager
             }
         }
 
-        private void Apply_Button_Click(object sender, RoutedEventArgs e)
+        private void OpenNotepad()
         {
-            DoApply();
+            if (isChangedHost == true)
+            {
+                MessageBoxResult result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n저장하지 않은 정보는 메모장에 반영이 되지 않습니다.\r\n저장하고 메모장으로 여시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    DoApply();
+                }
+            }
+
+            hostIOController.OpenNotepad();
+
+            //ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", null);
+        }
+
+        private void DoRefresh()
+        {
+            //SearchBoxClear();
+            MessageBoxResult result = MessageBoxResult.Yes;
+
+            if (isChangedHost == true)
+            {
+                result = MessageBox.Show("저장하지 않은 정보가 있습니다.\r\n새로고침을 할 경우 저장되지 않은 정보는 삭제됩니다.\r\n그래도 새로고침을 하시겠습니까?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            }
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (Hosts_TreeView.Visibility == Visibility.Visible)
+                {
+                    BindTree(null);
+                }
+                else
+                {
+                    Hosts_RichTextBox.Document.Blocks.Clear();
+                    Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel, null, false))));
+                }
+
+                if (SearchButtonImage.Tag.ToString() == "Cancel")
+                {
+                    SearchBox.Text = "";
+
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.UriSource = new Uri("Resources/Search.png", UriKind.Relative);
+                    bi.EndInit();
+                    SearchButtonImage.Source = bi;
+                    SearchButtonImage.Tag = "Search";
+                }
+
+                Apply_Button.IsEnabled = false;
+            }
+            else
+            {
+                //ChangeInfoLabel("Info", "새로고침을 취소하였습니다.", null);
+            }
         }
 
         // 저장하기
         private void DoApply()
         {
             treeViewItemConverterController.ConverterToString(treeViewItemModel, null, true);
+            isChangedHost = false;
         }
 
         #endregion

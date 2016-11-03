@@ -2,6 +2,7 @@
 using HostManager.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -67,6 +68,18 @@ namespace HostManager.Controllers
             }
         }
 
-        
+        public void OpenNotepad()
+        {
+            try
+            {
+                Process.Start("Notepad.exe", Settings.Default.HostFilePath + @"\Hosts");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
     }
 }
