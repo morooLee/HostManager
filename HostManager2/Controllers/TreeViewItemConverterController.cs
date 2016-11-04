@@ -10,7 +10,7 @@ namespace HostManager.Controllers
 {
     public class TreeViewItemConverterController
     {
-        HostIOController hostIOController = new HostIOController();
+        private HostIOController hostIOController = new HostIOController(); 
 
         /// <summary>
         /// string 형태의 hosts 내용을 Node로 변환하여 리스트 만들기
@@ -230,11 +230,11 @@ namespace HostManager.Controllers
                 if (openNodeCount != closeNodeCount)
                 {
                     MessageBox.Show("변환에 실패하였습니다.\r\n항목을 열고 닫는 명령어의 수는 동일해야 합니다.\r\n텍스트 형식으로 로드합니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return null;
                 }
                 else if (treeViewItemModel.NodeList.Count == 0)
                 {
-                    MessageBox.Show("변환될 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    treeViewItemModel.NodeList.Clear();
+                    MessageBox.Show("호스트 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else
                 {
@@ -253,18 +253,19 @@ namespace HostManager.Controllers
             }
             else
             {
-                MessageBox.Show("변환될 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("호스트 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return treeViewItemModel.NodeList;
             }
         }
 
         /// <summary>
         /// TreeViewItemModel에서 Node 형태의 hosts 내용을 string로 변환하기
+        /// (저장에 실패하였을 경우 null값 반환)
         /// </summary>
         /// <param name="treeViewItemModel">변환할 TreeViewItemModel</param>
         /// <param name="path">다른 이름으로 저장 시의 경로</param>
         /// <param name="isSave">저장 여부</param>
-        /// <returns>변환된 값</returns>
+        /// <returns>저장에 실패하였을 경우 null값 반환</returns>
         public string ConverterToString(TreeViewItemModel treeViewItemModel, string path, bool isSave)
         {
             string hosts = "";
@@ -276,7 +277,10 @@ namespace HostManager.Controllers
 
             if (isSave)
             {
-                hostIOController.HostSave(hosts, path);
+                if(hostIOController.HostSave(hosts, path) == false)
+                {
+                    return null;
+                }
             }
 
             return hosts;

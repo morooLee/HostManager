@@ -72,6 +72,68 @@ namespace HostManager.Models
                 }
             }
         }
+
+        public int Search(string word)
+        {
+            int searchCount = 0;
+
+            foreach(Node node in this.NodeList)
+            {
+                searchCount += DoSearch(node, word);
+            }
+
+            return searchCount;
+        }
+
+        private int DoSearch(Node node, string word)
+        {
+            int searchCount = 0;
+
+            if (node.Header.ToUpper().Contains(word.ToUpper()))
+            {
+                searchCount++;
+
+                if (node.IsExpanded != true)
+                {
+                    node.IsExpanded = true;
+                }
+
+                if (node.ParentNode != null)
+                {
+                    ParentIsExpanded(node.ParentNode);
+                }
+            }
+            else
+            {
+                if (node.IsExpanded != false)
+                {
+                    node.IsExpanded = false;
+                }
+            }
+
+            if (node.IsExternalNode == false)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    searchCount += DoSearch(childNode, word);
+                }
+            }
+
+            return searchCount;
+        }
+
+        private void ParentIsExpanded(Node parentNode)
+        {
+            if (parentNode.IsExpanded != true)
+            {
+                parentNode.IsExpanded = true;
+            }
+
+            if (parentNode.ParentNode != null)
+            {
+                ParentIsExpanded(parentNode.ParentNode);
+            }
+        }
     }
 
     /// <summary>
@@ -227,6 +289,7 @@ namespace HostManager.Models
         {
             _header = header;
         }
+
         // 부모노드 설정
         public void Initialize()
         {

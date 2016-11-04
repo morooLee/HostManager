@@ -48,8 +48,8 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <Border BorderThickness="1" BorderBrush="#FFABADB3">
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" />
-                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False">
+                            <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
+                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
                                 <Button.Style>
                                     <Style TargetType="Button">
                                         <Style.Triggers>
@@ -137,7 +137,7 @@
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=NodeList}">
                             <StackPanel Height="20" Orientation="Horizontal">
                                 <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
-                                <TextBlock Name="HeaderText" Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" />
+                                <TextBlock Name="HeaderText" Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
