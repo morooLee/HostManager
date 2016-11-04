@@ -605,7 +605,7 @@ namespace HostManager
                         }
                         else
                         {
-                            FindTreeViewItem(Hosts_TreeView);
+                            HighlightText(Hosts_TreeView);
                             ChangeInfoLabel(InfoLabelType.Info, Count + "개 검색되었습니다.");
                         }
                     }
@@ -622,7 +622,7 @@ namespace HostManager
                         }
                         else
                         {
-                            FindRichTextBox(Hosts_RichTextBox);
+                            HighlightText(Hosts_RichTextBox);
                             ChangeInfoLabel(InfoLabelType.Info, Count + "개 검색되었습니다.");
                         }
                     }
@@ -641,40 +641,14 @@ namespace HostManager
 
                 if (Hosts_TreeView.Visibility == Visibility.Visible)
                 {
-                    FindTreeViewItem(Hosts_TreeView);
+                    HighlightText(Hosts_TreeView);
                 }
                 else
                 {
-                    FindRichTextBox(Hosts_RichTextBox);
+                    HighlightText(Hosts_RichTextBox);
                 }
 
                 ChangeInfoLabel(InfoLabelType.Info, "검색을 취소하였습니다.");
-            }
-        }
-
-        private void FindTreeViewItem(DependencyObject obj)
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                TreeViewItem treeViewItem = obj as TreeViewItem;
-                if (treeViewItem != null)
-                {
-                    HighlightText(treeViewItem);
-                }
-                FindTreeViewItem(VisualTreeHelper.GetChild(obj as DependencyObject, i));
-            }
-        }
-
-        private void FindRichTextBox(DependencyObject obj)
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                RichTextBox textBlock = obj as RichTextBox;
-                if (textBlock != null)
-                {
-                    HighlightText(textBlock);
-                }
-                FindRichTextBox(VisualTreeHelper.GetChild(obj as DependencyObject, i));
             }
         }
 
@@ -683,74 +657,91 @@ namespace HostManager
             if (itx != null)
             {
                 Regex regex = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
-                if (itx is TextBlock)
-                {
-                    TextBlock textBlock = itx as TextBlock;
-                    if (SearchBox.Text.Length == 0)
-                    {
-                        string str = textBlock.Text;
-                        textBlock.Inlines.Clear();
-                        textBlock.Inlines.Add(str);
-                        return;
-                    }
-                    string[] substrings = regex.Split(textBlock.Text);
-                    textBlock.Inlines.Clear();
-                    foreach (string item in substrings)
-                    {
-                        if (regex.Match(item).Success)
-                        {
-                            Run runx = new Run(item);
-                            runx.Background = Brushes.Red;
-                            runx.Foreground = Brushes.White;
-                            runx.FontWeight = FontWeights.Bold;
-                            textBlock.Inlines.Add(runx);
-                        }
-                        else
-                        {
-                            textBlock.Inlines.Add(item);
-                        }
-                    }
-                    return;
-                }
-                else if (itx is RichTextBox)
-                {
-                    TextRange textRange = new TextRange(Hosts_RichTextBox.Document.ContentStart, Hosts_RichTextBox.Document.ContentEnd);
-                    textRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.White));
-                    textRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
-                    textRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
 
-                    if (SearchBox.Text.Length == 0)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        TextPointer start = Hosts_RichTextBox.Document.ContentStart;
-
-                        while (start != null && start.CompareTo(Hosts_RichTextBox.Document.ContentEnd) < 0)
-                        {
-                            if (start.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-                            {
-                                Match match = regex.Match(start.GetTextInRun(LogicalDirection.Forward));
-
-                                TextRange searchRange = new TextRange(start.GetPositionAtOffset(match.Index, LogicalDirection.Forward), start.GetPositionAtOffset(match.Index + match.Length, LogicalDirection.Backward));
-                                searchRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Red));
-                                searchRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.White));
-                                searchRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
-                                start = textRange.End; // I'm not sure if this is correct or skips ahead too far, try it out!!!
-                            }
-                            start = start.GetNextContextPosition(LogicalDirection.Forward);
-                        }
-                        return;
-                    }
-                }
-                else
+                if (itx is TreeView)
                 {
-                    for (int i = 0; i < VisualTreeHelper.GetChildrenCount(itx as DependencyObject); i++)
-                    {
-                        HighlightText(VisualTreeHelper.GetChild(itx as DependencyObject, i));
-                    }
+                    TreeView treeView = itx as TreeView;
+
+                    Console.WriteLine(treeView.ItemTemplate.);
                 }
+                //if (itx is TextBlock)
+                //{
+                //    TextBlock textBlock = itx as TextBlock;
+                //    Console.WriteLine(textBlock.Text);
+
+                //    string str = textBlock.Text;
+                //    textBlock.Inlines.Clear();
+                //    textBlock.Inlines.Add(str);
+
+                //    if (SearchBox.Text.Length == 0)
+                //    {
+                //        //string str = textBlock.Text;
+                //        //textBlock.Inlines.Clear();
+                //        //textBlock.Inlines.Add(str);
+
+                //        return;
+                //    }
+                //    string[] substrings = regex.Split(textBlock.Text);
+                //    textBlock.Inlines.Clear();
+                //    foreach (string item in substrings)
+                //    {
+                //        if (regex.Match(item).Success)
+                //        {
+                //            Run runx = new Run(item);
+                //            runx.Background = Brushes.Red;
+                //            runx.Foreground = Brushes.White;
+                //            runx.FontWeight = FontWeights.Bold;
+                //            textBlock.Inlines.Add(runx);
+                //        }
+                //        else
+                //        {
+                //            textBlock.Inlines.Add(item);
+                //        }
+                //    }
+                //    return;
+                //}
+                //else if (itx is RichTextBox)
+                //{
+                //    TextRange textRange = new TextRange(Hosts_RichTextBox.Document.ContentStart, Hosts_RichTextBox.Document.ContentEnd);
+                //    textRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.White));
+                //    textRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
+                //    textRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
+
+                //    if (SearchBox.Text.Length == 0)
+                //    {
+                //        return;
+                //    }
+                //    else
+                //    {
+                //        TextPointer start = Hosts_RichTextBox.Document.ContentStart;
+
+                //        int count = 0;
+                //        while (start != null && start.CompareTo(Hosts_RichTextBox.Document.ContentEnd) < 0)
+                //        {
+                //            if (start.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+                //            {
+                //                Match match = regex.Match(start.GetTextInRun(LogicalDirection.Forward));
+
+                //                TextRange searchRange = new TextRange(start.GetPositionAtOffset(match.Index, LogicalDirection.Forward), start.GetPositionAtOffset(match.Index + match.Length, LogicalDirection.Backward));
+                //                searchRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Red));
+                //                searchRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.White));
+                //                searchRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+                //                start = searchRange.End; // I'm not sure if this is correct or skips ahead too far, try it out!!!
+                //            }
+                //            start = start.GetNextContextPosition(LogicalDirection.Forward);
+                //            //Console.WriteLine(count++);
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    for (int i = 0; i < VisualTreeHelper.GetChildrenCount(itx as DependencyObject); i++)
+                //    {
+                //        HighlightText(VisualTreeHelper.GetChild(itx as DependencyObject, i));
+                //        Console.WriteLine(VisualTreeHelper.GetChild(itx as DependencyObject, i));
+                //        Console.WriteLine(i);
+                //    }
+                //}
             }
         }
     }
