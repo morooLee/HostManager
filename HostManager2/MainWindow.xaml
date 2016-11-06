@@ -3,166 +3,169 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HostManager"
+        xmlns:Controllers="clr-namespace:HostManager.Controllers"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center">
-    <DockPanel>
-        <Menu DockPanel.Dock="Top" Height="22">
-            <MenuItem Header="파일">
-                <MenuItem Name="Menu_File_Clear" Header="새로 만들기" />
-                <MenuItem Name="Menu_File_Open" Header="불러오기" />
-                <MenuItem Name="Menu_File_Save" Header="저장하기" />
-                <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" />
-                <Separator/>
-                <MenuItem Name="Menu_File_Exit" Header="프로그램 종료" />
-            </MenuItem>
-            <MenuItem Header="편집">
-                <MenuItem Header="호스트 추가하기" />
-                <MenuItem Name="Menu_Edit_HostEdit" Header="호스트 수정하기" />
-                <Separator/>
-                <MenuItem Name="Menu_Edit_Text" Header="텍스트로 보기" />
-                <MenuItem Name="Menu_Edit_Categoty" Header="카테고리로 보기" />
-                <Separator/>
-                <MenuItem Header="기본폴더 열기" />
-                <MenuItem Name="Menu_Edit_Notepad" Header="메모장에서 열기" />
-                <MenuItem Name="Menu_Edit_Refresh" Header="동기화 하기" />
-                <Separator/>
-                <MenuItem Name="Menu_Edit_Pref" Header="속성" />
-            </MenuItem>
-            <MenuItem Header="도움말">
-                <MenuItem Name="Menu_Help_About" Header="About" />
-                <MenuItem Header="사용법"/>
-                <MenuItem Header="업데이트"/>
-            </MenuItem>
-        </Menu>
-        <DockPanel>
-            <DockPanel DockPanel.Dock="Top" Margin="2, 0, 2, 0" MaxWidth="500">
+        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" >
+    <Grid>
+        <Controllers:AnimatedGIFControl x:Name="GIFCtrl" Visibility="Hidden"/>
+        <DockPanel Name="MainPanel">
+            <Menu DockPanel.Dock="Top" Height="22">
+                <MenuItem Header="파일">
+                    <MenuItem Name="Menu_File_Clear" Header="새로 만들기" />
+                    <MenuItem Name="Menu_File_Open" Header="불러오기" />
+                    <MenuItem Name="Menu_File_Save" Header="저장하기" />
+                    <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" />
+                    <Separator/>
+                    <MenuItem Name="Menu_File_Exit" Header="프로그램 종료" />
+                </MenuItem>
+                <MenuItem Header="편집">
+                    <MenuItem Header="호스트 추가하기" />
+                    <MenuItem Name="Menu_Edit_HostEdit" Header="호스트 수정하기" />
+                    <Separator/>
+                    <MenuItem Name="Menu_Edit_Text" Header="텍스트로 보기" />
+                    <MenuItem Name="Menu_Edit_Categoty" Header="카테고리로 보기" />
+                    <Separator/>
+                    <MenuItem Header="기본폴더 열기" />
+                    <MenuItem Name="Menu_Edit_Notepad" Header="메모장에서 열기" />
+                    <MenuItem Name="Menu_Edit_Refresh" Header="동기화 하기" />
+                    <Separator/>
+                    <MenuItem Name="Menu_Edit_Pref" Header="속성" />
+                </MenuItem>
+                <MenuItem Header="도움말">
+                    <MenuItem Name="Menu_Help_About" Header="About" />
+                    <MenuItem Header="사용법"/>
+                    <MenuItem Header="업데이트"/>
+                </MenuItem>
+            </Menu>
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Margin="2, 0, 2, 0" MaxWidth="500">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Border BorderThickness="1" BorderBrush="#FFABADB3">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
+                                <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Search">
+                                                    <Setter Property="ToolTip" Value="검색"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Cancel">
+                                                    <Setter Property="ToolTip" Value="취소"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="5,0,0,0" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style x:Key="ButtonStyle" TargetType="Button">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="false">
+                                        <Setter Property="Opacity" Value="0.3" />
+                                    </Trigger>
+                                </Style.Triggers>
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+                                <!--<Setter Property="BorderBrush" Value="White" />-->
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="TreeView_Button_Click">
+                            <Image Source="Resources/TreeView.png"/>
+                        </Button>
+                        <Border BorderBrush="White" BorderThickness="1" />
+                        <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="RichTextBox_Button_Click">
+                            <Image Source="Resources/TextEdit.png"/>
+                        </Button>
+                        <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
+                        <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="NodePad_Button_Click">
+                            <Image Source="Resources/NotePad.png"/>
+                        </Button>
+                        <Border BorderBrush="White" BorderThickness="1" />
+                        <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침" Click="Refresh_Button_Click">
+                            <Image Source="Resources/Refresh.png"/>
+                        </Button>
+                    </StackPanel>
+                    <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="true" Click="Apply_Button_Click">적용</Button>
+                </DockPanel>
+                <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
+                <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                </Grid>
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Border BorderThickness="1" BorderBrush="#FFABADB3">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
-                            <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Search">
-                                                <Setter Property="ToolTip" Value="검색"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Cancel">
-                                                <Setter Property="ToolTip" Value="취소"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                                <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
-                            </Button>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,0,0" Orientation="Horizontal">
-                    <StackPanel.Resources>
-                        <Style x:Key="ButtonStyle" TargetType="Button">
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Opacity" Value="0.3" />
-                                </Trigger>
-                            </Style.Triggers>
-                            <Setter Property="Background" Value="White" />
-                            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-                            <!--<Setter Property="BorderBrush" Value="White" />-->
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="TreeView_Button_Click">
-                        <Image Source="Resources/TreeView.png"/>
-                    </Button>
-                    <Border BorderBrush="White" BorderThickness="1" />
-                    <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="RichTextBox_Button_Click">
-                        <Image Source="Resources/TextEdit.png"/>
-                    </Button>
-                    <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
-                    <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="NodePad_Button_Click">
-                        <Image Source="Resources/NotePad.png"/>
-                    </Button>
-                    <Border BorderBrush="White" BorderThickness="1" />
-                    <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침" Click="Refresh_Button_Click">
-                        <Image Source="Resources/Refresh.png"/>
-                    </Button>
-                </StackPanel>
-                <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="true" Click="Apply_Button_Click">적용</Button>
-            </DockPanel>
-            <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
-            <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
-            <Grid>
-                <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
-                    <TreeView.Resources>
-                        <Style TargetType="TreeViewItem">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsChanged}" Value="true">
-                                    <Setter Property="Background" Value="Yellow"></Setter>
-                                    <Setter Property="Foreground" Value="Red"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                            <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-                            <!--<EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
+                    <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
+                        <TreeView.Resources>
+                            <Style TargetType="TreeViewItem">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChanged}" Value="true">
+                                        <Setter Property="Background" Value="Yellow"></Setter>
+                                        <Setter Property="Foreground" Value="Red"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                                <!--<EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
                             <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
                             <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown" />
                             <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
                             <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed" />-->
-                        </Style>
-                    </TreeView.Resources>
-                    
-                    <TreeView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="호스트 추가" />
-                            <Separator/>
-                            <MenuItem Header="기본폴더 열기" />
-                            <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" />
-                            <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" />
-                            <Separator/>
-                            <MenuItem Header="모두 접기" />
-                            <MenuItem Header="모두 해제하기" />
-                        </ContextMenu>
-                    </TreeView.ContextMenu>
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=NodeList}">
-                            <StackPanel Height="20" Orientation="Horizontal">
-                                <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
-                                <TextBlock Name="HeaderText" Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-                <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="Hosts_RichTextBox_TextChanged">
-                    <RichTextBox.Resources>
-                        <Style TargetType="{x:Type Paragraph}">
-                            <Setter Property="Margin" Value="0"/>
-                        </Style>
-                    </RichTextBox.Resources>
-                    <RichTextBox.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="복사하기" Command="Copy" />
-                            <MenuItem Header="잘라내기" Command="Cut" />
-                            <MenuItem Header="붙여넣기" Command="Paste" />
-                            <Separator/>
-                            <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" />
-                            <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" />
-                        </ContextMenu>
-                    </RichTextBox.ContextMenu>
-                    <RichTextBox.Document>
-                        <FlowDocument PageWidth="1000" />
-                    </RichTextBox.Document>
-                </RichTextBox>
-            </Grid>
+                            </Style>
+                        </TreeView.Resources>
+
+                        <TreeView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="호스트 추가" />
+                                <Separator/>
+                                <MenuItem Header="기본폴더 열기" />
+                                <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" />
+                                <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" />
+                                <Separator/>
+                                <MenuItem Header="모두 접기" />
+                                <MenuItem Header="모두 해제하기" />
+                            </ContextMenu>
+                        </TreeView.ContextMenu>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=NodeList}">
+                                <StackPanel Height="20" Orientation="Horizontal">
+                                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
+                                    <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                    <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="Hosts_RichTextBox_TextChanged">
+                        <RichTextBox.Resources>
+                            <Style TargetType="{x:Type Paragraph}">
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </RichTextBox.Resources>
+                        <RichTextBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="복사하기" Command="Copy" />
+                                <MenuItem Header="잘라내기" Command="Cut" />
+                                <MenuItem Header="붙여넣기" Command="Paste" />
+                                <Separator/>
+                                <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" />
+                                <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" />
+                            </ContextMenu>
+                        </RichTextBox.ContextMenu>
+                        <RichTextBox.Document>
+                            <FlowDocument PageWidth="1000" />
+                        </RichTextBox.Document>
+                    </RichTextBox>
+                </Grid>
+            </DockPanel>
         </DockPanel>
-    </DockPanel>
+    </Grid>
 </Window>

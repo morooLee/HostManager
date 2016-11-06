@@ -73,65 +73,43 @@ namespace HostManager.Models
             }
         }
 
-        public int Search(string word)
+        public void AllISExpanded(bool isExpanded)
         {
-            int searchCount = 0;
-
-            foreach(Node node in this.NodeList)
+            foreach (Node node in NodeList)
             {
-                searchCount += DoSearch(node, word);
+                NodeIsExpanded(node, isExpanded);
             }
-
-            return searchCount;
         }
 
-        private int DoSearch(Node node, string word)
+        private void NodeIsExpanded(Node node, bool isExpanded)
         {
-            int searchCount = 0;
-
-            if (node.Header.ToUpper().Contains(word.ToUpper()))
+            if (node.IsChecked == false)
             {
-                searchCount++;
-
-                if (node.IsExpanded != true)
-                {
-                    node.IsExpanded = true;
-                }
-
-                if (node.ParentNode != null)
-                {
-                    ParentIsExpanded(node.ParentNode);
-                }
-            }
-            else
-            {
-                if (node.IsExpanded != false)
-                {
-                    node.IsExpanded = false;
-                }
+                node.IsExpanded = isExpanded;
             }
 
             if (node.IsExternalNode == false)
             {
                 foreach (Node childNode in node.NodeList)
                 {
-                    searchCount += DoSearch(childNode, word);
+                    NodeIsExpanded(childNode, isExpanded);
                 }
             }
-
-            return searchCount;
         }
 
-        private void ParentIsExpanded(Node parentNode)
+        public void ParentIsExpanded(Node parentNode)
         {
-            if (parentNode.IsExpanded != true)
+            if (parentNode != null)
             {
-                parentNode.IsExpanded = true;
-            }
+                if (parentNode.IsExpanded != true)
+                {
+                    parentNode.IsExpanded = true;
+                }
 
-            if (parentNode.ParentNode != null)
-            {
-                ParentIsExpanded(parentNode.ParentNode);
+                if (parentNode.ParentNode != null)
+                {
+                    ParentIsExpanded(parentNode.ParentNode);
+                }
             }
         }
     }
@@ -151,6 +129,7 @@ namespace HostManager.Models
         private string _tooltip = null;
         private Node _parentNode = null;
         private List<Node> _nodeList = null;
+        private string _textBlockName = null;
 
         public bool IsSelected
         {
@@ -277,6 +256,18 @@ namespace HostManager.Models
             set
             {
                 _nodeList = value;
+            }
+        }
+
+        public string TextBlockName
+        {
+            get
+            {
+                return _textBlockName;
+            }
+            set
+            {
+                _textBlockName = value;
             }
         }
 

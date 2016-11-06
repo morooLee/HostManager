@@ -287,7 +287,7 @@ namespace HostManager.Controllers
         }
 
         /// <summary>
-        /// List<Node>를 정보를 검색하여 Node 당 한문단씩 string으로 변환하기
+        /// Node를 string으로 변환하기
         /// </summary>
         /// <param name="node">string으로 변환할 Node</param>
         /// <returns>string</returns>
