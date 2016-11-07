@@ -1,6 +1,7 @@
 ﻿using HostManager.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,7 +18,7 @@ namespace HostManager.Controllers
         /// </summary>
         /// <param name="hosts">변경할 string</param>
         /// <returns>List<Node></returns>
-        public List<Node> ConverterToNodeList(string hosts)
+        public TreeViewItemModel ConverterToNodeList(string hosts)
         {
             TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
             Regex regex = new Regex(@"((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])");
@@ -249,12 +250,12 @@ namespace HostManager.Controllers
                     }
                 }
 
-                return treeViewItemModel.NodeList;
+                return treeViewItemModel;
             }
             else
             {
                 MessageBox.Show("호스트 내용이 없습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return treeViewItemModel.NodeList;
+                return treeViewItemModel;
             }
         }
 
@@ -291,7 +292,7 @@ namespace HostManager.Controllers
         /// </summary>
         /// <param name="node">string으로 변환할 Node</param>
         /// <returns>string</returns>
-        private string SetString(Node node)
+        public string SetString(Node node)
         {
             string hosts = "";
 

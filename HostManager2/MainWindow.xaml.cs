@@ -1,5 +1,6 @@
 ﻿using HostManager.Controllers;
 using HostManager.Models;
+using HostManager.Views.EditHost;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -61,7 +62,7 @@ namespace HostManager
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            LoadingImagePlay(true);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -71,7 +72,7 @@ namespace HostManager
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            LoadingImagePlay(false);
         }
 
         #region TreeView 이벤트 및 관련 함수
@@ -80,22 +81,6 @@ namespace HostManager
         private void Hosts_TreeView_Loaded(object sender, RoutedEventArgs e)
         {
             BindTree(null);
-            
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { LoadingImagePlay(true); }),
-                DispatcherPriority.ApplicationIdle);
-
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
-                DispatcherPriority.ApplicationIdle);
-
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(false); }),
-                DispatcherPriority.ApplicationIdle);
-
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { LoadingImagePlay(false); }),
-                DispatcherPriority.ApplicationIdle);
         }
 
         // 트리뷰 SelectedItemChanged 이벤트
@@ -142,13 +127,15 @@ namespace HostManager
         /// <param name="hosts">바인딩할 string 개체 (null이면  파일에서 string 개체 생성)</param>
         private void BindTree(string hosts)
         {
+            LoadingImagePlay(true);
+
             bool isConverted = true;
 
             if (hosts == null)
             {
                 try
                 {
-                    treeViewItemModel.NodeList = treeViewItemConverterController.ConverterToNodeList(null).ToList();
+                    treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(null);
                 }
                 catch (ArgumentNullException e)
                 {
@@ -159,7 +146,7 @@ namespace HostManager
             {
                 try
                 {
-                    treeViewItemModel.NodeList = treeViewItemConverterController.ConverterToNodeList(hosts).ToList();
+                    treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(hosts);
                 }
                 catch (ArgumentNullException e)
                 {
@@ -187,6 +174,16 @@ namespace HostManager
                     DomainDuplication(node);
                 }
             }
+
+            this.Dispatcher.BeginInvoke(
+                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
+                DispatcherPriority.ApplicationIdle);
+
+            this.Dispatcher.BeginInvoke(
+                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(false); }),
+                DispatcherPriority.ApplicationIdle);
+
+            LoadingImagePlay(false);
         }
 
         #endregion
@@ -457,6 +454,8 @@ namespace HostManager
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
+            //LoadingImagePlay(true);
+
             if (SearchButtonImage.Tag.ToString() == "Search")
             {
                 if (SearchBox.Text.Length == 0)
@@ -476,11 +475,36 @@ namespace HostManager
 
                     if (Hosts_TreeView.Visibility == Visibility.Visible)
                     {
-                        count += HighlightText(Hosts_TreeView);
+                        //Dispatcher.BeginInvoke(
+                        //    (ThreadStart)(() => { count = HighlightText(Hosts_TreeView);
+                        //        if (count == 0)
+                        //        {
+                        //            ChangeInfoLabel(InfoLabelType.Info, SearchBox.Text + "에 대한 검색 결과가 없습니다.");
+                        //        }
+                        //        else
+                        //        {
+                        //            ChangeInfoLabel(InfoLabelType.Info, count + "개 검색되었습니다.");
+                        //        }
+                        //    }),
+                        //    DispatcherPriority.ApplicationIdle);
+                        count = HighlightText(Hosts_TreeView);
                     }
                     else
                     {
-                        count += HighlightText(Hosts_RichTextBox);
+                        //Dispatcher.BeginInvoke(
+                        //    (ThreadStart)(() => {
+                        //        count = HighlightText(Hosts_RichTextBox);
+                        //        if (count == 0)
+                        //        {
+                        //            ChangeInfoLabel(InfoLabelType.Info, SearchBox.Text + "에 대한 검색 결과가 없습니다.");
+                        //        }
+                        //        else
+                        //        {
+                        //            ChangeInfoLabel(InfoLabelType.Info, count + "개 검색되었습니다.");
+                        //        }
+                        //    }),
+                        //    DispatcherPriority.ApplicationIdle);
+                        count = HighlightText(Hosts_RichTextBox);
                     }
 
                     if (count == 0)
@@ -506,15 +530,29 @@ namespace HostManager
 
                 if (Hosts_TreeView.Visibility == Visibility.Visible)
                 {
+                    //Dispatcher.BeginInvoke(
+                    //    (ThreadStart)(() => {
+                    //        HighlightText(Hosts_TreeView);
+                    //        ChangeInfoLabel(InfoLabelType.Info, "검색을 취소하였습니다.");
+                    //    }),
+                    //    DispatcherPriority.ApplicationIdle);
                     HighlightText(Hosts_TreeView);
                 }
                 else
                 {
+                    //Dispatcher.BeginInvoke(
+                    //    (ThreadStart)(() => {
+                    //        HighlightText(Hosts_RichTextBox);
+                    //        ChangeInfoLabel(InfoLabelType.Info, "검색을 취소하였습니다.");
+                    //    }),
+                    //    DispatcherPriority.ApplicationIdle);
                     HighlightText(Hosts_RichTextBox);
                 }
 
                 ChangeInfoLabel(InfoLabelType.Info, "검색을 취소하였습니다.");
             }
+
+            //LoadingImagePlay(false);
         }
 
         // SearchBox 초기화
@@ -625,7 +663,6 @@ namespace HostManager
 
                     if (SearchBox.Text.Length == 0)
                     {
-
                         return count;
                     }
 
@@ -662,8 +699,6 @@ namespace HostManager
         // 버튼 UI 변경하기
         private void ChangeButtonUI()
         {
-            //SearchBoxClear();
-
             if (Hosts_TreeView.Visibility == Visibility.Visible)
             {
                 TreeView_Button.IsEnabled = true;
@@ -860,23 +895,76 @@ namespace HostManager
             InfoLabel.Content = msg;
         }
 
+
+        /// <summary>
+        /// 로딩화면 출력
+        /// </summary>
+        /// <param name="isLoaded">로딩화면 출력 여부</param>
         private void LoadingImagePlay(bool isLoaded)
         {
-            if (isLoaded)
+            this.Dispatcher.BeginInvoke(
+                (ThreadStart)(() =>
+                {
+                    if (isLoaded)
+                    {
+                        MainPanel.IsEnabled = false;
+                        MainPanel.Opacity = 0.5;
+                        Hosts_TreeView.Visibility = Visibility.Hidden;
+                        GIFCtrl.Visibility = Visibility.Visible;
+                        GIFCtrl.StartAnimate();
+                    }
+                    else
+                    {
+                        GIFCtrl.StopAnimate();
+                        GIFCtrl.Visibility = Visibility.Hidden;
+                        Hosts_TreeView.Visibility = Visibility.Visible;
+                        MainPanel.IsEnabled = true;
+                        MainPanel.Opacity = 1.0;
+                    }
+                }),
+                DispatcherPriority.ApplicationIdle);
+        }
+
+        private void TreeViewItem_MouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node.IsExternalNode && node.IsSelected)
             {
-                MainPanel.IsEnabled = false;
-                MainPanel.Opacity = 0.5;
-                Hosts_TreeView.Visibility = Visibility.Hidden;
-                GIFCtrl.Visibility = Visibility.Visible;
-                GIFCtrl.StartAnimate();
+                EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, "선택한 항목 수정");
+                editTreeViewWindow.Owner = Application.Current.MainWindow;
+                editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                editTreeViewWindow.ShowDialog();
+
+                if (editTreeViewWindow.treeViewItemModel != null && editTreeViewWindow.treeViewItemModel.NodeList.Count != 0)
+                {
+                    node.CopyTo(editTreeViewWindow.treeViewItemModel.NodeList.ElementAt(0));
+                    ChangeInfoLabel(InfoLabelType.Success, "선택한 항목이 수정되었습니다.");
+                }
+                else
+                {
+                    ChangeInfoLabel(InfoLabelType.Warning, "작업이 취소되었습니다.");
+                }
+
+                editTreeViewWindow.treeViewItemModel = null;
+                editTreeViewWindow.Close();
             }
-            else
+        }
+
+        private void TreeViewItem_KeyUp(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = sender as TreeViewItem;
+            Node node = treeViewItem.DataContext as Node;
+
+            if (node != null)
             {
-                GIFCtrl.StopAnimate();
-                GIFCtrl.Visibility = Visibility.Hidden;
-                Hosts_TreeView.Visibility = Visibility.Visible;
-                MainPanel.IsEnabled = true;
-                MainPanel.Opacity = 1.0;
+                node.IsSelected = true;
             }
         }
     }

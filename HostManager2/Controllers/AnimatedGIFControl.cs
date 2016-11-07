@@ -69,6 +69,15 @@ namespace HostManager.Controllers
                 _bitmapSource = GetBitmapSource();
                 Source = _bitmapSource;
             }
+            //if (HostManager.Properties.Resources.Progress != null)
+            //{
+            //    _bitmap = HostManager.Properties.Resources.Progress;
+            //    Width = _bitmap.Width;
+            //    Height = _bitmap.Height;
+
+            //    _bitmapSource = GetBitmapSource();
+            //    Source = _bitmapSource;
+            //}
         }
 
         /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -30,6 +32,16 @@ namespace HostManager.Models
                 _nodeList = value;
             }
         }
+
+        //public TreeViewItemModel()
+        //{
+        //    _nodeList = new List<Node>();
+        //}
+
+        //public TreeViewItemModel(List<Node> nodeList)
+        //{
+        //    _nodeList = nodeList;
+        //}
 
         /// <summary>
         /// 중복체크를 위한 트리뷰 아이템 리스트 검색
@@ -215,6 +227,7 @@ namespace HostManager.Models
             set
             {
                 _header = value;
+                this.OnPropertyChanged("Header");
             }
         }
 
@@ -360,33 +373,69 @@ namespace HostManager.Models
         }
 
         //깊은 복사
-        public object Clone()
+        //public object Clone()
+        //{
+        //    Node node = new Node();
+        //    node._isSelected = this._isSelected;
+        //    node._isExternalNode = this._isExternalNode;
+        //    node._isChecked = this._isChecked;
+        //    node._ip = this._ip;
+        //    node._domain = this._domain;
+        //    node._header = this._header;
+        //    node._tooltip = this._tooltip;
+        //    node._textBlockName = this._textBlockName;
+
+        //    if (this._parentNode != null)
+        //    {
+        //        node.ParentNode = (Node)this._parentNode.Clone();
+        //    }            
+
+        //    if (this._nodeList != null)
+        //    {
+        //        node.NodeList = new List<Node>();
+
+        //        foreach (Node childNode in this._nodeList)
+        //        {
+        //            node.NodeList.Add((Node)childNode.Clone());
+        //        }
+        //    }
+
+        //    return node;
+        //}
+
+        public object ShallowCopy()
         {
-            Node node = new Node();
-            node._isSelected = this._isSelected;
-            node._isExternalNode = this._isExternalNode;
-            node._isChecked = this._isChecked;
-            node._ip = this._ip;
-            node._domain = this._domain;
-            node._header = this._header;
-            node._tooltip = this._tooltip;
+            return this.MemberwiseClone();
+        }
+        public void CopyTo(Node node)
+        {
+            this.IsSelected = node._isSelected;
+            this.IsExternalNode = node._isExternalNode;
+            this.IsChecked = node._isChecked;
+            this.IP = node._ip;
+            this.Domain = node._domain;
+            this.Header = node._header;
+            this.Tooltip = node._tooltip;
+            this.TextBlockName = node._textBlockName;
 
-            if (this._parentNode != null)
+            if (node.ParentNode != null)
             {
-                node.ParentNode = (Node)this._parentNode.Clone();
-            }            
+                this.ParentNode = node._parentNode;
+            }
 
-            if (this._nodeList != null)
+            if (node.NodeList != null)
             {
-                node.NodeList = new List<Node>();
-
-                foreach (Node childNode in this._nodeList)
+                if(this.NodeList == null)
                 {
-                    node.NodeList.Add((Node)childNode.Clone());
+                    this.NodeList = new List<Node>();
+                }
+                foreach (Node childNode in node._nodeList)
+                {
+                    this.NodeList.Add(childNode);
                 }
             }
 
-            return node;
+            this.IsExpanded = true;
         }
 
         /// <summary>
