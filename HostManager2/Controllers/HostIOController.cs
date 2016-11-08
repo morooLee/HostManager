@@ -80,6 +80,12 @@ namespace HostManager.Controllers
             }
         }
 
-
+        public void OpenFolder()
+        {
+            Process process = new Process();
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.FileName = Settings.Default.HostFilePath;
+            process.Start();
+        }
     }
 }

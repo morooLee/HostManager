@@ -387,7 +387,9 @@ namespace HostManager
 
                 if (editTreeViewWindow.treeViewModel != null && editTreeViewWindow.treeViewModel.NodeList.Count != 0)
                 {
+                    MessageBox.Show(node.NodeList.GetHashCode().ToString());
                     node = editTreeViewWindow.treeViewModel.NodeList.ElementAt(0);
+                    MessageBox.Show(node.NodeList.GetHashCode().ToString());
                     ChangeInfoLabel("Success", "선택한 항목이 수정되었습니다.", null);
                 }
                 else

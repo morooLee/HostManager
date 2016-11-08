@@ -17,7 +17,7 @@ namespace HostManager.Controllers
         /// string 형태의 hosts 내용을 Node로 변환하여 리스트 만들기
         /// </summary>
         /// <param name="hosts">변경할 string</param>
-        /// <returns>List<Node></returns>
+        /// <returns>string</returns>
         public TreeViewItemModel ConverterToNodeList(string hosts)
         {
             TreeViewItemModel treeViewItemModel = new TreeViewItemModel();

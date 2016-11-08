@@ -6,7 +6,7 @@
         xmlns:Controllers="clr-namespace:HostManager.Controllers"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" >
+        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Loaded="Window_Loaded" >
     <Grid>
         <Controllers:AnimatedGIFControl x:Name="GIFCtrl" Visibility="Hidden"/>
         <DockPanel Name="MainPanel">
@@ -105,6 +105,7 @@
                 <Grid>
                     <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
                         <TreeView.Resources>
+                            <src:TreeViewItemModel x:Key="TreeViewItemModel"/>
                             <Style TargetType="TreeViewItem">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsChanged}" Value="true">
@@ -125,19 +126,47 @@
 
                         <TreeView.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="호스트 추가" />
+                                <MenuItem Header="호스트 추가" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="Root_Add_TreeViewItem"/>
                                 <Separator/>
-                                <MenuItem Header="기본폴더 열기" />
-                                <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" />
-                                <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" />
+                                <MenuItem Header="기본폴더 열기" Click="OpenFolder" />
+                                <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="TreeView_Notpad_Item_Click" />
+                                <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="TextEdit_MenuItem_Click" />
                                 <Separator/>
-                                <MenuItem Header="모두 접기" />
-                                <MenuItem Header="모두 해제하기" />
+                                <MenuItem Header="모두 열기" Click="AllExpanded" />
+                                <MenuItem Header="모두 접기" Click="AllCollapsed" />
+                                <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
                             </ContextMenu>
                         </TreeView.ContextMenu>
                         <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Path=NodeList}">
+                            <HierarchicalDataTemplate DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
                                 <StackPanel Height="20" Orientation="Horizontal">
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="하위 항목에 추가" DataContext="{Binding}" Click="Add_Child_TreeViewItem">
+                                                <MenuItem.Style>
+                                                    <Style TargetType="MenuItem">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Path=IsExternalNode}" Value="true">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </MenuItem.Style>
+                                            </MenuItem>
+                                            <MenuItem Header="현재 항목에 추가" DataContext="{Binding}" Click="Add_TreeViewItem" />
+                                            <MenuItem Header="선택한 항목 수정" DataContext="{Binding}" Click="Edit_TreeViewItem" />
+                                            <MenuItem Header="선택한 항목 삭제" DataContext="{Binding}" Click="Del_TreeViewItem" />
+                                            <Separator/>
+                                            <MenuItem Header="위로 이동" Click="MoveToUp_TreeViewItem"/>
+                                            <MenuItem Header="아래로 이동" Click="MoveToDown_TreeViewItem"/>
+                                            <Separator/>
+                                            <MenuItem Header="기본폴더 열기" Click="OpenFolder"/>
+                                            <MenuItem Header="모두 열기" Click="AllExpanded" />
+                                            <MenuItem Header="모두 접기" Click="AllCollapsed"/>
+                                            <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    
                                     <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
                                     <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
                                 </StackPanel>
@@ -156,8 +185,8 @@
                                 <MenuItem Header="잘라내기" Command="Cut" />
                                 <MenuItem Header="붙여넣기" Command="Paste" />
                                 <Separator/>
-                                <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" />
-                                <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" />
+                                <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" Click="TextBox_Notepad_Item_Click" />
+                                <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" Click="TreeView_MenuItem_Click" />
                             </ContextMenu>
                         </RichTextBox.ContextMenu>
                         <RichTextBox.Document>

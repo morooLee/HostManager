@@ -14,15 +14,15 @@ namespace HostManager.Models
     public class TreeViewItemModel
     {
         // TreeView 아이템 리스트
-        private List<Node> _nodeList = null;
+        private ObservableCollection<Node> _nodeList = null;
         
-        public List<Node> NodeList
+        public ObservableCollection<Node> NodeList
         {
             get
             {
                 if (_nodeList == null)
                 {
-                    _nodeList = new List<Node>();
+                    _nodeList = new ObservableCollection<Node>();
                 }
 
                 return _nodeList;
@@ -33,15 +33,15 @@ namespace HostManager.Models
             }
         }
 
-        //public TreeViewItemModel()
-        //{
-        //    _nodeList = new List<Node>();
-        //}
+        public TreeViewItemModel() : this(null)
+        {
 
-        //public TreeViewItemModel(List<Node> nodeList)
-        //{
-        //    _nodeList = nodeList;
-        //}
+        }
+
+        public TreeViewItemModel(ObservableCollection<Node> nodeList)
+        {
+            _nodeList = nodeList;
+        }
 
         /// <summary>
         /// 중복체크를 위한 트리뷰 아이템 리스트 검색
@@ -134,13 +134,14 @@ namespace HostManager.Models
         private bool _isSelected = false;
         private bool _isExpanded = false;
         private bool _isExternalNode = true;
+        private bool _isChanged = false;
         private bool? _isChecked = false;
         private string _ip = null;
         private string _domain = null;
         private string _header = "";
         private string _tooltip = null;
         private Node _parentNode = null;
-        private List<Node> _nodeList = null;
+        private ObservableCollection<Node> _nodeList = null;
         private string _textBlockName = null;
 
         public bool IsSelected
@@ -179,6 +180,18 @@ namespace HostManager.Models
             {
                 _isExternalNode = value;
                 this.OnPropertyChanged("IsExternalNode");
+            }
+        }
+
+        public bool IsChanged
+        {
+            get
+            {
+                return _isChanged;
+            }
+            set
+            {
+                SetIsChanged(value);
             }
         }
 
@@ -255,13 +268,13 @@ namespace HostManager.Models
             }
         }
 
-        public List<Node> NodeList
+        public ObservableCollection<Node> NodeList
         {
             get
             {
                 if (_isExternalNode == false && _nodeList == null)
                 {
-                    _nodeList = new List<Node>();
+                    _nodeList = new ObservableCollection<Node>();
                 }
 
                 return _nodeList;
@@ -305,6 +318,21 @@ namespace HostManager.Models
                     childNode.Initialize();
                 }
             }
+        }
+
+        private void SetIsChanged(bool value)
+        {
+            _isChanged = value;
+
+            if (this._isExternalNode == false)
+            {
+                foreach (Node childNode in NodeList)
+                {
+                    childNode.SetIsChanged(value);
+                }
+            }
+
+            this.OnPropertyChanged("IsChanged");
         }
 
         /// <summary>
@@ -418,23 +446,32 @@ namespace HostManager.Models
             this.Tooltip = node._tooltip;
             this.TextBlockName = node._textBlockName;
 
-            if (node.ParentNode != null)
-            {
-                this.ParentNode = node._parentNode;
-            }
+            //if (node.ParentNode != null)
+            //{
+            //    this.ParentNode.CopyTo(node.ParentNode);
+            //}
 
             if (node.NodeList != null)
             {
-                if(this.NodeList == null)
+                if(this._nodeList == null)
                 {
-                    this.NodeList = new List<Node>();
+                    this._nodeList = new ObservableCollection<Node>();
                 }
-                foreach (Node childNode in node._nodeList)
-                {
-                    this.NodeList.Add(childNode);
-                }
-            }
 
+                this._nodeList = node.NodeList;
+
+                this.Initialize();
+
+                //if(this.NodeList == null)
+                //{
+                //    this.NodeList = new ObservableCollection<Node>();
+                //}
+                //foreach (Node childNode in node._nodeList)
+                //{
+                //    this.NodeList.Add(childNode);
+                //}
+            }
+            
             this.IsExpanded = true;
         }
 
