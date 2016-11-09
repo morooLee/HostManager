@@ -13,9 +13,14 @@ namespace HostManager.Models
     /// </summary>
     public class TreeViewItemModel
     {
-        // TreeView 아이템 리스트
+        #region Members
+
         private ObservableCollection<Node> _nodeList = null;
-        
+
+        #endregion
+
+        #region Properties
+
         public ObservableCollection<Node> NodeList
         {
             get
@@ -33,6 +38,10 @@ namespace HostManager.Models
             }
         }
 
+        #endregion
+
+        #region 생성자
+
         public TreeViewItemModel() : this(null)
         {
 
@@ -42,6 +51,10 @@ namespace HostManager.Models
         {
             _nodeList = nodeList;
         }
+
+        #endregion
+
+        #region Function
 
         /// <summary>
         /// 중복체크를 위한 트리뷰 아이템 리스트 검색
@@ -85,6 +98,10 @@ namespace HostManager.Models
             }
         }
 
+        /// <summary>
+        /// 전체 노드 열기/접기
+        /// </summary>
+        /// <param name="isExpanded">true : 열기 / false : 접기</param>
         public void AllISExpanded(bool isExpanded)
         {
             foreach (Node node in NodeList)
@@ -93,6 +110,11 @@ namespace HostManager.Models
             }
         }
 
+        /// <summary>
+        /// 체크안된 노드 열기/접기
+        /// </summary>
+        /// <param name="node">체크여부 확인할 노드</param>
+        /// <param name="isExpanded">true : 열기 / false : 접기</param>
         private void NodeIsExpanded(Node node, bool isExpanded)
         {
             if (node.IsChecked == false)
@@ -109,6 +131,10 @@ namespace HostManager.Models
             }
         }
 
+        /// <summary>
+        /// 조상 노드 확장하기
+        /// </summary>
+        /// <param name="parentNode">부모노드</param>
         public void ParentIsExpanded(Node parentNode)
         {
             if (parentNode != null)
@@ -124,6 +150,39 @@ namespace HostManager.Models
                 }
             }
         }
+
+        /// <summary>
+        /// 전체 노드 변경여부 취소하기
+        /// </summary>
+        public void SetIsChangedAll(bool isChanged)
+        {
+            foreach (Node node in NodeList)
+            {
+                SetIsChanged(node, isChanged);
+            }
+        }
+
+        /// <summary>
+        /// 변경된 노드 변경여부 취소하기
+        /// </summary>
+        /// <param name="node"></param>
+        private void SetIsChanged(Node node, bool isChanged)
+        {
+            if (node.IsChanged != isChanged)
+            {
+                node.IsChanged = isChanged;
+            }
+
+            if (node.IsExternalNode == false)
+            {
+                foreach (Node childNode in node.NodeList)
+                {
+                    SetIsChanged(childNode, isChanged);
+                }
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -131,6 +190,8 @@ namespace HostManager.Models
     /// </summary>
     public class Node : INotifyPropertyChanged
     {
+        #region Members
+
         private bool _isSelected = false;
         private bool _isExpanded = false;
         private bool _isExternalNode = true;
@@ -144,6 +205,11 @@ namespace HostManager.Models
         private ObservableCollection<Node> _nodeList = null;
         private string _textBlockName = null;
 
+        #endregion
+
+        #region Properties
+
+        // 선택 여부
         public bool IsSelected
         {
             get
@@ -156,7 +222,7 @@ namespace HostManager.Models
                 this.OnPropertyChanged("IsSelected");
             }
         }
-
+        // 확장 여부
         public bool IsExpanded
         {
             get
@@ -169,7 +235,7 @@ namespace HostManager.Models
                 this.OnPropertyChanged("IsExpanded");
             }
         }
-
+        // 마지막 노드 여부
         public bool IsExternalNode
         {
             get
@@ -182,7 +248,7 @@ namespace HostManager.Models
                 this.OnPropertyChanged("IsExternalNode");
             }
         }
-
+        // 변경 여부
         public bool IsChanged
         {
             get
@@ -191,10 +257,11 @@ namespace HostManager.Models
             }
             set
             {
-                SetIsChanged(value);
+                _isChanged = value;
+                this.OnPropertyChanged("IsChanged");
             }
         }
-
+        // 체크 여부
         public bool? IsChecked
         {
             get
@@ -255,7 +322,7 @@ namespace HostManager.Models
                 _tooltip = value;
             }
         }
-
+        
         public Node ParentNode
         {
             get
@@ -267,7 +334,7 @@ namespace HostManager.Models
                 _parentNode = value;
             }
         }
-
+        // 자식 노드들
         public ObservableCollection<Node> NodeList
         {
             get
@@ -284,7 +351,7 @@ namespace HostManager.Models
                 _nodeList = value;
             }
         }
-
+        // 노드와 연결된 TextBlock Name
         public string TextBlockName
         {
             get
@@ -297,6 +364,10 @@ namespace HostManager.Models
             }
         }
 
+        #endregion
+
+        #region 생성자
+
         public Node()
         {
 
@@ -306,6 +377,10 @@ namespace HostManager.Models
         {
             _header = header;
         }
+
+        #endregion
+
+        #region Function
 
         // 부모노드 설정
         public void Initialize()
@@ -320,6 +395,7 @@ namespace HostManager.Models
             }
         }
 
+        // 노드 수정 여부
         private void SetIsChanged(bool value)
         {
             _isChanged = value;
@@ -400,81 +476,6 @@ namespace HostManager.Models
             SetIsChecked(state, false, true);
         }
 
-        //깊은 복사
-        //public object Clone()
-        //{
-        //    Node node = new Node();
-        //    node._isSelected = this._isSelected;
-        //    node._isExternalNode = this._isExternalNode;
-        //    node._isChecked = this._isChecked;
-        //    node._ip = this._ip;
-        //    node._domain = this._domain;
-        //    node._header = this._header;
-        //    node._tooltip = this._tooltip;
-        //    node._textBlockName = this._textBlockName;
-
-        //    if (this._parentNode != null)
-        //    {
-        //        node.ParentNode = (Node)this._parentNode.Clone();
-        //    }            
-
-        //    if (this._nodeList != null)
-        //    {
-        //        node.NodeList = new List<Node>();
-
-        //        foreach (Node childNode in this._nodeList)
-        //        {
-        //            node.NodeList.Add((Node)childNode.Clone());
-        //        }
-        //    }
-
-        //    return node;
-        //}
-
-        public object ShallowCopy()
-        {
-            return this.MemberwiseClone();
-        }
-        public void CopyTo(Node node)
-        {
-            this.IsSelected = node._isSelected;
-            this.IsExternalNode = node._isExternalNode;
-            this.IsChecked = node._isChecked;
-            this.IP = node._ip;
-            this.Domain = node._domain;
-            this.Header = node._header;
-            this.Tooltip = node._tooltip;
-            this.TextBlockName = node._textBlockName;
-
-            //if (node.ParentNode != null)
-            //{
-            //    this.ParentNode.CopyTo(node.ParentNode);
-            //}
-
-            if (node.NodeList != null)
-            {
-                if(this._nodeList == null)
-                {
-                    this._nodeList = new ObservableCollection<Node>();
-                }
-
-                this._nodeList = node.NodeList;
-
-                this.Initialize();
-
-                //if(this.NodeList == null)
-                //{
-                //    this.NodeList = new ObservableCollection<Node>();
-                //}
-                //foreach (Node childNode in node._nodeList)
-                //{
-                //    this.NodeList.Add(childNode);
-                //}
-            }
-            
-            this.IsExpanded = true;
-        }
-
         /// <summary>
         /// 이벤트 생성
         /// </summary>
@@ -488,5 +489,7 @@ namespace HostManager.Models
         }
         // 이벤트 변수
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
     }
 }

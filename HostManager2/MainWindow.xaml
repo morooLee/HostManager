@@ -6,36 +6,36 @@
         xmlns:Controllers="clr-namespace:HostManager.Controllers"
         xmlns:src="clr-namespace:HostManager.Models"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Loaded="Window_Loaded" >
+        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Loaded="Window_Loaded" KeyDown="Window_KeyDown" >
     <Grid>
-        <Controllers:AnimatedGIFControl x:Name="GIFCtrl" Visibility="Hidden"/>
+        <Controllers:AnimatedGIFControl x:Name="GIFCtrl" Visibility="Hidden" />
         <DockPanel Name="MainPanel">
             <Menu DockPanel.Dock="Top" Height="22">
                 <MenuItem Header="파일">
-                    <MenuItem Name="Menu_File_Clear" Header="새로 만들기" />
-                    <MenuItem Name="Menu_File_Open" Header="불러오기" />
-                    <MenuItem Name="Menu_File_Save" Header="저장하기" />
-                    <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" />
+                    <MenuItem Name="Menu_File_Clear" Header="새로 만들기" Click="Menu_File_Clear_Click" />
+                    <MenuItem Name="Menu_File_Open" Header="불러오기" Click="Menu_File_Open_Click" />
+                    <MenuItem Name="Menu_File_Save" Header="저장하기" Click="Menu_File_Save_Click" />
+                    <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" Click="Menu_File_AsSave_Click" />
                     <Separator/>
-                    <MenuItem Name="Menu_File_Exit" Header="프로그램 종료" />
+                    <MenuItem Name="Menu_File_Exit" Header="프로그램 종료" Click="Menu_File_Exit_Click" />
                 </MenuItem>
                 <MenuItem Header="편집">
-                    <MenuItem Header="호스트 추가하기" />
-                    <MenuItem Name="Menu_Edit_HostEdit" Header="호스트 수정하기" />
+                    <MenuItem Header="호스트 추가하기" Click="Root_Add_TreeViewItem" />
+                    <MenuItem Name="Menu_Edit_HostEdit" Header="호스트 수정하기" Click="Edit_TreeViewItem" />
                     <Separator/>
-                    <MenuItem Name="Menu_Edit_Text" Header="텍스트로 보기" />
-                    <MenuItem Name="Menu_Edit_Categoty" Header="카테고리로 보기" />
+                    <MenuItem Name="Menu_Edit_Text" Header="텍스트로 보기" Click="ViewByRichTextBox" />
+                    <MenuItem Name="Menu_Edit_Categoty" Header="카테고리로 보기" Click="ViewByTreeView" />
                     <Separator/>
-                    <MenuItem Header="기본폴더 열기" />
-                    <MenuItem Name="Menu_Edit_Notepad" Header="메모장에서 열기" />
-                    <MenuItem Name="Menu_Edit_Refresh" Header="동기화 하기" />
+                    <MenuItem Header="기본폴더 열기" Click="OpenFolder" />
+                    <MenuItem Name="Menu_Edit_Notepad" Header="메모장에서 열기" Click="OpenNotepad" />
+                    <MenuItem Name="Menu_Edit_Refresh" Header="동기화 하기" Click="Refresh_Button_Click" />
                     <Separator/>
-                    <MenuItem Name="Menu_Edit_Pref" Header="속성" />
+                    <MenuItem Name="Menu_Edit_Pref" Header="속성" Click="Menu_Edit_Pref_Click" />
                 </MenuItem>
                 <MenuItem Header="도움말">
-                    <MenuItem Name="Menu_Help_About" Header="About" />
-                    <MenuItem Header="사용법"/>
-                    <MenuItem Header="업데이트"/>
+                    <MenuItem Name="Menu_Help_About" Header="About" Click="Menu_Help_About_Click" />
+                    <!--<MenuItem Header="사용법"/>
+                    <MenuItem Header="업데이트"/>-->
                 </MenuItem>
             </Menu>
             <DockPanel>
@@ -119,8 +119,6 @@
                                 <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
                                 <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
                                 <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown" />
-                            <!--<EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
-                            <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed" />-->
                             </Style>
                         </TreeView.Resources>
 

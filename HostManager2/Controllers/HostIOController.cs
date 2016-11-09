@@ -14,7 +14,7 @@ namespace HostManager.Controllers
     public class HostIOController
     {
         /// <summary>
-        /// 파일 읽기
+        /// 기본 파일 읽기
         /// </summary>
         /// <returns>string</returns>
         public string HostLoad()
@@ -29,6 +29,29 @@ namespace HostManager.Controllers
                 return host;
             }
             catch(Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 선택한 파일 읽기
+        /// </summary>
+        /// <param name="Path">파일 경로</param>
+        /// <returns>string</returns>
+        public string HostLoad(string Path)
+        {
+            try
+            {
+                StreamReader streamReader = new StreamReader(Path, Encoding.UTF8);
+                string host = streamReader.ReadToEnd();
+
+                streamReader.Close();
+
+                return host;
+            }
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return "";
@@ -66,6 +89,27 @@ namespace HostManager.Controllers
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
+        }
+
+        public string FileLoad()
+        {
+            string path = "";
+            System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+
+            // Set filter for file extension and default file extension
+            //dlg.DefaultExt = ".txt";
+            dlg.Filter = "모든파일 (*.*)|*.*|텍스트 파일 (*.txt)|*.txt";
+
+            // Display OpenFileDialog by calling ShowDialog method
+            System.Windows.Forms.DialogResult dlgResult = dlg.ShowDialog();
+
+            // Get the selected file name and display in a TextBox
+            if (dlgResult == System.Windows.Forms.DialogResult.OK)
+            {
+                path = dlg.FileName;
+            }
+
+            return path;
         }
 
         public void OpenNotepad()
