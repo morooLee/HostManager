@@ -82,15 +82,15 @@
                                 <!--<Setter Property="BorderBrush" Value="White" />-->
                             </Style>
                         </StackPanel.Resources>
-                        <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="TreeView_Button_Click">
+                        <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="ViewByTreeView">
                             <Image Source="Resources/TreeView.png"/>
                         </Button>
                         <Border BorderBrush="White" BorderThickness="1" />
-                        <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="RichTextBox_Button_Click">
+                        <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="ViewByRichTextBox">
                             <Image Source="Resources/TextEdit.png"/>
                         </Button>
                         <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
-                        <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="NodePad_Button_Click">
+                        <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="OpenNotepad">
                             <Image Source="Resources/NotePad.png"/>
                         </Button>
                         <Border BorderBrush="White" BorderThickness="1" />
@@ -118,7 +118,7 @@
                                 <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                                 <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
                                 <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
-                                <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonUp" />
+                                <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown" />
                             <!--<EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
                             <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed" />-->
                             </Style>
@@ -129,8 +129,8 @@
                                 <MenuItem Header="호스트 추가" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="Root_Add_TreeViewItem"/>
                                 <Separator/>
                                 <MenuItem Header="기본폴더 열기" Click="OpenFolder" />
-                                <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="TreeView_Notpad_Item_Click" />
-                                <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="TextEdit_MenuItem_Click" />
+                                <MenuItem Name="TreeView_Notpad_Item" Header="메모장에서 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="OpenNotepad" />
+                                <MenuItem Name="TextEdit_MenuItem" Header="텍스트로 보기" DataContext="{Binding Mode=OneWay, Source={StaticResource TreeViewItemModel}}" Click="ViewByRichTextBox" />
                                 <Separator/>
                                 <MenuItem Header="모두 열기" Click="AllExpanded" />
                                 <MenuItem Header="모두 접기" Click="AllCollapsed" />
@@ -185,8 +185,8 @@
                                 <MenuItem Header="잘라내기" Command="Cut" />
                                 <MenuItem Header="붙여넣기" Command="Paste" />
                                 <Separator/>
-                                <MenuItem Name="TextBox_Notepad_Item" Header="메모장에서 보기" Click="TextBox_Notepad_Item_Click" />
-                                <MenuItem Name="TreeView_MenuItem" Header="카테고리로 보기" Click="TreeView_MenuItem_Click" />
+                                <MenuItem Name="RichTextBox_MenuItem_Notepad" Header="메모장에서 보기" Click="OpenNotepad" />
+                                <MenuItem Name="RichTextBox_MenuItem_TreeView" Header="카테고리로 보기" Click="ViewByTreeView" />
                             </ContextMenu>
                         </RichTextBox.ContextMenu>
                         <RichTextBox.Document>

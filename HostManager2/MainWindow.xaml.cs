@@ -27,7 +27,6 @@ namespace HostManager
     /// </summary>
     public partial class MainWindow : Window
     {
-        BackgroundWorker backgroundWorker = new BackgroundWorker();
         TreeViewItemModel treeViewItemModel = new TreeViewItemModel();
         HostIOController hostIOController = new HostIOController();
         TreeViewItemConverterController treeViewItemConverterController = new TreeViewItemConverterController();
@@ -40,42 +39,7 @@ namespace HostManager
             InitializeComponent();
         }
 
-        protected override void OnInitialized(EventArgs e)
-        {
-            // 이벤트 발생 시 초기화
-            base.OnInitialized(e);
-
-            // 진행률 전송 여부
-            backgroundWorker.WorkerReportsProgress = true;
-
-            // 작업 취소 여부
-            backgroundWorker.WorkerSupportsCancellation = true;
-
-            // 작업 쓰레드 
-            backgroundWorker.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
-
-            // 진행률 변경
-            backgroundWorker.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
-
-            // 작업 완료
-            backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
-        }
-
-        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            LoadingImagePlay(true);
-        }
-
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-        }
-
-        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            LoadingImagePlay(false);
-        }
-
+        // 메인윈도우 로드 이벤트
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             BindTree(null);
@@ -98,6 +62,7 @@ namespace HostManager
             statusBarUpdate(selectedNode);
         }
 
+        // 헤더 로드 이벤트
         private void HeaderText_Loaded(object sender, RoutedEventArgs e)
         {
             TextBlock tb = (TextBlock)sender;
@@ -117,6 +82,7 @@ namespace HostManager
             }
         }
 
+        //헤더 텍스트 입력 이벤트
         private void HeaderText_TextInput(object sender, TextCompositionEventArgs e)
         {
             TextBlock tb = (TextBlock)sender;
@@ -180,6 +146,8 @@ namespace HostManager
                     DomainDuplication(node);
                 }
             }
+
+            isChangedHost = false;
 
             this.Dispatcher.BeginInvoke(
                 (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
@@ -365,31 +333,19 @@ namespace HostManager
 
         #region 도구모음 이벤트 및 관련 함수
 
-        private void TreeView_Button_Click(object sender, RoutedEventArgs e)
-        {
-            ViewByTreeView();
-        }
-
-        private void RichTextBox_Button_Click(object sender, RoutedEventArgs e)
-        {
-            ViewByRichTextBox();
-        }
-
-        private void NodePad_Button_Click(object sender, RoutedEventArgs e)
-        {
-            OpenNotepad();
-        }
-
+        // 적용 버튼 Click 이벤트
         private void Apply_Button_Click(object sender, RoutedEventArgs e)
         {
             DoApply();
         }
 
+        // 새로고침 버튼 Click 이벤트
         private void Refresh_Button_Click(object sender, RoutedEventArgs e)
         {
             DoRefresh();
         }
 
+        // 검색창 TextChanged 이벤트
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             BitmapImage bi = new BitmapImage();
@@ -400,42 +356,43 @@ namespace HostManager
             SearchButtonImage.Tag = "Search";
         }
 
+        // 검색창 Key 이벤트
         private void SearchBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
+            if (SearchBox.Text != "")
             {
-                // ignore alt+space which invokes the system menu
-                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                // Enter
+                if (e.Key == Key.Enter)
                 {
-                    return;
-                }
+                    e.Handled = true;
 
-                SearchButtonImage.Tag = "Search";
-                SearchButton_Click(SearchButton, null);
-            }
-            else if ((e.Key == Key.Escape))
-            {
-                // ignore alt+space which invokes the system menu
-                if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                    // ignore alt+space which invokes the system menu
+                    if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                    {
+                        return;
+                    }
+
+                    SearchButtonImage.Tag = "Search";
+                    SearchButton_Click(SearchButton, null);
+                }
+                // ESC
+                else if ((e.Key == Key.Escape))
                 {
-                    return;
-                }
+                    e.Handled = true;
 
-                SearchButtonImage.Tag = "Cancel";
-                SearchButton_Click(SearchButton, null);
-            }
-            else if (e.Key == Key.Return && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
-            {
-                SearchButtonImage.Tag = "Search";
-                SearchButton_Click(SearchButton, null);
-            }
-            else if (e.Key == Key.Escape && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
-            {
-                SearchButtonImage.Tag = "Cancel";
-                SearchButton_Click(SearchButton, null);
+                    // ignore alt+space which invokes the system menu
+                    if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                    {
+                        return;
+                    }
+
+                    SearchButtonImage.Tag = "Cancel";
+                    SearchButton_Click(SearchButton, null);
+                }
             }
         }
 
+        // 검색창 Click 이벤트
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             if (SearchButtonImage.Tag.ToString() == "Search")
@@ -639,7 +596,7 @@ namespace HostManager
             return count;
         }
 
-        // 버튼 UI 변경하기
+        // 트리 - 텍스트 전환 시 버튼 UI 변경하기
         private void ChangeButtonUI()
         {
             if (Hosts_TreeView.Visibility == Visibility.Visible)
@@ -659,7 +616,7 @@ namespace HostManager
         }
 
         // Notepad 열기
-        private void OpenNotepad()
+        private void OpenNotepad(object sender, RoutedEventArgs e)
         {
             if (isChangedHost == true)
             {
@@ -672,14 +629,13 @@ namespace HostManager
             }
 
             hostIOController.OpenNotepad();
-
-            //ChangeInfoLabel("Info", "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.", null);
+            ChangeInfoLabel(InfoLabelType.Info, "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.");
         }
 
         // 새로고침
         private void DoRefresh()
         {
-            //SearchBoxClear();
+            SearchBoxClear();
             MessageBoxResult result = MessageBoxResult.Yes;
 
             if (isChangedHost == true)
@@ -710,10 +666,12 @@ namespace HostManager
                     SearchButtonImage.Source = bi;
                     SearchButtonImage.Tag = "Search";
                 }
+
+                ChangeInfoLabel(InfoLabelType.Success, "호스트 정보를 새로 불러들였습니다.");
             }
             else
             {
-                //ChangeInfoLabel("Info", "새로고침을 취소하였습니다.", null);
+                ChangeInfoLabel(InfoLabelType.Info, "새로고침을 취소하였습니다.");
             }
 
             isChangedHost = false;
@@ -729,7 +687,7 @@ namespace HostManager
             }
             else
             {
-                ChangeInfoLabel(InfoLabelType.Warning, "적용되었습니다.");
+                ChangeInfoLabel(InfoLabelType.Warning, "호스트가 저장되었습니다.");
             }
 
             isChangedHost = false;
@@ -868,29 +826,28 @@ namespace HostManager
                 DispatcherPriority.ApplicationIdle);
         }
 
+        // 트리 더블클릭 시 수정창 띄우기
         private void TreeViewItem_MouseDoubleClick(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             TreeViewItem treeViewItem = sender as TreeViewItem;
             Node node = treeViewItem.DataContext as Node;
 
-            if (node == null && node.IsSelected == true)
-            {
-                MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "선택된 호스트가 없습니다.");
-            }
-            else
-            {
-                EditTreeViewItem(node, "선택한 항목 수정");
-            }
+            EditTreeViewItem(NodeEditPosition.ThisNodeEdit, node, "호스트 수정");
         }
 
+        // 트리 키입력 이벤트
         private void TreeViewItem_KeyUp(object sender, KeyEventArgs e)
         {
             TreeViewItem item = sender as TreeViewItem;
             Node node = item.DataContext as Node;
 
+            // SPACE
             if (e.Key == Key.Space)
             {
+                e.Handled = true;
+
                 // ignore alt+space which invokes the system menu
                 if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
                 {
@@ -912,8 +869,11 @@ namespace HostManager
                     }
                 }
             }
+            // ENTER
             else if (e.Key == Key.Enter && (bool)(sender as DependencyObject).GetValue(KeyboardNavigation.AcceptsReturnProperty))
             {
+                e.Handled = true;
+
                 if (item.IsSelected)
                 {
                     if (e.OriginalSource == sender)
@@ -929,22 +889,29 @@ namespace HostManager
                     }
                 }
             }
+            // ESC
             else if (e.Key == Key.Escape)
             {
+                e.Handled = true;
+
                 // ignore alt+space which invokes the system menu
                 if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
                 {
                     return;
                 }
 
-                if (SearchBox.Text == "")
+                if (SearchBox.Text != "")
                 {
-                    SearchBoxClear();
+                    SearchButtonImage.Tag = "Cancel";
+                    SearchButton_Click(SearchButton, null);
                 }
             }
+            // DEL
             else if (e.Key == Key.Delete)
             {
-                if (node == SelectedNode)
+                e.Handled = true;
+
+                if (node.IsSelected)
                 {
                     domainHashSet.Remove(node.Domain);
 
@@ -956,14 +923,18 @@ namespace HostManager
                     {
                         node.ParentNode.NodeList.Remove(node);
                     }
-                    
+
                     ChangeInfoLabel(InfoLabelType.Success, "선택한 항목이 삭제되었습니다.");
+                    isChangedHost = true;
                 }
             }
         }
 
-        private void TreeViewItem_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        // 트리 우클릭 시 Select 하기
+        private void TreeViewItem_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
+
             TreeViewItem treeViewItem = sender as TreeViewItem;
             Node node = treeViewItem.DataContext as Node;
 
@@ -973,123 +944,84 @@ namespace HostManager
             }
         }
 
+        // 루트에 트리 추가
         private void Root_Add_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node node = null;
 
-            EditTreeViewItem(node, menuItem.Name);
+            EditTreeViewItem(NodeEditPosition.RootNodeAdd, null, menuItem.Name);
         }
 
+        // 기본 폴더 열기
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
             hostIOController.OpenFolder();
         }
 
-        private void TreeView_Notpad_Item_Click(object sender, RoutedEventArgs e)
-        {
-            OpenNotepad();
-        }
-
-        private void TextEdit_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ViewByRichTextBox();
-        }
-
+        //모두 접기
         private void AllCollapsed(object sender, RoutedEventArgs e)
         {
             treeViewItemModel.AllISExpanded(false);
             ChangeInfoLabel(InfoLabelType.Info, "카테고리를 모두 닫았습니다.");
         }
 
+        // 모두 열기
         private void AllExpanded(object sender, RoutedEventArgs e)
         {
             treeViewItemModel.AllISExpanded(true);
             ChangeInfoLabel(InfoLabelType.Info, "카테고리를 모두 확장하였습니다.");
         }
 
+        // 자식 트리에 추가
         private void Add_Child_TreeViewItem(object sender, RoutedEventArgs e)
         {
-            MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node parentNode = (menuItem.DataContext as Node);
-            Node childNode = new Node();
+            e.Handled = true;
 
-            if (parentNode == null)
-            {
-                MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "선택된 호스트가 없습니다.");
-            }
-            else
-            {
-                EditTreeViewItem(childNode, menuItem.Name);
-                childNode.ParentNode = parentNode;
-                parentNode.NodeList.Insert(0, childNode);
-            }
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            Node node = (menuItem.DataContext as Node);
+
+            EditTreeViewItem(NodeEditPosition.ChildNodeAdd, node, menuItem.Name);
         }
 
+        // 트리 추가
         private void Add_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            Node childNode = menuItem.DataContext as Node;
-            Node parentNode = null;
+            Node node = menuItem.DataContext as Node;
 
-            if (childNode != null && childNode.ParentNode != null)
-            {
-                parentNode = childNode.ParentNode;
-            }
-
-            if (parentNode == null)
-            {
-                MessageBox.Show("호스트를 추가하지 못했습니다.\r\n다시 시도해 주십시오.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "호스트를 추가하지 못했습니다.");
-            }
-            else
-            {
-                EditTreeViewItem(parentNode, menuItem.Name);
-            }
+            EditTreeViewItem(NodeEditPosition.SameNodeAdd, node, menuItem.Name);
         }
 
+        // 트리 수정
         private void Edit_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
 
-            if (node == null)
-            {
-                MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "선택된 호스트가 없습니다.");
-            }
-            else
-            {
-                EditTreeViewItem(node, menuItem.Name);
-            }
+            EditTreeViewItem(NodeEditPosition.ThisNodeEdit, node, menuItem.Name);
         }
 
+        // 트리 삭제
         private void Del_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
 
-            if (node == null)
-            {
-                MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "선택된 호스트가 없습니다.");
-            }
-            else
-            {
-                if (node.ParentNode == null)
-                {
-                    treeViewItemModel.NodeList.Remove(node);
-                }
-                else
-                {
-                    node.ParentNode.NodeList.Remove(node);
-                }
-            }
+            EditTreeViewItem(NodeEditPosition.ThisNodeDel, node, "");
         }
 
+        //트리 위로 이동
         private void MoveToUp_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
 
@@ -1124,11 +1056,16 @@ namespace HostManager
                         ChangeInfoLabel(InfoLabelType.Warning, "더이상 위로 이동할 수 없습니다.");
                     }
                 }
+
+                isChangedHost = true;
             }
         }
 
+        // 트리 아래로 이동
         private void MoveToDown_TreeViewItem(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             MenuItem menuItem = e.OriginalSource as MenuItem;
             Node node = menuItem.DataContext as Node;
 
@@ -1163,30 +1100,29 @@ namespace HostManager
                         ChangeInfoLabel(InfoLabelType.Warning, "더이상 아래로 이동할 수 없습니다.");
                     }
                 }
+
+                isChangedHost = true;
             }
         }
 
+        // CheckBox 전체 해제
         private void AllUnchecked(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             foreach (Node node in treeViewItemModel.NodeList)
             {
                 node.IsChecked = false;
             }
-            ChangeInfoLabel(InfoLabelType.Info, "호스트가 모두 체크되었습니다.");
+            
+            ChangeInfoLabel(InfoLabelType.Info, "호스트가 모두 해제되었습니다."); 
         }
 
-        private void TextBox_Notepad_Item_Click(object sender, RoutedEventArgs e)
+        // 트리 형식으로 전환
+        private void ViewByTreeView(object sender, RoutedEventArgs e)
         {
-            OpenNotepad();
-        }
+            e.Handled = true;
 
-        private void TreeView_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ViewByTreeView();
-        }
-
-        private void ViewByTreeView()
-        {
             TextRange textRange = new TextRange(Hosts_RichTextBox.Document.ContentStart, Hosts_RichTextBox.Document.ContentEnd);
             BindTree(textRange.Text);
 
@@ -1195,11 +1131,15 @@ namespace HostManager
                 SearchBoxClear();
             }
 
+            ChangeInfoLabel(InfoLabelType.Info, "트리 형식으로 전환합니다..");
             ChangeButtonUI();
         }
 
-        private void ViewByRichTextBox()
+        // 텍스트 형식으로 전환
+        private void ViewByRichTextBox(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
+
             Hosts_RichTextBox.Document.Blocks.Clear();
             Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel, null, false))));
 
@@ -1208,67 +1148,150 @@ namespace HostManager
                 SearchBoxClear();
             }
 
+            ChangeInfoLabel(InfoLabelType.Info, "텍스트 형식으로 전환합니다..");
             ChangeButtonUI();
         }
-
-        private void EditTreeViewItem(Node node, string windowTitle)
+        
+        // Edit창 띄워서 호스트 수정하기
+        private void EditTreeViewItem(NodeEditPosition nodeEditPosition, Node node, string windowTitle)
         {
-            EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, windowTitle);
-            editTreeViewWindow.Owner = Application.Current.MainWindow;
-            editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            editTreeViewWindow.ShowDialog();
-
-            if (editTreeViewWindow.treeViewItemModel != null && editTreeViewWindow.treeViewItemModel.NodeList.Count != 0)
+            if (nodeEditPosition == NodeEditPosition.ThisNodeDel)
             {
-                if (node == null)
+                domainHashSet.Remove(node.Domain);
+
+                if (node.ParentNode == null)
                 {
-                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
-                    {
-                        treeViewItemModel.NodeList.Add(item);
-                    }
+                    treeViewItemModel.NodeList.Remove(node);
                 }
                 else
                 {
-                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
-                    {
-                        item.ParentNode = node.ParentNode;
-                        item.IsChanged = true;
-                        item.IsChecked = true;
-                        item.IsExpanded = true;
-
-                        if (node.ParentNode == null)
-                        {
-                            treeViewItemModel.NodeList.Insert(treeViewItemModel.NodeList.IndexOf(node), item);
-                        }
-                        else
-                        {
-                            node.ParentNode.NodeList.Insert(node.ParentNode.NodeList.IndexOf(node), item);
-                        }
-                    }
-
-                    if (node.ParentNode == null)
-                    {
-                        treeViewItemModel.NodeList.RemoveAt(treeViewItemModel.NodeList.IndexOf(node));
-                    }
-                    else
-                    {
-                        node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
-                        node.ParentNode.IsSelected = false;
-                    }
+                    node.ParentNode.NodeList.Remove(node);
                 }
 
                 isChangedHost = true;
-
-                ChangeInfoLabel(InfoLabelType.Success, "선택한 항목이 수정되었습니다.");
+                ChangeInfoLabel(InfoLabelType.Success, "호스트가 삭제 되었습니다.");
             }
             else
             {
-                ChangeInfoLabel(InfoLabelType.Warning, "작업이 취소되었습니다.");
+                if (node == null)
+                {
+                    MessageBox.Show("선택된 호스트가 없습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel(InfoLabelType.Warning, "선택된 호스트가 없습니다.");
+                }
+                else
+                {
+                    EditTreeViewWindow editTreeViewWindow = new EditTreeViewWindow(node, windowTitle);
+                    editTreeViewWindow.Owner = Application.Current.MainWindow;
+                    editTreeViewWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                    editTreeViewWindow.ShowDialog();
+
+                    if (editTreeViewWindow.treeViewItemModel != null && editTreeViewWindow.treeViewItemModel.NodeList.Count != 0)
+                    {
+                        switch (nodeEditPosition)
+                        {
+                            case NodeEditPosition.ChildNodeAdd:
+                                {
+                                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
+                                    {
+                                        item.ParentNode = node;
+                                        item.IsChanged = true;
+                                        item.IsChecked = true;
+                                        item.IsExpanded = true;
+                                        node.NodeList.Add(item);
+                                    }
+
+                                    ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다.");
+                                    node.IsExpanded = true;
+
+                                    break;
+                                }
+                            case NodeEditPosition.ThisNodeEdit:
+                                {
+                                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
+                                    {
+                                        item.ParentNode = node.ParentNode;
+                                        item.IsChanged = true;
+                                        item.IsChecked = true;
+                                        item.IsExpanded = true;
+
+                                        if (node.ParentNode == null)
+                                        {
+                                            treeViewItemModel.NodeList.Insert(treeViewItemModel.NodeList.IndexOf(node), item);
+                                        }
+                                        else
+                                        {
+                                            node.ParentNode.NodeList.Insert(node.ParentNode.NodeList.IndexOf(node), item);
+                                        }
+                                    }
+
+                                    domainHashSet.Remove(node.Domain);
+
+                                    if (node.ParentNode == null)
+                                    {
+                                        treeViewItemModel.NodeList.RemoveAt(treeViewItemModel.NodeList.IndexOf(node));
+                                    }
+                                    else
+                                    {
+                                        node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
+                                    }
+
+                                    ChangeInfoLabel(InfoLabelType.Warning, "호스트를 수정하였습니다.");
+
+                                    break;
+                                }
+                            case NodeEditPosition.SameNodeAdd:
+                                {
+                                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
+                                    {
+                                        item.ParentNode = node.ParentNode;
+                                        item.IsChanged = true;
+                                        item.IsChecked = true;
+                                        item.IsExpanded = true;
+
+                                        if (node.ParentNode == null)
+                                        {
+
+                                            treeViewItemModel.NodeList.Add(item);
+                                        }
+                                        else
+                                        {
+                                            node.ParentNode.NodeList.Add(item);
+                                        }
+                                    }
+
+                                    ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다.");
+
+                                    break;
+                                }
+                            case NodeEditPosition.RootNodeAdd:
+                                {
+                                    foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
+                                    {
+                                        treeViewItemModel.NodeList.Add(item);
+                                    }
+
+                                    ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다..");
+
+                                    break;
+                                }
+                        }
+
+                        foreach (Node item in editTreeViewWindow.treeViewItemModel.NodeList)
+                        {
+                            DomainDuplication(item);
+                        }
+
+                        isChangedHost = true;
+                    }
+                    else
+                    {
+                        ChangeInfoLabel(InfoLabelType.Warning, "작업이 취소되었습니다.");
+                    }
+
+                    editTreeViewWindow.treeViewItemModel = null;
+                    editTreeViewWindow.Close();
+                }
             }
-
-
-            editTreeViewWindow.treeViewItemModel = null;
-            editTreeViewWindow.Close();
         }
     }
 }
