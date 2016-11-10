@@ -117,10 +117,7 @@ namespace HostManager.Models
         /// <param name="isExpanded">true : 열기 / false : 접기</param>
         private void NodeIsExpanded(Node node, bool isExpanded)
         {
-            if (node.IsChecked == false)
-            {
-                node.IsExpanded = isExpanded;
-            }
+            node.IsExpanded = isExpanded;
 
             if (node.IsExternalNode == false)
             {
@@ -132,54 +129,26 @@ namespace HostManager.Models
         }
 
         /// <summary>
-        /// 조상 노드 확장하기
-        /// </summary>
-        /// <param name="parentNode">부모노드</param>
-        public void ParentIsExpanded(Node parentNode)
-        {
-            if (parentNode != null)
-            {
-                if (parentNode.IsExpanded != true)
-                {
-                    parentNode.IsExpanded = true;
-                }
-
-                if (parentNode.ParentNode != null)
-                {
-                    ParentIsExpanded(parentNode.ParentNode);
-                }
-            }
-        }
-
-        /// <summary>
         /// 전체 노드 변경여부 취소하기
         /// </summary>
         public void SetIsChangedAll(bool isChanged)
         {
             foreach (Node node in NodeList)
             {
-                SetIsChanged(node, isChanged);
+                node.SetIsChanged(isChanged);
             }
         }
 
-        /// <summary>
-        /// 변경된 노드 변경여부 취소하기
-        /// </summary>
-        /// <param name="node"></param>
-        private void SetIsChanged(Node node, bool isChanged)
+        public int WordSearchInNode(string word)
         {
-            if (node.IsChanged != isChanged)
+            int count = 0;
+
+            foreach(Node node in NodeList)
             {
-                node.IsChanged = isChanged;
+                count += node.Search(word);
             }
 
-            if (node.IsExternalNode == false)
-            {
-                foreach (Node childNode in node.NodeList)
-                {
-                    SetIsChanged(childNode, isChanged);
-                }
-            }
+            return count;
         }
 
         #endregion
@@ -396,7 +365,7 @@ namespace HostManager.Models
         }
 
         // 노드 수정 여부
-        private void SetIsChanged(bool value)
+        public void SetIsChanged(bool value)
         {
             _isChanged = value;
 
@@ -409,6 +378,58 @@ namespace HostManager.Models
             }
 
             this.OnPropertyChanged("IsChanged");
+        }
+
+        public int Search(string searchString)
+        {
+            int count = 0;
+
+            if (this.Header.ToUpper().Contains(searchString.ToUpper()))
+            {
+                count++;
+
+                if (_isExpanded != true)
+                {
+                    _isExpanded = true;
+                    this.OnPropertyChanged("IsExpanded");
+                }
+
+                if (_parentNode != null)
+                {
+                    _parentNode.ParentIsExpanded();
+                }
+            }
+            else
+            {
+                if (_isExpanded != false)
+                {
+                    _isExpanded = false;
+                    this.OnPropertyChanged("IsExpanded");
+                }
+            }
+            if (_isExternalNode == false)
+            {
+                foreach (Node node in this.NodeList)
+                {
+                    count += node.Search(searchString);
+                }
+            }
+
+            return count;
+        }
+
+        private void ParentIsExpanded()
+        {
+            if (_isExpanded != true)
+            {
+                _isExpanded = true;
+                this.OnPropertyChanged("IsExpanded");
+            }
+
+            if (_parentNode != null)
+            {
+                _parentNode.ParentIsExpanded();
+            }
         }
 
         /// <summary>

@@ -895,6 +895,7 @@ namespace HostManager
 
         private void FindTreeViewItem(DependencyObject obj)
         {
+            int asd = VisualTreeHelper.GetChildrenCount(obj);
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
                 TreeViewItem treeViewItem = obj as TreeViewItem;

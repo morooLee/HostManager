@@ -35,7 +35,6 @@ namespace HostManager
         private HostIOController hostIOController = new HostIOController();
         private TreeViewItemConverterController treeViewItemConverterController = new TreeViewItemConverterController();
         private HashSet<string> domainHashSet = new HashSet<string>();
-        private Node SelectedNode = null;
         private bool isChangedHost = false;
         private string originalSource = "";
         private string hostPath = Settings.Default.HostFilePath + @"\Hosts";
@@ -81,7 +80,6 @@ namespace HostManager
         private void Hosts_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             Node selectedNode = e.NewValue as Node;
-            SelectedNode = selectedNode;
 
             statusBarUpdate(selectedNode);
         }
@@ -296,11 +294,14 @@ namespace HostManager
 
                     if (Hosts_TreeView.Visibility == Visibility.Visible)
                     {
-                        count = HighlightText(Hosts_TreeView);
+                        treeViewItemModel.AllISExpanded(true);
+                        count = treeViewItemModel.WordSearchInNode(SearchBox.Text);
+                        HighlightText(Hosts_TreeView);
                     }
                     else
                     {
-                        count = HighlightText(Hosts_RichTextBox);
+                        count = treeViewItemModel.WordSearchInNode(SearchBox.Text);
+                        HighlightText(Hosts_RichTextBox);
                     }
 
                     if (count == 0)
@@ -629,17 +630,6 @@ namespace HostManager
                 }
 
                 isChangedHost = false;
-                LoadingImagePlay(true);
-
-                this.Dispatcher.Invoke(
-                    (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
-                    DispatcherPriority.Normal);
-
-                this.Dispatcher.BeginInvoke(
-                    (ThreadStart)(() => { treeViewItemModel.AllISExpanded(false); }),
-                    DispatcherPriority.Normal);
-
-                LoadingImagePlay(false);
             }
             else
             {
@@ -729,73 +719,41 @@ namespace HostManager
         /// <summary>
         /// 하이라이트 설정하기
         /// </summary>
-        /// <param name="itx">Control (TreeView / Node / RichTextBox)</param>
+        /// <param name="itx">Control (TreeViewItem / Node / RichTextBox)</param>
         /// <returns>하이라이트가 적용된 수</returns>
-        private int HighlightText(object itx)
+        private void HighlightText(object itx)
         {
-            int count = 0;
             if (itx != null)
             {
                 Regex regex = new Regex("(" + SearchBox.Text + ")", RegexOptions.IgnoreCase);
-
-                if (itx is TreeView)
+                if (itx is TextBlock)
                 {
-
-                    TreeView treeView = itx as TreeView;
-
-                    foreach (Node node in treeView.Items)
-                    {
-                        count += HighlightText(node);
-                    }
-                }
-                else if (itx is Node)
-                {
-                    int matchCount = 0;
-                    Node node = itx as Node;
-
-                    TextBlock textBlock = (TextBlock)this.Hosts_TreeView.FindName(node.TextBlockName);
-
+                    TextBlock textBlock = itx as TextBlock;
                     if (SearchBox.Text.Length == 0)
                     {
                         string str = textBlock.Text;
                         textBlock.Inlines.Clear();
                         textBlock.Inlines.Add(str);
-
-                        treeViewItemModel.AllISExpanded(false);
+                        return;
                     }
-                    else
+                    string[] substrings = regex.Split(textBlock.Text);
+                    textBlock.Inlines.Clear();
+                    foreach (string item in substrings)
                     {
-                        string[] substrings = substrings = regex.Split(textBlock.Text);
-                        textBlock.Inlines.Clear();
-                        foreach (string item in substrings)
+                        if (regex.Match(item).Success)
                         {
-                            if (regex.Match(item).Success)
-                            {
-                                Run runx = new Run(item);
-
-                                runx.Background = Brushes.Red;
-                                runx.Foreground = Brushes.White;
-                                runx.FontWeight = FontWeights.Bold;
-                                textBlock.Inlines.Add(runx);
-
-                                treeViewItemModel.ParentIsExpanded(node.ParentNode);
-                                matchCount++;
-                            }
-                            else
-                            {
-                                textBlock.Inlines.Add(item);
-                            }
+                            Run runx = new Run(item);
+                            runx.Background = Brushes.Red;
+                            runx.Foreground = Brushes.White;
+                            runx.FontWeight = FontWeights.Bold;
+                            textBlock.Inlines.Add(runx);
+                        }
+                        else
+                        {
+                            textBlock.Inlines.Add(item);
                         }
                     }
-
-                    if (node.IsExternalNode == false)
-                    {
-                        foreach (Node childNode in node.NodeList)
-                        {
-                            matchCount += HighlightText(childNode);
-                        }
-                    }
-                    return matchCount;
+                    return;
                 }
                 else if (itx is RichTextBox)
                 {
@@ -807,14 +765,14 @@ namespace HostManager
 
                     if (SearchBox.Text.Length == 0)
                     {
-                        return count;
+                        return;
                     }
 
                     for (TextPointer position = Hosts_RichTextBox.Document.ContentStart; position != null && position.CompareTo(Hosts_RichTextBox.Document.ContentEnd) <= 0; position = position.GetNextContextPosition(LogicalDirection.Forward))
                     {
                         if (position.CompareTo(Hosts_RichTextBox.Document.ContentEnd) == 0)
                         {
-                            return count;
+                            return;
                         }
 
                         string textRun = position.GetTextInRun(LogicalDirection.Forward);
@@ -830,14 +788,18 @@ namespace HostManager
                                 textRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Red));
                                 textRange.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.White));
                                 textRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
-
-                                count++;
                             }
                         }
                     }
                 }
+                else
+                {
+                    for (int i = 0; i < VisualTreeHelper.GetChildrenCount(itx as DependencyObject); i++)
+                    {
+                        HighlightText(VisualTreeHelper.GetChild(itx as DependencyObject, i));
+                    }
+                }
             }
-            return count;
         }
 
         // 트리 - 텍스트 전환 시 버튼 UI 변경하기
@@ -1056,35 +1018,6 @@ namespace HostManager
             InfoLabel.Content = msg;
         }
 
-        /// <summary>
-        /// 로딩화면 출력
-        /// </summary>
-        /// <param name="isLoaded">로딩화면 출력 여부</param>
-        private void LoadingImagePlay(bool isLoaded)
-        {
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() =>
-                {
-                    if (isLoaded)
-                    {
-                        MainPanel.IsEnabled = false;
-                        MainPanel.Opacity = 0.5;
-                        Hosts_TreeView.Visibility = Visibility.Hidden;
-                        GIFCtrl.Visibility = Visibility.Visible;
-                        GIFCtrl.StartAnimate();
-                    }
-                    else
-                    {
-                        GIFCtrl.StopAnimate();
-                        GIFCtrl.Visibility = Visibility.Hidden;
-                        Hosts_TreeView.Visibility = Visibility.Visible;
-                        MainPanel.IsEnabled = true;
-                        MainPanel.Opacity = 1.0;
-                    }
-                }),
-                DispatcherPriority.Normal);
-        }
-
         // 루트에 트리 추가
         private void Root_Add_TreeViewItem(object sender, RoutedEventArgs e)
         {
@@ -1154,7 +1087,7 @@ namespace HostManager
 
             if (node == null)
             {
-                node = SelectedNode;
+                node = Hosts_TreeView.SelectedItem as Node;
             }
 
             EditTreeViewItem(NodeEditPosition.ThisNodeEdit, node, menuItem.Name);
@@ -1370,7 +1303,7 @@ namespace HostManager
                                             node.NodeList.Add(item);
                                         }
 
-                                        ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다.");
+                                        ChangeInfoLabel(InfoLabelType.Success, "호스트가 추가되었습니다.");
                                         node.IsExpanded = true;
                                     }
 
@@ -1408,7 +1341,7 @@ namespace HostManager
                                             node.ParentNode.NodeList.RemoveAt(node.ParentNode.NodeList.IndexOf(node));
                                         }
 
-                                        ChangeInfoLabel(InfoLabelType.Warning, "호스트를 수정하였습니다.");
+                                        ChangeInfoLabel(InfoLabelType.Success, "호스트를 수정하였습니다.");
                                     }
 
                                     break;
@@ -1435,7 +1368,7 @@ namespace HostManager
                                             }
                                         }
 
-                                        ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다.");
+                                        ChangeInfoLabel(InfoLabelType.Success, "호스트가 추가되었습니다.");
                                     }
 
                                     break;
@@ -1447,7 +1380,7 @@ namespace HostManager
                                         treeViewItemModel.NodeList.Add(item);
                                     }
 
-                                    ChangeInfoLabel(InfoLabelType.Warning, "호스트가 추가되었습니다..");
+                                    ChangeInfoLabel(InfoLabelType.Success, "호스트가 추가되었습니다..");
 
                                     break;
                                 }

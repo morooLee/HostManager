@@ -103,24 +103,59 @@
                 <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
                 <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>
                 <Grid>
-                    <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
-                        <TreeView.Resources>
-                            <src:TreeViewItemModel x:Key="TreeViewItemModel"/>
-                            <Style TargetType="TreeViewItem">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsChanged}" Value="true">
-                                        <Setter Property="Background" Value="Yellow"></Setter>
-                                        <Setter Property="Foreground" Value="Red"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-                                <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
-                                <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
-                                <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown" />
-                            </Style>
-                        </TreeView.Resources>
+                    <Grid.Resources>
+                        <src:TreeViewItemModel x:Key="TreeViewItemModel"/>
+                        <Style  x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsChanged}" Value="true">
+                                    <Setter Property="Background" Value="Yellow"></Setter>
+                                    <Setter Property="Foreground" Value="Red"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                            <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
+                            <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
+                            <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown" />
+                        </Style>
+                        
+                        <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
+                            <StackPanel Height="20" Orientation="Horizontal">
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="하위 항목에 추가" DataContext="{Binding}" Click="Add_Child_TreeViewItem">
+                                            <MenuItem.Style>
+                                                <Style TargetType="MenuItem">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=IsExternalNode}" Value="true">
+                                                            <Setter Property="IsEnabled" Value="False"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </MenuItem.Style>
+                                        </MenuItem>
+                                        <MenuItem Header="현재 항목에 추가" DataContext="{Binding}" Click="Add_TreeViewItem" />
+                                        <MenuItem Header="선택한 항목 수정" DataContext="{Binding}" Click="Edit_TreeViewItem" />
+                                        <MenuItem Header="선택한 항목 삭제" DataContext="{Binding}" Click="Del_TreeViewItem" />
+                                        <Separator/>
+                                        <MenuItem Header="위로 이동" Click="MoveToUp_TreeViewItem"/>
+                                        <MenuItem Header="아래로 이동" Click="MoveToDown_TreeViewItem"/>
+                                        <Separator/>
+                                        <MenuItem Header="폴더 열기" Click="OpenFolder"/>
+                                        <MenuItem Header="모두 열기" Click="AllExpanded" />
+                                        <MenuItem Header="모두 접기" Click="AllCollapsed"/>
+                                        <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+
+                                <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
+                                <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </Grid.Resources>
+                    <TreeView Name="Hosts_TreeView" BorderThickness="1" BorderBrush="#B5B5B5" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemTemplate="{StaticResource TreeViewItemTemplate}"  Loaded="Hosts_TreeView_Loaded" SelectedItemChanged="Hosts_TreeView_SelectedItemChanged">
+
 
                         <TreeView.ContextMenu>
                             <ContextMenu>
@@ -135,41 +170,6 @@
                                 <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
                             </ContextMenu>
                         </TreeView.ContextMenu>
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate DataType="{x:Type src:Node}" ItemsSource="{Binding Path=NodeList}">
-                                <StackPanel Height="20" Orientation="Horizontal">
-                                    <StackPanel.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="하위 항목에 추가" DataContext="{Binding}" Click="Add_Child_TreeViewItem">
-                                                <MenuItem.Style>
-                                                    <Style TargetType="MenuItem">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Path=IsExternalNode}" Value="true">
-                                                                <Setter Property="IsEnabled" Value="False"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </MenuItem.Style>
-                                            </MenuItem>
-                                            <MenuItem Header="현재 항목에 추가" DataContext="{Binding}" Click="Add_TreeViewItem" />
-                                            <MenuItem Header="선택한 항목 수정" DataContext="{Binding}" Click="Edit_TreeViewItem" />
-                                            <MenuItem Header="선택한 항목 삭제" DataContext="{Binding}" Click="Del_TreeViewItem" />
-                                            <Separator/>
-                                            <MenuItem Header="위로 이동" Click="MoveToUp_TreeViewItem"/>
-                                            <MenuItem Header="아래로 이동" Click="MoveToDown_TreeViewItem"/>
-                                            <Separator/>
-                                            <MenuItem Header="폴더 열기" Click="OpenFolder"/>
-                                            <MenuItem Header="모두 열기" Click="AllExpanded" />
-                                            <MenuItem Header="모두 접기" Click="AllCollapsed"/>
-                                            <MenuItem Header="모두 해제하기" Click="AllUnchecked"/>
-                                        </ContextMenu>
-                                    </StackPanel.ContextMenu>
-                                    
-                                    <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
-                                    <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
-                                </StackPanel>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
                     </TreeView>
                     <RichTextBox Name="Hosts_RichTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" Visibility="Hidden" TextChanged="Hosts_RichTextBox_TextChanged">
                         <RichTextBox.Resources>
