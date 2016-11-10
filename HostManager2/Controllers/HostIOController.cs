@@ -40,11 +40,11 @@ namespace HostManager.Controllers
         /// </summary>
         /// <param name="Path">파일 경로</param>
         /// <returns>string</returns>
-        public string HostLoad(string Path)
+        public string HostLoad(string path)
         {
             try
             {
-                StreamReader streamReader = new StreamReader(Path, Encoding.UTF8);
+                StreamReader streamReader = new StreamReader(path, Encoding.UTF8);
                 string host = streamReader.ReadToEnd();
 
                 streamReader.Close();
@@ -112,11 +112,11 @@ namespace HostManager.Controllers
             return path;
         }
 
-        public void OpenNotepad()
+        public void OpenNotepad(string path)
         {
             try
             {
-                Process.Start("Notepad.exe", Settings.Default.HostFilePath + @"\Hosts");
+                Process.Start("Notepad.exe", path);
             }
             catch (Exception e)
             {
@@ -124,11 +124,19 @@ namespace HostManager.Controllers
             }
         }
 
-        public void OpenFolder()
+        public void OpenFolder(string path)
         {
+            string[] tmpArr = path.Split('\\');
+            string fileName = "";
+
+            if(path.EndsWith(tmpArr.Last()))
+            {
+                fileName = path.Replace(tmpArr.Last(), "");
+            }
+
             Process process = new Process();
             process.StartInfo.UseShellExecute = true;
-            process.StartInfo.FileName = Settings.Default.HostFilePath;
+            process.StartInfo.FileName = fileName;
             process.Start();
         }
     }

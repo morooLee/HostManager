@@ -267,20 +267,15 @@ namespace HostManager.Controllers
         /// <param name="path">다른 이름으로 저장 시의 경로</param>
         /// <param name="isSave">저장 여부</param>
         /// <returns>저장에 실패하였을 경우 null값 반환</returns>
-        public string ConverterToString(TreeViewItemModel treeViewItemModel, string path, bool isSave)
+        public string ConverterToString(TreeViewItemModel treeViewItemModel)
         {
             string hosts = "";
 
-            foreach (Node node in treeViewItemModel.NodeList)
+            if (treeViewItemModel != null)
             {
-                hosts += SetString(node);
-            }
-
-            if (isSave)
-            {
-                if(hostIOController.HostSave(hosts, path) == false)
+                foreach (Node node in treeViewItemModel.NodeList)
                 {
-                    return null;
+                    hosts += SetString(node);
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using HostManager.Controllers;
 using HostManager.Models;
+using HostManager.Properties;
 using HostManager.Views.EditHost;
 using HostManager.Views.Menu;
 using System;
@@ -36,6 +37,9 @@ namespace HostManager
         private HashSet<string> domainHashSet = new HashSet<string>();
         private Node SelectedNode = null;
         private bool isChangedHost = false;
+        private string originalSource = "";
+        private string hostPath = Settings.Default.HostFilePath + @"\Hosts";
+        private int applyCount = 0;
 
         public MainWindow()
         {
@@ -47,7 +51,11 @@ namespace HostManager
         // 메인윈도우 로드 이벤트
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            originalSource = hostIOController.HostLoad();
             BindTree(null);
+
+            statusBar.Items.Clear();
+            statusBar.Items.Add(hostPath);
         }
 
         // 메인윈도우 키 이벤트
@@ -66,7 +74,7 @@ namespace HostManager
         // 트리뷰 로드 이벤트
         private void Hosts_TreeView_Loaded(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         // 트리뷰 SelectedItemChanged 이벤트
@@ -498,7 +506,9 @@ namespace HostManager
                         SearchBoxClear();
                     }
 
-                    BindTree(hostIOController.HostLoad(dlg.FileName));
+                    originalSource = hostIOController.HostLoad(dlg.FileName);
+                    hostPath = dlg.FileName;
+                    BindTree(originalSource);
                     ChangeInfoLabel(InfoLabelType.Success, dlg.SafeFileName + "을 불러왔습니다.");
                 }
                 else
@@ -541,7 +551,8 @@ namespace HostManager
                     SearchBoxClear();
                 }
 
-                DoApply(dlg.FileName);
+                hostPath = dlg.FileName;
+                DoApply();
             }
             else
             {
@@ -593,71 +604,51 @@ namespace HostManager
 
         #region 기능 함수
 
-        /// <summary>
-        /// 트리뷰 바인딩
-        /// </summary>
-        /// <param name="hosts">바인딩할 string 개체 (null이면  파일에서 string 개체 생성)</param>
         private void BindTree(string hosts)
         {
-            LoadingImagePlay(true);
-
-            bool isConverted = true;
-
             if (hosts == null)
             {
-                try
-                {
-                    treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(null);
-                }
-                catch (ArgumentNullException e)
-                {
-                    isConverted = false;
-                }
+                treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(originalSource);
             }
             else
             {
-                try
-                {
-                    treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(hosts);
-                }
-                catch (ArgumentNullException e)
-                {
-                    isConverted = false;
-                }
+                treeViewItemModel = treeViewItemConverterController.ConverterToNodeList(hosts);
             }
 
-            if (isConverted == false)
+            if (treeViewItemModel != null)
             {
-                ChangeInfoLabel(InfoLabelType.Warning, "트리 변환에 실패하였습니다.");
+                Hosts_TreeView.ItemsSource = treeViewItemModel.NodeList;
 
+                // 최초 체크상태 UI 업데이트
+                foreach (Node node in treeViewItemModel.NodeList)
+                {
+                    if (node.IsChecked != false)
+                    {
+                        DomainDuplication(node);
+                    }
+                }
+
+                isChangedHost = false;
+                LoadingImagePlay(true);
+
+                this.Dispatcher.Invoke(
+                    (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
+                    DispatcherPriority.Normal);
+
+                this.Dispatcher.BeginInvoke(
+                    (ThreadStart)(() => { treeViewItemModel.AllISExpanded(false); }),
+                    DispatcherPriority.Normal);
+
+                LoadingImagePlay(false);
+            }
+            else
+            {
                 Hosts_RichTextBox.Document.Blocks.Clear();
-                Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(hostIOController.HostLoad())));
-
-                ChangeButtonUI();
+                Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(originalSource)));
+                ViewByRichTextBox(null, null);
+                ChangeInfoLabel(InfoLabelType.Warning, "트리 변환에 실패하였습니다.");
             }
-
-            Hosts_TreeView.ItemsSource = treeViewItemModel.NodeList;
-
-            // 최초 체크상태 UI 업데이트
-            foreach (Node node in treeViewItemModel.NodeList)
-            {
-                if (node.IsChecked != false)
-                {
-                    DomainDuplication(node);
-                }
-            }
-
-            isChangedHost = false;
-
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(true); }),
-                DispatcherPriority.ApplicationIdle);
-
-            this.Dispatcher.BeginInvoke(
-                (ThreadStart)(() => { treeViewItemModel.AllISExpanded(false); }),
-                DispatcherPriority.ApplicationIdle);
-
-            LoadingImagePlay(false);
+            Console.WriteLine(hostPath);
         }
 
         /// <summary>
@@ -881,7 +872,7 @@ namespace HostManager
                 }
             }
 
-            hostIOController.OpenNotepad();
+            hostIOController.OpenNotepad(hostPath);
             ChangeInfoLabel(InfoLabelType.Info, "메모장에서 수정한 것을 반영하려면 새로고침을 누르세요.");
         }
 
@@ -900,12 +891,12 @@ namespace HostManager
             {
                 if (Hosts_TreeView.Visibility == Visibility.Visible)
                 {
-                    BindTree(null);
+                    BindTree(originalSource);
                 }
                 else
                 {
                     Hosts_RichTextBox.Document.Blocks.Clear();
-                    Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel, null, false))));
+                    Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(originalSource)));
                 }
 
                 if (SearchButtonImage.Tag.ToString() == "Cancel")
@@ -930,40 +921,40 @@ namespace HostManager
             isChangedHost = false;
         }
 
-        // 저장하기
+        // 적용하기
         private void DoApply()
         {
-            if (treeViewItemConverterController.ConverterToString(treeViewItemModel, null, true) == null)
+            if (Hosts_TreeView.Visibility == Visibility.Visible)
             {
-                MessageBox.Show("호스트 적용에 실패하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "호스트 적용에 실패하였습니다.");
+                originalSource = treeViewItemConverterController.ConverterToString(treeViewItemModel);
             }
             else
             {
-                ChangeInfoLabel(InfoLabelType.Warning, "호스트가 저장되었습니다.");
+                TextRange textRange = new TextRange(Hosts_RichTextBox.Document.ContentStart, Hosts_RichTextBox.Document.ContentEnd);
+                originalSource = textRange.Text;
+            }
+
+            if (hostIOController.HostSave(originalSource, hostPath))
+            {
+                ChangeInfoLabel(InfoLabelType.Warning, "호스트가 적용되었습니다.");
+            }
+            else
+            {
+                ChangeInfoLabel(InfoLabelType.Warning, "호스트 적용에 실패하였습니다.");
             }
 
             treeViewItemModel.SetIsChangedAll(false);
             isChangedHost = false;
-        }
 
-        // 다른이름으로 저장하기
-        private void DoApply(string path)
-        {
-            if (treeViewItemConverterController.ConverterToString(treeViewItemModel, path, true) == null)
+            statusBar.Items.Clear();
+            statusBar.Items.Add(hostPath);
+            applyCount++;
+
+            if (applyCount == 3)
             {
-                MessageBox.Show("호스트 적용에 실패하였습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ChangeInfoLabel(InfoLabelType.Warning, "호스트 적용에 실패하였습니다.");
+                applyCount = 0;
             }
-            else
-            {
-                ChangeInfoLabel(InfoLabelType.Warning, "호스트가 저장되었습니다.");
-            }
-
-            treeViewItemModel.SetIsChangedAll(false);
-            isChangedHost = false;
         }
-
 
         /// <summary>
         /// 선택한 노드 경로 출력하기
@@ -1091,7 +1082,7 @@ namespace HostManager
                         MainPanel.Opacity = 1.0;
                     }
                 }),
-                DispatcherPriority.ApplicationIdle);
+                DispatcherPriority.Normal);
         }
 
         // 루트에 트리 추가
@@ -1114,7 +1105,7 @@ namespace HostManager
         // 기본 폴더 열기
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
-            hostIOController.OpenFolder();
+            hostIOController.OpenFolder(hostPath);
         }
 
         //모두 접기
@@ -1301,10 +1292,21 @@ namespace HostManager
         // 텍스트 형식으로 전환
         private void ViewByRichTextBox(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
+            if (e != null)
+            {
+                e.Handled = true;
+            }
 
             Hosts_RichTextBox.Document.Blocks.Clear();
-            Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel, null, false))));
+
+            if (treeViewItemModel == null)
+            {
+                Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(originalSource)));
+            }
+            else
+            {
+                Hosts_RichTextBox.Document.Blocks.Add(new Paragraph(new Run(treeViewItemConverterController.ConverterToString(treeViewItemModel))));
+            } 
 
             if (SearchBox.Text.Length > 0)
             {
@@ -1469,6 +1471,7 @@ namespace HostManager
             }
         }
 
+        // 프로그램 종료하기
         private void DoExit()
         {
             if (isChangedHost)
