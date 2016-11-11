@@ -37,6 +37,7 @@ namespace HostManager
         private TreeViewItemConverterController treeViewItemConverterController = new TreeViewItemConverterController();
         private HashSet<string> domainHashSet = new HashSet<string>();
         private bool isChangedHost = false;
+        private bool isHostLoadedUrl = false;
         private string originalSource = "";
         private string hostPath = Settings.Default.HostFilePath + @"\Hosts";
         private int applyCount = 0;
@@ -51,7 +52,8 @@ namespace HostManager
         // 메인윈도우 로드 이벤트
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Settings.Default.IsHostLoadedUrl)
+            isHostLoadedUrl = Settings.Default.IsHostLoadedUrl;
+            if (isHostLoadedUrl)
             {
                 originalSource = browserController.OpenFileForWeb(Settings.Default.HostFileUrl);
             }
@@ -550,6 +552,7 @@ namespace HostManager
 
             if (urlInputWindow.DialogResult == true)
             {
+                isHostLoadedUrl = true;
                 originalSource = urlInputWindow.hosts;
                 BindTree(originalSource);
                 ChangeInfoLabel(InfoLabelType.Success, "호스트가 적용되었습니다.");
@@ -930,6 +933,7 @@ namespace HostManager
         private void DoApply()
         {
             bool isSaved = false;
+            string hostPosition = "";
 
             if (Hosts_TreeView.Visibility == Visibility.Visible)
             {
@@ -941,13 +945,15 @@ namespace HostManager
                 originalSource = textRange.Text;
             }
 
-            if (Settings.Default.IsHostLoadedUrl)
+            if (isHostLoadedUrl)
             {
                 isSaved = browserController.SaveFileForWeb(originalSource);
+                hostPosition = Settings.Default.HostFileUrl;
             }
             else
             {
                 isSaved = hostIOController.HostSave(originalSource, hostPath);
+                hostPosition = hostPath;
             }
 
             if (isSaved)
@@ -958,7 +964,7 @@ namespace HostManager
                 isChangedHost = false;
 
                 statusBar.Items.Clear();
-                statusBar.Items.Add(hostPath);
+                statusBar.Items.Add(hostPosition);
                 applyCount++;
 
                 if (applyCount == 3)

@@ -89,6 +89,8 @@ namespace HostManager.Views
                 try
                 {
                     hosts = browserController.OpenFileForWeb(InputUrl_Textbox.Text);
+                    Settings.Default.HostFileUrl = InputUrl_Textbox.Text;
+                    Settings.Default.IsHostLoadedUrl = (bool) IsHostLoadedUrl_CheckBox.IsChecked;
 
                     this.DialogResult = true;
                     this.Close();
@@ -96,7 +98,6 @@ namespace HostManager.Views
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.DialogResult = false;
                 }
             }
         }

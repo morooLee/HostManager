@@ -132,13 +132,26 @@ namespace HostManager.Controllers
                 }
                 else
                 {
-                    Settings.Default.HostFileUrl = url;
-                    Settings.Default.IsHostLoadedUrl = true;
                     WebClient client = new WebClient();
-                    hosts = client.DownloadString(uri);
+                    Stream stream = client.OpenRead(url);
+
+                    byte[] b = new byte[1024];
+                    UTF8Encoding temp = new UTF8Encoding(true);
+
+                    while (stream.Read(b, 0, b.Length) > 0)
+                    {
+                        hosts += temp.GetString(b);
+                    }
+
+                    stream.Close();
+
+                    //Settings.Default.HostFileUrl = url;
+                    //Settings.Default.IsHostLoadedUrl = true;
+                    //WebClient client = new WebClient();
+                    //hosts = client.DownloadString(uri);
                 }
             }
-            catch (Exception e)
+            catch
             {
                 throw;
             }
@@ -150,13 +163,26 @@ namespace HostManager.Controllers
         {
             try
             {
-                StreamWriter streamWriter = null;
-                streamWriter = new StreamWriter(Settings.Default.HostFileUrl, false, Encoding.UTF8);
+                Uri uri = new Uri(Settings.Default.HostFileUrl);
+                WebRequest req = WebRequest.Create(uri);
+                req.Method = "HEAD";
+                WebResponse res = req.GetResponse();
 
-                streamWriter.WriteLine(hosts);
-                streamWriter.Close();
+                if (res.ContentType == "text/html")
+                {
+                    throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
+                }
+                else
+                {
+                    WebClient client = new WebClient();
+                    Stream stream = client.OpenWrite(Settings.Default.HostFileUrl);
+                    Byte[] info = Encoding.ASCII.GetBytes(hosts);/* UTF8Encoding(true).GetBytes(hosts);*/
 
-                return true;
+                    stream.Write(info, 0, info.Length);
+                    stream.Close();
+
+                    return true;
+                }
             }
             catch (Exception e)
             {
