@@ -29,5 +29,11 @@
     <Setting Name="HostFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Windows\System32\drivers\etc</Value>
     </Setting>
+    <Setting Name="HostFileUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="IsHostLoadedUrl" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

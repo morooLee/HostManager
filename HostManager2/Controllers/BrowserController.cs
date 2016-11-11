@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using HostManager.Properties;
+using System.Net;
+using System.Windows;
+using System.IO;
 
 namespace HostManager.Controllers
 {
@@ -110,6 +113,55 @@ namespace HostManager.Controllers
                     Process.Start(pathFireFox);
                     Thread.Sleep(500);
                 }
+            }
+        }
+
+        public string OpenFileForWeb(string url)
+        {
+            string hosts = "";
+            try
+            {
+                Uri uri = new Uri(url);
+                WebRequest req = WebRequest.Create(uri);
+                req.Method = "HEAD";
+                WebResponse res = req.GetResponse();
+
+                if (res.ContentType == "text/html")
+                {
+                    throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
+                }
+                else
+                {
+                    Settings.Default.HostFileUrl = url;
+                    Settings.Default.IsHostLoadedUrl = true;
+                    WebClient client = new WebClient();
+                    hosts = client.DownloadString(uri);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
+            return hosts;
+        }
+
+        public bool SaveFileForWeb(string hosts)
+        {
+            try
+            {
+                StreamWriter streamWriter = null;
+                streamWriter = new StreamWriter(Settings.Default.HostFileUrl, false, Encoding.UTF8);
+
+                streamWriter.WriteLine(hosts);
+                streamWriter.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
     }

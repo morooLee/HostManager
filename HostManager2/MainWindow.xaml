@@ -13,7 +13,8 @@
             <Menu DockPanel.Dock="Top" Height="22">
                 <MenuItem Header="파일">
                     <MenuItem Name="Menu_File_Clear" Header="새로 만들기" Click="Menu_File_Clear_Click" />
-                    <MenuItem Name="Menu_File_Open" Header="불러오기" Click="Menu_File_Open_Click" />
+                    <MenuItem Name="Menu_File_Open" Header="열기" Click="Menu_File_Open_Click" />
+                    <MenuItem Name="Menu_File_Open_Web" Header="웹에서 열기" Click="Menu_File_Open_Web_Click" />
                     <MenuItem Name="Menu_File_Save" Header="저장하기" Click="Menu_File_Save_Click" />
                     <MenuItem Name="Menu_File_AsSave" Header="다른이름으로 저장하기" Click="Menu_File_AsSave_Click" />
                     <Separator/>
@@ -116,7 +117,6 @@
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                             <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                             <EventSetter Event="KeyUp" Handler="TreeViewItem_KeyUp" />
-                            <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
                             <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown" />
                         </Style>
                         
@@ -150,7 +150,7 @@
                                 </StackPanel.ContextMenu>
 
                                 <CheckBox Margin="0, 0, 5, 0" VerticalAlignment="Center" IsChecked="{Binding Path=IsChecked}" Loaded="CheckBox_Loaded" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Indeterminate="CheckBox_Indeterminate" PreviewMouseLeftButtonUp="CheckBox_PreviewMouseLeftButtonUp" />
-                                <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" />
+                                <TextBlock Height="18" Margin="0, 0, 5, 0" VerticalAlignment="Center" Text="{Binding Path=Header}" ToolTip="{Binding Path=Tooltip}" Loaded="HeaderText_Loaded" TextInput="HeaderText_TextInput" MouseDown="TextBlock_MouseDown"  />
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </Grid.Resources>

@@ -130,5 +130,29 @@ namespace HostManager.Properties {
                 this["HostFilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HostFileUrl {
+            get {
+                return ((string)(this["HostFileUrl"]));
+            }
+            set {
+                this["HostFileUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsHostLoadedUrl {
+            get {
+                return ((bool)(this["IsHostLoadedUrl"]));
+            }
+            set {
+                this["IsHostLoadedUrl"] = value;
+            }
+        }
     }
 }

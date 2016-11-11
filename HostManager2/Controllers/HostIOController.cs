@@ -68,19 +68,19 @@ namespace HostManager.Controllers
         {
             try
             {
-                StreamWriter StreamWriter = null;
+                StreamWriter streamWriter = null;
 
                 if (path == null)
                 {
-                    StreamWriter = new StreamWriter(Settings.Default.HostFilePath + @"\Hosts", false, Encoding.UTF8);
+                    streamWriter = new StreamWriter(Settings.Default.HostFilePath + @"\Hosts", false, Encoding.UTF8);
                 }
                 else
                 {
-                    StreamWriter = new StreamWriter(path, false, Encoding.UTF8);
+                    streamWriter = new StreamWriter(path, false, Encoding.UTF8);
                 }
 
-                StreamWriter.WriteLine(hosts);
-                StreamWriter.Close();
+                streamWriter.WriteLine(hosts);
+                streamWriter.Close();
 
                 return true;
             }

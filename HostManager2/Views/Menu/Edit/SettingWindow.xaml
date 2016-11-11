@@ -118,7 +118,7 @@
                             </DockPanel>
                             
                             <StackPanel Orientation="Horizontal" >
-                                <TextBox Name="HostPath_TextBox" Width="250" IsReadOnly="True" Text="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Host_File_Path}" PreviewMouseLeftButtonUp="HostPath_TextBox_PreviewMouseLeftButtonUp"/>
+                                <TextBox Name="HostPath_TextBox" Width="250" IsReadOnly="True" Text="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=HostFilePath}" PreviewMouseLeftButtonUp="HostPath_TextBox_PreviewMouseLeftButtonUp"/>
                                 <Button Name="HostPath_Button" Content="찾아보기" Click="HostPath_Button_Click" FontSize="10"/>
                             </StackPanel>
                         </StackPanel>

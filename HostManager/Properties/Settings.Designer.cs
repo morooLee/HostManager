@@ -130,5 +130,17 @@ namespace HostManager.Properties {
                 this["Host_File_Path"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Host_File_Url {
+            get {
+                return ((string)(this["Host_File_Url"]));
+            }
+            set {
+                this["Host_File_Url"] = value;
+            }
+        }
     }
 }
