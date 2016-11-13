@@ -8,6 +8,7 @@ using HostManager.Views.Menu;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -1607,13 +1608,13 @@ namespace HostManager
         public void UpdateCheck()
         {
             string updateurl = Settings.Default.UpdateUrl;
+            FileVersionInfo myFI = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            Version clientVersion = new Version(myFI.FileVersion);
             Version serverVersion = null;
-            Version clientVersion = null;
 
             try
             {
                 serverVersion = new Version(browserController.RequestJson(updateurl, "version"));
-                clientVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
                 if (serverVersion > clientVersion)
                 {
