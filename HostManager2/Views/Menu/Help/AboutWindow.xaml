@@ -16,20 +16,19 @@
                     <StackPanel Name="NewVersion_Panel" Orientation="Horizontal" HorizontalAlignment="Center" >
                         <!--<TextBlock Text="New" VerticalAlignment="Center"/>
                         <TextBlock Name="NewVersion_Text" Margin="2, 0, 5, 0" Text="(1.2.3.4)" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
-                        <Button Name="Update_Button" Margin="0, 2, 0, 0" Width="80" Content="업데이트" Click="Update_Button_Click" />
+                        <Button Name="Update_Button" Margin="0, 2, 0, 0" Width="80" Content="업데이트" ToolTip="업데이트 파일이 있는 사이트로 이동합니다." Click="Update_Button_Click" />
                     </StackPanel>
-                    
                 </StackPanel>
             </StackPanel>
-            <Button Name="Manual_Button" Margin="0, 5, 0, 0" Width="100" Content="메뉴얼 다운로드" Click="Manual_Button_Click" />
-            <Image Width="80" Margin="0, 10, 0, 0" Source="/HostManager;component/Resources/Sign_moroo.jpg" />
-            <TextBlock Text="moroo" HorizontalAlignment="Center" FontWeight="Bold"/>
-            <TextBlock Name="Email_Text" HorizontalAlignment="Center">
+            <Button Name="Manual_Button" Margin="0, 5, 0, 0" Width="100" Content="메뉴얼 다운로드" ToolTip="매뉴얼이 있는 사이트로 이동합니다." Click="Manual_Button_Click" />
+            <Image Width="80" Margin="0, 10, 0, 0" ToolTip="MoRoo" Source="/HostManager;component/Resources/Sign_moroo.jpg" />
+            <TextBlock Text="moroo" HorizontalAlignment="Center" FontWeight="Bold" ToolTip="만든 이"/>
+            <TextBlock Name="Email_Text" HorizontalAlignment="Center" ToolTip="메일 보내기">
                 <Hyperlink NavigateUri="mailto:example@stackoverflow.com?subject=SubjectExample&amp;body=BodyExample" RequestNavigate="OnNavigate">
                     moroo.lee@gmail.com
                 </Hyperlink>
             </TextBlock>
-            <TextBlock Name="Homepage_Text" HorizontalAlignment="Center">
+            <TextBlock Name="Homepage_Text" HorizontalAlignment="Center" ToolTip="홈페이지 방문하기">
                 <Hyperlink NavigateUri="http://moroosoft.azurewebsites.net" RequestNavigate="OnNavigate">
                     http://moroosoft.azurewebsites.net
                 </Hyperlink>

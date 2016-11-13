@@ -1,7 +1,10 @@
-﻿using System;
+﻿using HostManager.Controllers;
+using HostManager.Properties;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web.Script.Serialization;
 using System.Windows;
@@ -25,35 +28,35 @@ namespace HostManager.Views.Menu
             InitializeComponent();
         }
 
+        // 윈도우 로드 이벤트
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string updateurl = "http://moroosoft.azurewebsites.net/Application/HostManager?version=Check";
-            string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            string newVersion = null;
+            string updateurl = Settings.Default.UpdateUrl;
+            FileVersionInfo myFI = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            Version clientVersion = new Version(myFI.FileVersion);
+            Version serverVersion = null;
+            
 
-            System.Net.WebClient wclient = new System.Net.WebClient();
-            wclient.BaseAddress = updateurl;
+            
 
             try
             {
-                JavaScriptSerializer jsonSer = new JavaScriptSerializer();
-                dynamic json = jsonSer.DeserializeObject(wclient.DownloadString(updateurl));
-                newVersion = json["version"];
-
-                //NewVersion_Text.Text = "(Ver. " + newVersion + ")";
-                Update_Button.Content = "Ver. " + newVersion;
+                BrowserController browserController = new BrowserController();
+                serverVersion = new Version(browserController.RequestJson(updateurl, "version"));
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message + "\r\n업데이트를 확인하지 못했습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-            }
-            
-            if (newVersion == null)
+            if (serverVersion == null)
             {
-                Help_Update_Panel.Visibility = Visibility.Hidden;
-                Help_Update_Panel.Height = 0;
+                UpdateCheck_Text.Text = "업데이트를 확인하지 못했습니다.";
+                Update_Button.IsEnabled = false;
+                //Help_Update_Panel.Visibility = Visibility.Hidden;
+                //Help_Update_Panel.Height = 0;
             }
-            else if (newVersion == version)
+            else if (serverVersion <= clientVersion)
             {
                 UpdateCheck_Text.Text = "최신버전입니다.";
                 UpdateCheck_Text.Foreground = Brushes.Black;
@@ -63,20 +66,23 @@ namespace HostManager.Views.Menu
                 NewVersion_Panel.Height = 0;
             }
 
-            Version.Text = "(Ver. " + version + ")";
+            Version.Text = "(Ver. " + clientVersion + ")";
         }
 
+        // 업데이트 버튼 클릭 이벤트
         private void Update_Button_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");
         }
 
+        // 하이퍼링크 처리
         private void OnNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             Process.Start(e.Uri.AbsoluteUri);
             e.Handled = true;
         }
 
+        // 매뉴얼 버튼 클릭 이벤트
         private void Manual_Button_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");

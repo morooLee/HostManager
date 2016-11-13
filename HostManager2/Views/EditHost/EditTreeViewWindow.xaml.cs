@@ -42,6 +42,7 @@ namespace HostManager.Views.EditHost
             }
         }
 
+        // 도움말 버튼 클릭 이벤트
         private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
             EditTreeViewHelpWindow editTreeViewHelpWindow = new EditTreeViewHelpWindow();
@@ -51,6 +52,7 @@ namespace HostManager.Views.EditHost
             editTreeViewHelpWindow.Focus();
         }
 
+        // 윈도우 로드 이벤트
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (tmpNode != null)
@@ -83,11 +85,13 @@ namespace HostManager.Views.EditHost
             }
         }
 
+        // RichTextBox 삭제하기 버튼 클릭 이벤트
         private void RichTextBoxClearButton_Click(object sender, RoutedEventArgs e)
         {
             DirectEditTextBox.Text = "";
         }
 
+        // RichTextBox 추가하기 버튼 클릭 이벤트
         private void RichTextBoxAddButton_Click(object sender, RoutedEventArgs e)
         {
             string addString = "";
@@ -98,6 +102,7 @@ namespace HostManager.Views.EditHost
             DirectEditTextBox.AppendText(addString);
         }
 
+        // 적용버튼 클릭 이벤트
         private void EditNodeApplyButton_Click(object sender, RoutedEventArgs e)
         {
             if (TextTabItem.IsSelected)
@@ -194,12 +199,14 @@ namespace HostManager.Views.EditHost
             Close();
         }
 
+        // 취소버튼 클릭 이벤트
         private void EditNodeCancelButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
     }
 
+    // 설정창에 닫기버튼만 설정하기
     internal static class WindowExtensions
     {
         // from winuser.h

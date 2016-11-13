@@ -7,25 +7,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using HostManager.Properties;
 using System.Net;
+using System.Net.Sockets;
 using System.Windows;
 using System.IO;
+using System.Xml;
+using System.Reflection;
+using System.Web.Script.Serialization;
 
 namespace HostManager.Controllers
 {
     public class BrowserController
     {
+        /// <summary>
+        /// 브라우저 설정 저장하기
+        /// </summary>
         public void CheckDoBrowsers()
         {
             if (Settings.Default.AutoRestart_IE || Settings.Default.AutoRestart_Edge || Settings.Default.AutoRestart_Chrome || Settings.Default.AutoRestart_Firefox)
             {
                 bool isIE = false;
-                String pathIE = "";
+                string pathIE = "";
                 bool isEdge = false;
-                String pathEdge = "";
+                string pathEdge = "";
                 bool isChrome = false;
-                String pathChrome = "";
+                string pathChrome = "";
                 bool isFireFox = false;
-                String pathFireFox = "";
+                string pathFireFox = "";
 
                 Process[] processList = Process.GetProcesses();
                 List<Process> tmpList = new List<Process>();
@@ -116,79 +123,148 @@ namespace HostManager.Controllers
             }
         }
 
+        /// <summary>
+        /// 웹에서 호스트 파일 정보 가져오기
+        /// </summary>
+        /// <param name="url">URL 정보</param>
+        /// <returns>호스트 정보</returns>
         public string OpenFileForWeb(string url)
         {
             string hosts = "";
-            try
+
+            if (url != "")
             {
-                Uri uri = new Uri(url);
-                WebRequest req = WebRequest.Create(uri);
-                req.Method = "HEAD";
-                WebResponse res = req.GetResponse();
-
-                if (res.ContentType == "text/html")
+                try
                 {
-                    throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
-                }
-                else
-                {
-                    WebClient client = new WebClient();
-                    Stream stream = client.OpenRead(url);
+                    Uri uri = new Uri(url);
+                    string contentType = "";
+                    WebRequest req = WebRequest.Create(uri);
+                    //req.Method = "HEAD";
+                    WebResponse res = req.GetResponse();
+                    contentType = res.ContentType;
+                    res.Close();
 
-                    byte[] b = new byte[1024];
-                    UTF8Encoding temp = new UTF8Encoding(true);
-
-                    while (stream.Read(b, 0, b.Length) > 0)
+                    if (contentType == "text/html")
                     {
-                        hosts += temp.GetString(b);
+                        throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
                     }
+                    else
+                    {
+                        WebClient webClient = new WebClient();
+                        Stream stream = webClient.OpenRead(url);
+                        StreamReader streamReader = new StreamReader(stream);
 
-                    stream.Close();
+                        hosts = streamReader.ReadToEnd();
+                        stream.Close();
+                        stream.Dispose();
+                        webClient.Dispose();
 
-                    //Settings.Default.HostFileUrl = url;
-                    //Settings.Default.IsHostLoadedUrl = true;
-                    //WebClient client = new WebClient();
-                    //hosts = client.DownloadString(uri);
+                        //Settings.Default.HostFileUrl = url;
+                        //Settings.Default.IsHostLoadedUrl = true;
+                        //WebClient client = new WebClient();
+                        //hosts = client.DownloadString(uri);
+                    }
                 }
-            }
-            catch
-            {
-                throw;
+                catch
+                {
+                    throw;
+                }
             }
 
             return hosts;
         }
 
+        // 웹에 호스트 파일 저장하기 - 미 구현 (구현 불가)
         public bool SaveFileForWeb(string hosts)
         {
             try
             {
-                Uri uri = new Uri(Settings.Default.HostFileUrl);
-                WebRequest req = WebRequest.Create(uri);
-                req.Method = "HEAD";
-                WebResponse res = req.GetResponse();
+                //Uri uri = new Uri(Settings.Default.HostFileUrl);
+                //string contentType = "";
+                //WebRequest req = WebRequest.Create(uri);
+                //req.Method = "HEAD";
+                //WebResponse res = req.GetResponse();
+                //contentType = res.ContentType;
+                //res.Close();
 
-                if (res.ContentType == "text/html")
-                {
-                    throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
-                }
-                else
-                {
-                    WebClient client = new WebClient();
-                    Stream stream = client.OpenWrite(Settings.Default.HostFileUrl);
-                    Byte[] info = Encoding.ASCII.GetBytes(hosts);/* UTF8Encoding(true).GetBytes(hosts);*/
+                //if (contentType == "text/html")
+                //{
+                //    throw new FileNotFoundException("파일을 찾을 수 없습니다.\r\n Url이 정확한지 다시 확인해 주세요.", "original");
+                //}
+                //else
+                //{
+                //    byte[] data = Encoding.UTF8.GetBytes(hosts);
+                //    WebClient webClient = new WebClient();
 
-                    stream.Write(info, 0, info.Length);
-                    stream.Close();
 
-                    return true;
-                }
+
+                //    Stream stream = webClient.OpenWrite(Settings.Default.HostFileUrl);
+
+                //    if (data.Length > 0)
+                //    {
+                //        stream.Write(data, 0, data.Length);
+                //        stream.Close();
+                //    }
+
+                //    //StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
+
+                //    //streamWriter.WriteLine(hostArr);
+                //    //stream.Close();
+                //    //stream.Dispose();
+                //    //webClient.Dispose();
+
+                return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
+        }
+
+        public string RequestJson(string url, string obj)
+        {
+            string result = "";
+            try
+            {
+                WebClient webClient = new WebClient();
+                webClient.BaseAddress = url;
+
+                try
+                {
+                    JavaScriptSerializer jsonSer = new JavaScriptSerializer();
+                    dynamic json = jsonSer.DeserializeObject(webClient.DownloadString(url));
+
+                    result = json[obj];
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
+            return result;
+        }
+
+        public string UpdateCheck()
+        {
+            string updateurl = "http://moroosoft.azurewebsites.net/Application/HostManager?version=Check";
+            string version = "";
+
+            try
+            {
+                version = RequestJson(updateurl, "version");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return version;
         }
     }
 }

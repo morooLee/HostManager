@@ -32,8 +32,8 @@
                                 </Button.Content>
                             </Button>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                <Button Name="RichTextBoxClearButton" Margin="0, 0, 10, 0" Click="RichTextBoxClearButton_Click">모두 지우기</Button>
-                                <Button Name="RichTextBoxAddButton" Margin="0, 0, 2, 0" Click="RichTextBoxAddButton_Click">항목 추가하기</Button>
+                                <Button Name="RichTextBoxClearButton" Margin="0, 0, 10, 0" ToolTip="작성된 내용을 모두 지웁니다." Click="RichTextBoxClearButton_Click">모두 지우기</Button>
+                                <Button Name="RichTextBoxAddButton" Margin="0, 0, 2, 0" ToolTip="항목 형식을 추가합니다." Click="RichTextBoxAddButton_Click">항목 추가하기</Button>
                             </StackPanel>
                         </DockPanel>
                         <TextBox Name="DirectEditTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsTab="True" AcceptsReturn="True" TextWrapping="NoWrap"></TextBox>
@@ -69,7 +69,7 @@
 
                         <GroupBox Grid.Row="0" Margin="5">
                             <GroupBox.Header>
-                                <RadioButton x:Name="CategoryRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="카테고리"/>
+                                <RadioButton x:Name="CategoryRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="카테고리" ToolTip="항목을 추가합니다."/>
                             </GroupBox.Header>
                             <StackPanel Style="{StaticResource CategoryIsEnabledStyle}" VerticalAlignment="Center">
                                 <Grid Margin="5">
@@ -79,7 +79,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" Width="50" Text="항목명"/>
-                                    <TextBox Grid.Column="1" Name="CategoryNameTextBox"></TextBox>
+                                    <TextBox Grid.Column="1" Name="CategoryNameTextBox" ToolTip="항목명을 입력하세요."></TextBox>
                                 </Grid>
                                 <Grid Margin="5">
                                     <Grid.ColumnDefinitions>
@@ -88,13 +88,13 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" Width="50" Text="도움말"></TextBlock>
-                                    <TextBox Grid.Column="1" Name="CategoryTooltipTextBox"></TextBox>
+                                    <TextBox Grid.Column="1" Name="CategoryTooltipTextBox" ToolTip="도움말을 입력하세요."></TextBox>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Margin="5">
                             <GroupBox.Header>
-                                <RadioButton x:Name="HostRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="호스트"/>
+                                <RadioButton x:Name="HostRadioButton" GroupName="EditTreeView" BorderBrush="Black" FontWeight="Bold" Content="호스트" ToolTip="호스트를 추가합니다."/>
                             </GroupBox.Header>
                             <StackPanel Style="{StaticResource HostIsEnabledStyle}" VerticalAlignment="Center">
                                 <Grid Margin="5">
@@ -104,7 +104,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" Width="50" Text="IP"></TextBlock>
-                                    <TextBox Grid.Column="1" Name="HostIPTextBox"></TextBox>
+                                    <TextBox Grid.Column="1" Name="HostIPTextBox" ToolTip="IP 주소를 입력하세요."></TextBox>
                                 </Grid>
                                 <Grid Margin="5">
                                     <Grid.ColumnDefinitions>
@@ -113,7 +113,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" Width="50" Text="도메인"></TextBlock>
-                                    <TextBox Grid.Column="1" Name="HostDomainTextBox"></TextBox>
+                                    <TextBox Grid.Column="1" Name="HostDomainTextBox" ToolTip="도메인을 입력하세요."></TextBox>
                                 </Grid>
                                 <Grid Margin="5">
                                     <Grid.ColumnDefinitions>
@@ -122,7 +122,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" Width="50" Text="도움말"></TextBlock>
-                                    <TextBox Grid.Column="1" Name="HostTooltipTextBox"></TextBox>
+                                    <TextBox Grid.Column="1" Name="HostTooltipTextBox" ToolTip="도움말을 입력하세요."></TextBox>
                                 </Grid>
                             </StackPanel>
                         </GroupBox>

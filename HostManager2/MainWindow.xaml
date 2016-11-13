@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controllers="clr-namespace:HostManager.Controllers"
         xmlns:src="clr-namespace:HostManager.Models"
+        xmlns:appSettings="clr-namespace:HostManager.Properties"
         mc:Ignorable="d"
-        Title="Moroo | Host Manager" Height="530" MinHeight="152" MinWidth="400" Width="400" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Loaded="Window_Loaded" KeyDown="Window_KeyDown" >
+        Title="Moroo | Host Manager" Height="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Height}" MinHeight="152" MinWidth="400" Width="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Width}" Icon="Resources/Sign_Icon.ico" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" Loaded="Window_Loaded" KeyDown="Window_KeyDown" >
     <Grid>
         <Controllers:AnimatedGIFControl x:Name="GIFCtrl" Visibility="Hidden" />
         <DockPanel Name="MainPanel">
@@ -40,66 +41,61 @@
                 </MenuItem>
             </Menu>
             <DockPanel>
-                <DockPanel DockPanel.Dock="Top" Margin="2, 0, 2, 0" MaxWidth="500">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                    </Grid>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <Border BorderThickness="1" BorderBrush="#FFABADB3">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
-                                <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Search">
-                                                    <Setter Property="ToolTip" Value="검색"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Cancel">
-                                                    <Setter Property="ToolTip" Value="취소"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
-                                </Button>
-                            </StackPanel>
-                        </Border>
+                <DockPanel DockPanel.Dock="Top" Margin="2, 0, 2, 0">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <Border BorderThickness="1" BorderBrush="#FFABADB3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Name="SearchBox" MinWidth="200" BorderThickness="0" ToolTip="검색할 단어를 입력하세요." TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
+                                    <Button Name="SearchButton" Width="18" Background="White" BorderBrush="White" Margin="0" Focusable="False" IsTabStop="False" Click="SearchButton_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Search">
+                                                        <Setter Property="ToolTip" Value="검색"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Tag, ElementName=SearchButtonImage}" Value="Cancel">
+                                                        <Setter Property="ToolTip" Value="취소"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Image Name="SearchButtonImage" Tag="Search" Source="Resources/Search.png"/>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <Style x:Key="ButtonStyle" TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter Property="Opacity" Value="0.3" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Background" Value="White" />
+                                    <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+                                    <!--<Setter Property="BorderBrush" Value="White" />-->
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="ViewByTreeView">
+                                <Image Source="Resources/TreeView.png"/>
+                            </Button>
+                            <Border BorderBrush="White" BorderThickness="1" />
+                            <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="ViewByRichTextBox">
+                                <Image Source="Resources/TextEdit.png"/>
+                            </Button>
+                            <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
+                            <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="OpenNotepad">
+                                <Image Source="Resources/NotePad.png"/>
+                            </Button>
+                            <Border BorderBrush="White" BorderThickness="1" />
+                            <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침" Click="Refresh_Button_Click">
+                                <Image Source="Resources/Refresh.png"/>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="5,0,0,0" Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <Style x:Key="ButtonStyle" TargetType="Button">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="false">
-                                        <Setter Property="Opacity" Value="0.3" />
-                                    </Trigger>
-                                </Style.Triggers>
-                                <Setter Property="Background" Value="White" />
-                                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-                                <!--<Setter Property="BorderBrush" Value="White" />-->
-                            </Style>
-                        </StackPanel.Resources>
-                        <Button Name="TreeView_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="카테고리로 보기" IsEnabled="False" Click="ViewByTreeView">
-                            <Image Source="Resources/TreeView.png"/>
-                        </Button>
-                        <Border BorderBrush="White" BorderThickness="1" />
-                        <Button Name="RichTextBox_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="텍스트로 보기" Click="ViewByRichTextBox">
-                            <Image Source="Resources/TextEdit.png"/>
-                        </Button>
-                        <Border Margin="5,2,5,2" BorderBrush="#B5B5B5" BorderThickness="1" />
-                        <Button Name="NodePad_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="메모장에서 보기" Click="OpenNotepad">
-                            <Image Source="Resources/NotePad.png"/>
-                        </Button>
-                        <Border BorderBrush="White" BorderThickness="1" />
-                        <Button Name="Refresh_Button" Width="22" Style="{Binding Mode=OneWay, Source={StaticResource ButtonStyle}}" ToolTip="새로고침" Click="Refresh_Button_Click">
-                            <Image Source="Resources/Refresh.png"/>
-                        </Button>
-                    </StackPanel>
-                    <Button Name="Apply_Button" Grid.Column="2" Width="35"  HorizontalAlignment="Right" IsEnabled="true" Click="Apply_Button_Click">적용</Button>
+                    <Button DockPanel.Dock="Right" Name="Apply_Button" Width="35"  HorizontalAlignment="Right" IsEnabled="true" ToolTip="설정한 정보를 적용합니다." Click="Apply_Button_Click" >적용</Button>
                 </DockPanel>
                 <Label Name="InfoLabel" DockPanel.Dock="Top" Height="25"></Label>
                 <StatusBar Name="statusBar" DockPanel.Dock="Bottom" Height="22" VerticalAlignment="Bottom"/>

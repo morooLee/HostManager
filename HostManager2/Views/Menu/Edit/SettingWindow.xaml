@@ -6,45 +6,46 @@
         xmlns:local="clr-namespace:HostManager.Views.Menu"
         xmlns:appSettings="clr-namespace:HostManager.Properties"
         mc:Ignorable="d"
-        Title="속성" Height="400" Width="350" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded" >
+        Title="속성" Height="400" Width="380" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <GroupBox Margin="5">
-                <GroupBox.Header>
-                    <TextBlock FontWeight="Bold" Text="브라우저 설정"/>
-                </GroupBox.Header>
-                <StackPanel>
-                    <GroupBox Margin="5">
-                        <GroupBox.Header>
-                            <TextBlock FontWeight="Bold" Text="브라우저 자동 재시작"/>
-                        </GroupBox.Header>
-                        <StackPanel>
-                            <TextBlock Margin="0,5,0,10" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저가 실행 중이라면 자동으로 종료 후 재시작됩니다." FontSize="10"/>
-                            <StackPanel Orientation="Horizontal" >
-                                <CheckBox Name="RestartIE" Content="IE 계열" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IE_Auto_Restart}"/>
-                                <Border Width="10"/>
-                                <CheckBox Name="RestartEdge" Content="Edge" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Edge_Auto_Restart}"/>
-                                <Border Width="10"/>
-                                <CheckBox Name="RestartChrome" Content="Chrome" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Chrome_Auto_Restart}"/>
-                                <Border Width="10"/>
-                                <CheckBox Name="RestartFirefox" Content="Firefox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=FF_Auto_Restart}"/>
+        <ScrollViewer>
+            <StackPanel Grid.Row="0">
+                <GroupBox Margin="5">
+                    <GroupBox.Header>
+                        <TextBlock FontWeight="Bold" Text="브라우저 설정"/>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>
+                                <TextBlock FontWeight="Bold" Text="브라우저 자동 재시작"/>
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <TextBlock Margin="0,5,0,10" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저가 실행 중이라면 자동으로 종료 후 재시작됩니다." FontSize="10"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox Name="RestartIE" Content="IE 계열" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IE_Auto_Restart}"/>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="RestartEdge" Content="Edge" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Edge_Auto_Restart}"/>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="RestartChrome" Content="Chrome" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Chrome_Auto_Restart}"/>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="RestartFirefox" Content="Firefox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=FF_Auto_Restart}"/>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </GroupBox>
-                    <GroupBox Margin="5">
-                        <GroupBox.Header>
-                            <TextBlock FontWeight="Bold" Text="캐시 및 쿠키 삭제하기"/>
-                        </GroupBox.Header>
-                        <StackPanel>
-                            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저의 캐시와 쿠기를 제거합니다." FontSize="10"/>
-                            <TextBlock Margin="0,0,0,10" TextWrapping="Wrap" Text="( Edge / Chrome / Firefox는 미 구현 )" Foreground="Red" FontSize="10"/>
-                            <StackPanel Orientation="Horizontal" >
-                                <CheckBox Name="AutoDelIE" Content="IE 계열" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IE_TmpFile_Del}">
-                                    <!--<CheckBox.Style>
+                        </GroupBox>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>
+                                <TextBlock FontWeight="Bold" Text="캐시 및 쿠키 삭제하기"/>
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" Text="호스트 적용 시 체크된 브라우저의 캐시와 쿠기를 제거합니다." FontSize="10"/>
+                                <TextBlock Margin="0,0,0,10" TextWrapping="Wrap" Text="( Edge / Chrome / Firefox는 미 구현 )" Foreground="Red" FontSize="10"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <CheckBox Name="AutoDelIE" Content="IE 계열" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IE_TmpFile_Del}">
+                                        <!--<CheckBox.Style>
                                         <Style TargetType="CheckBox">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsChecked, ElementName=RestartIE}" Value="false">
@@ -54,78 +55,118 @@
                                             </Style.Triggers>
                                         </Style>
                                     </CheckBox.Style>-->
-                                </CheckBox>
-                                <Border Width="10"/>
-                                <CheckBox Name="AutoDelEdge" Content="Edge" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Edge_TmpFile_Del}" Visibility="Hidden">
-                                    <CheckBox.Style>
-                                        <Style TargetType="CheckBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked, ElementName=RestartEdge}" Value="false">
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                    <Setter Property="Foreground" Value="Gray"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </CheckBox.Style>
-                                </CheckBox>
-                                <Border Width="10"/>
-                                <CheckBox Name="AutoDelChrome" Content="Chrome" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Chrome_TmpFile_Del}" Visibility="Hidden">
-                                    <CheckBox.Style>
-                                        <Style TargetType="CheckBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked, ElementName=RestartChrome}" Value="false">
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                    <Setter Property="Foreground" Value="Gray"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </CheckBox.Style>
-                                </CheckBox>
-                                <Border Width="10"/>
-                                <CheckBox Name="AutoDelFirefox" Content="Firefox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=FF_TmpFile_Del}" Visibility="Hidden">
-                                    <CheckBox.Style>
-                                        <Style TargetType="CheckBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked, ElementName=RestartFirefox}" Value="false">
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                    <Setter Property="Foreground" Value="Gray"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </CheckBox.Style>
-                                </CheckBox>
+                                    </CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="AutoDelEdge" Content="Edge" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Edge_TmpFile_Del}" Visibility="Hidden">
+                                        <CheckBox.Style>
+                                            <Style TargetType="CheckBox">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked, ElementName=RestartEdge}" Value="false">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Foreground" Value="Gray"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </CheckBox.Style>
+                                    </CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="AutoDelChrome" Content="Chrome" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=Chrome_TmpFile_Del}" Visibility="Hidden">
+                                        <CheckBox.Style>
+                                            <Style TargetType="CheckBox">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked, ElementName=RestartChrome}" Value="false">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Foreground" Value="Gray"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </CheckBox.Style>
+                                    </CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox Name="AutoDelFirefox" Content="Firefox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=FF_TmpFile_Del}" Visibility="Hidden">
+                                        <CheckBox.Style>
+                                            <Style TargetType="CheckBox">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked, ElementName=RestartFirefox}" Value="false">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Foreground" Value="Gray"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </CheckBox.Style>
+                                    </CheckBox>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </GroupBox>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Margin="5">
-                <GroupBox.Header>
-                    <TextBlock FontWeight="Bold" Text="Host 설정"/>
-                </GroupBox.Header>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
                 <GroupBox Margin="5">
                     <GroupBox.Header>
-                        <TextBlock FontWeight="Bold" Text="경로 수동 설정"/>
+                        <TextBlock FontWeight="Bold" Text="Host 설정"/>
                     </GroupBox.Header>
                     <StackPanel>
-                        <StackPanel>
-                            <DockPanel>
-                                <StackPanel DockPanel.Dock="Left" Margin="0,5,0,5">
-                                    <TextBlock TextWrapping="Wrap" Text="Host 파일의 경로를 수동으로 설정합니다." FontSize="10"/>
-                                    <TextBlock TextWrapping="Wrap" Text="※ 호스트 적용이 되지 않을 경우에만 변경하세요." FontSize="10" Foreground="red"/>
-                                </StackPanel>
-                                <TextBlock DockPanel.Dock="Right" Name="PathInit" Cursor="Hand" TextWrapping="Wrap" Text="경로 초기화" FontSize="10" FontWeight="Bold" FontStyle="Oblique" TextDecorations="Underline" ToolTip="Host 경로를 초기화합니다." MouseLeftButtonUp="PathInit_MouseLeftButtonUp" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </DockPanel>
-                            
-                            <StackPanel Orientation="Horizontal" >
-                                <TextBox Name="HostPath_TextBox" Width="250" IsReadOnly="True" Text="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=HostFilePath}" PreviewMouseLeftButtonUp="HostPath_TextBox_PreviewMouseLeftButtonUp"/>
-                                <Button Name="HostPath_Button" Content="찾아보기" Click="HostPath_Button_Click" FontSize="10"/>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>
+                                <TextBlock FontWeight="Bold" Text="경로 수동 설정"/>
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Left" Margin="0,5,0,5">
+                                        <TextBlock TextWrapping="Wrap" Text="Host 파일의 경로를 수동으로 설정합니다." FontSize="10"/>
+                                        <TextBlock TextWrapping="Wrap" Text="※ 호스트 적용이 되지 않을 경우에만 변경하세요." FontSize="10" Foreground="red"/>
+                                    </StackPanel>
+                                    <TextBlock DockPanel.Dock="Right" Name="PathInit" Cursor="Hand" TextWrapping="Wrap" Text="경로 초기화" FontSize="10" FontWeight="Bold" FontStyle="Oblique" TextDecorations="Underline" ToolTip="Host 경로를 초기화합니다." MouseLeftButtonUp="PathInit_MouseLeftButtonUp" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </DockPanel>
+                                <DockPanel>
+                                    <TextBox DockPanel.Dock="Left" Name="HostPath_TextBox" Width="260"  IsReadOnly="True" Text="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=HostFilePath}" PreviewMouseLeftButtonUp="HostPath_TextBox_PreviewMouseLeftButtonUp"/>
+                                    <Button DockPanel.Dock="Right" Name="HostPath_Button" Width="50" Content="찾아보기" Click="HostPath_Button_Click" FontSize="10" HorizontalAlignment="Right"/>
+                                </DockPanel>
                             </StackPanel>
+                        </GroupBox>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>
+                                <TextBlock FontWeight="Bold" Text="Url 설정"/>
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left" Margin="0,5,0,5" TextWrapping="Wrap" Text="호스트 파일이 있는 Url을 입력해 주세요." FontSize="10" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right" Name="UrlCheck_Button" Margin="0,5,0,5" Content="Url 확인" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" ToolTip="입력한 Url 형식을 검사합니다." Click="UrlCheck_Button_Click" />
+                                </DockPanel>
+                                <TextBox Name="InputUrl_Textbox" />
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Name="IsHostLoadedUrl_CheckBox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IsHostLoadedUrl}" VerticalAlignment="Center" Margin="5" />
+                                    <TextBlock Name="IsHostLoadedUrl_TextBlock" Text="실행 시마다 해당 Url로 파일 정보 가져오기" VerticalAlignment="Center" FontSize="10" MouseUp="IsHostLoadedUrl_TextBlock_MouseUp" />
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>
+                                <TextBlock FontWeight="Bold" Text="Host 알림 설정"/>
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <TextBlock DockPanel.Dock="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="호스트 적용 시 알림창을 띄워 줍니다." VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Name="IsApplyAlert_CheckBox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IsApplyAlert}" VerticalAlignment="Center" Margin="5" />
+                                    <TextBlock Name="IsApplyAlert_TextBlock" Text="호스트 적용 시마다 알림창 띄우기" VerticalAlignment="Center" FontSize="10" MouseUp="IsApplyAlert_TextBlock_MouseUp" />
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Margin="5">
+                    <GroupBox.Header>
+                        <TextBlock FontWeight="Bold" Text="Update 설정"/>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <TextBlock DockPanel.Dock="Left" Margin="0,5,0,0" TextWrapping="Wrap" Text="프로그램을 시작할 때 최신버전이 있는지 확인합니다." VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Name="IsUpdateCheck_CheckBox" IsChecked="{Binding Source={x:Static appSettings:Settings.Default}, Mode=OneWay, Path=IsUpdateCheck}" VerticalAlignment="Center" Margin="5" />
+                            <TextBlock Name="IsUpdateCheck_TextBlock" Text="시작 시 업데이트 확인하기" VerticalAlignment="Center" FontSize="10" MouseUp="IsUpdateCheck_TextBlock_MouseUp"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-            </GroupBox>
-        </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" >
             <Button Name="ApplyButton" Margin="0,0,20,0" Content="저장" Click="ApplyButton_Click" />
             <Button Name="ClosedButton" Content="취소" Click="ClosedButton_Click" />

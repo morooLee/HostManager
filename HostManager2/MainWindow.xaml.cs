@@ -3,11 +3,13 @@ using HostManager.Models;
 using HostManager.Properties;
 using HostManager.Views;
 using HostManager.Views.EditHost;
+using HostManager.Views.Etc;
 using HostManager.Views.Menu;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -41,11 +43,95 @@ namespace HostManager
         private string originalSource = "";
         private string hostPath = Settings.Default.HostFilePath + @"\Hosts";
         private int applyCount = 0;
+        private DateTime applytime = new DateTime();
+        public bool doNotAgainRespect = false;
 
         public MainWindow()
         {
+            if (Settings.Default.IsUpdateCheck)
+            {
+                UpdateCheck();
+            }
+
             InitializeComponent();
+
+            // 프로그램 종료 시 Exit 이벤트 발생
+            App.Current.Exit += new ExitEventHandler(SaveWindowSize);
+
+            // 트레이 생성
+            CreateTray();
         }
+
+        #region 트레이 함수
+
+        // 트레이 만들기
+        private void CreateTray()
+        {
+            // 트레이 생성 - 콘텍스트 생성
+            System.Windows.Forms.ContextMenu trayContextMenu = new System.Windows.Forms.ContextMenu();
+            // 트레이 생성 - 프로그램 열기 메뉴 생성
+            System.Windows.Forms.MenuItem trayMenuItemOpen = new System.Windows.Forms.MenuItem();
+            // 트레이 생성 - 프로그램 닫기 메뉴 생성
+            System.Windows.Forms.MenuItem trayMenuItemClose = new System.Windows.Forms.MenuItem();
+
+            // 트레이 기능 - 프로그램 열기
+            trayMenuItemOpen.Index = 0;
+            trayMenuItemOpen.Text = "프로그램 열기";
+            trayMenuItemOpen.Click += delegate (object click, EventArgs e)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
+
+            // 트레이 기능 - 프로그램 닫기
+            trayMenuItemClose.Index = 1;
+            trayMenuItemClose.Text = "프로그램 닫기";
+            trayMenuItemClose.Click += delegate (object click, EventArgs e)
+            {
+                DoExit();
+            };
+
+            // 트레이 추가
+            trayContextMenu.MenuItems.Add(trayMenuItemOpen);
+            trayContextMenu.MenuItems.Add(trayMenuItemClose);
+
+            // 트레이 아이콘
+            notifyIcon.Icon = Properties.Resources.Sign_Icon;
+            notifyIcon.Text = "Moroo | Host Manager";
+            notifyIcon.Visible = true;
+            notifyIcon.ContextMenu = trayContextMenu;
+            notifyIcon.DoubleClick += delegate (object senders, EventArgs e)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
+        }
+
+        // 트레이로 보내기
+        public void BringToForeground()
+        {
+            if (this.WindowState == WindowState.Minimized || this.Visibility == Visibility.Hidden)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            }
+
+            // According to some sources these steps gurantee that an app will be brought to foreground.
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            this.Focus();
+        }
+
+        // 닫기버튼 오버라이딩 - 닫기 버튼 클릭 시 프로그램 종료 시키지 않기
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
+            base.OnClosing(e);
+        }
+
+        #endregion
 
         #region 이벤트 함수
 
@@ -61,7 +147,7 @@ namespace HostManager
             {
                 originalSource = hostIOController.HostLoad();
             }
-            
+
             BindTree(originalSource);
 
             statusBar.Items.Clear();
@@ -553,12 +639,20 @@ namespace HostManager
             if (urlInputWindow.DialogResult == true)
             {
                 isHostLoadedUrl = true;
-                originalSource = urlInputWindow.hosts;
-                BindTree(originalSource);
-                ChangeInfoLabel(InfoLabelType.Success, "호스트가 적용되었습니다.");
+                if (urlInputWindow.hosts != "")
+                {
+                    originalSource = urlInputWindow.hosts;
+                    BindTree(originalSource);
+                    ChangeInfoLabel(InfoLabelType.Success, "호스트가 적용되었습니다.");
 
-                statusBar.Items.Clear();
-                statusBar.Items.Add(Settings.Default.HostFileUrl);
+                    statusBar.Items.Clear();
+                    statusBar.Items.Add(Settings.Default.HostFileUrl);
+                }
+                else
+                {
+                    MessageBox.Show("Url이 설정되지 않았거나 호스트 내용이 없습니다.\r\n편집 > 속성창에서 확인하세요.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ChangeInfoLabel(InfoLabelType.Warning, "Url이 설정되지 않았거나 호스트 내용이 없습니다.");
+                }
             }
             else
             {
@@ -947,17 +1041,21 @@ namespace HostManager
 
             if (isHostLoadedUrl)
             {
-                isSaved = browserController.SaveFileForWeb(originalSource);
-                hostPosition = Settings.Default.HostFileUrl;
+                MessageBox.Show("로컬 파일에 적용하였습니다.\r\n웹에 있는 원본 파일에는 저장이 되지 않습니다.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                //isSaved = browserController.SaveFileForWeb(originalSource);
+                //hostPosition = Settings.Default.HostFileUrl;
+                isHostLoadedUrl = false;
             }
-            else
-            {
-                isSaved = hostIOController.HostSave(originalSource, hostPath);
-                hostPosition = hostPath;
-            }
+
+            isSaved = hostIOController.HostSave(originalSource, hostPath);
+            hostPosition = hostPath;
 
             if (isSaved)
             {
+                if (Settings.Default.IsApplyAlert)
+                {
+                    MessageBox.Show("호스트가 적용되었습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
                 ChangeInfoLabel(InfoLabelType.Warning, "호스트가 적용되었습니다.");
 
                 treeViewItemModel.SetIsChangedAll(false);
@@ -965,11 +1063,42 @@ namespace HostManager
 
                 statusBar.Items.Clear();
                 statusBar.Items.Add(hostPosition);
-                applyCount++;
 
-                if (applyCount == 3)
+                if (doNotAgainRespect == false)
                 {
-                    applyCount = 0;
+                    if (applyCount == 0)
+                    {
+                        applytime = DateTime.Now;
+                        applyCount++;
+                    }
+                    else
+                    {
+                        DateTime nowTime = DateTime.Now;
+                        TimeSpan applyInterval = nowTime - applytime;
+
+                        if (applyInterval < TimeSpan.FromMilliseconds(1000))
+                        {
+                            applytime = nowTime;
+                            applyCount++;
+                        }
+                        else
+                        {
+                            applytime = nowTime;
+                            applyCount = 0;
+                        }
+                    }
+
+                    if (applyCount == 3)
+                    {
+                        NoMoreClickWindow noMoreClickWindow = new NoMoreClickWindow();
+                        noMoreClickWindow.Owner = Application.Current.MainWindow;
+                        noMoreClickWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+                        noMoreClickWindow.ShowDialog();
+
+                        doNotAgainRespect = noMoreClickWindow.doNotAgainRespect;
+                        applyCount = 0;
+                    }
                 }
             }
             else
@@ -1474,6 +1603,35 @@ namespace HostManager
             }
         }
 
+        // 업데이트 여부 확인하기
+        public void UpdateCheck()
+        {
+            string updateurl = Settings.Default.UpdateUrl;
+            Version serverVersion = null;
+            Version clientVersion = null;
+
+            try
+            {
+                serverVersion = new Version(browserController.RequestJson(updateurl, "version"));
+                clientVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                if (serverVersion > clientVersion)
+                {
+                    MessageBoxResult result = MessageBox.Show("최신 버전이 아닙니다. 새 버전을 받으시겠습니까?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+
+                    if(result == MessageBoxResult.OK)
+                    {
+                        System.Diagnostics.Process.Start("http://moroosoft.azurewebsites.net/Application/HostManager");
+                        DoExit();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message + "\r\n업데이트를 확인하지 못했습니다.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         // 프로그램 종료하기
         private void DoExit()
         {
@@ -1484,7 +1642,8 @@ namespace HostManager
                 if (result == MessageBoxResult.Yes)
                 {
                     notifyIcon.Visible = false;
-                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    Application.Current.Shutdown();
+                    //System.Diagnostics.Process.GetCurrentProcess().Kill();
                 }
                 else
                 {
@@ -1494,8 +1653,33 @@ namespace HostManager
             else
             {
                 notifyIcon.Visible = false;
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Application.Current.Shutdown();
+                //System.Diagnostics.Process.GetCurrentProcess().Kill();
             }
+        }
+
+        // 프로그램 종료 시 윈도우 사이즈 저장하기
+        private void SaveWindowSize(object sender, ExitEventArgs e)
+        {
+            if (this.Width < 400)
+            {
+                Settings.Default.Width = 400;
+            }
+            else
+            {
+                Settings.Default.Width = this.Width;
+            }
+
+            if (this.Height < 152)
+            {
+                Settings.Default.Height = 152;
+            }
+            else
+            {
+                Settings.Default.Height = this.Height;
+            }
+
+            Settings.Default.Save();
         }
 
         #endregion

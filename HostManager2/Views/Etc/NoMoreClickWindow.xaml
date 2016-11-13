@@ -1,0 +1,32 @@
+﻿<Window x:Class="HostManager.Views.Etc.NoMoreClickWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HostManager.Views.Etc"
+        mc:Ignorable="d"
+        Title="NoMoreClickWindow" Height="410" Width="300" Icon="/HostManager;component/Resources/Sign_Icon.ico" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
+    <Grid>
+        <StackPanel Name="Respect_Panel" Visibility="Visible">
+            <Grid>
+                <Image Source="/HostManager;component/Resources/JustClick.jpg" Height="350" ToolTip="왼손은 거들지라도..."></Image>
+                <TextBlock Margin="0,0,27,2" Cursor="Hand" Text="다시보지 않기 " Foreground="White" Background="Black" Opacity="0.3" FontSize="10" FontStyle="Oblique" TextDecorations="Underline" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                <TextBlock Name="DoNotAgain_TextBlock" Margin="0,0,27,2" Cursor="Hand" Text="다시보지 않기 " Foreground="White" FontSize="10" FontStyle="Oblique" TextDecorations="Underline" ToolTip="클릭하시면 취존창을 다시 보지 않습니다." HorizontalAlignment="Right" VerticalAlignment="Bottom" MouseLeftButtonUp="DoNotAgain_TextBlock_MouseLeftButtonUp" />
+            </Grid>
+            <Grid Margin="0,5,0,0">
+                <Button Name="Respect_Button" Content=" 취향은 존중합니다만... " ToolTip="한번만 눌러도 적용됩니다." HorizontalAlignment="Center" Click="Respect_Button_Click" />
+            </Grid>
+        </StackPanel>
+        <StackPanel Name="IsApplyAlert_Panel" Visibility="Hidden">
+            <Image Source="/HostManager;component/Resources/NoMoreClick.jpg" ToolTip="클릭을 너무 했더니 캔뚜껑 딸 힘도 없네..."></Image>
+            <StackPanel Margin="0, 10, 0, 10">
+                <TextBlock Text="한번만 눌러도 적용 됩니다." HorizontalAlignment="Center" FontWeight="Bold" ToolTip="정말입니다." />
+                <TextBlock Text="적용 시마다 알림창을 띄워 줄까요?" HorizontalAlignment="Center" ToolTip="참 친절하죠?" />
+            </StackPanel>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" >
+                <Button Name="ApplyButton" Margin="0,0,20,0" Content="좋아요" ToolTip="저도요" Click="ApplyButton_Click" />
+                <Button Name="ClosedButton" Content="아니오" ToolTip="그래요" Click="ClosedButton_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

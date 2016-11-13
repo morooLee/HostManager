@@ -91,6 +91,10 @@ namespace HostManager.Controllers
             }
         }
 
+        /// <summary>
+        /// 호스트 파일 로드하기
+        /// </summary>
+        /// <returns>호스트 내용</returns>
         public string FileLoad()
         {
             string path = "";
@@ -112,6 +116,10 @@ namespace HostManager.Controllers
             return path;
         }
 
+        /// <summary>
+        /// NotePad 열기
+        /// </summary>
+        /// <param name="path">경로</param>
         public void OpenNotepad(string path)
         {
             try
@@ -124,6 +132,10 @@ namespace HostManager.Controllers
             }
         }
 
+        /// <summary>
+        /// 폴더 열기
+        /// </summary>
+        /// <param name="path">경로</param>
         public void OpenFolder(string path)
         {
             string[] tmpArr = path.Split('\\');
